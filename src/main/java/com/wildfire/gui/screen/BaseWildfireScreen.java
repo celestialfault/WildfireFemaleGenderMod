@@ -26,7 +26,6 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 
 public abstract class BaseWildfireScreen extends Screen {
-
     protected final UUID playerUUID;
     protected final Screen parent;
 
