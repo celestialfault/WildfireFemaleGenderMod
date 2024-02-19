@@ -166,8 +166,8 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
     }
 
     @Override
-    public void renderBackground(DrawContext ctx, int mouseX, int mouseY, float delta) {
-        super.renderBackground(ctx, mouseX, mouseY, delta);
+    public void renderBackground(DrawContext ctx) {
+        super.renderBackground(ctx);
         int x = this.width / 2;
         int y = this.height / 2;
         ctx.fill(x + 28, y - 64 - 21, x + 190, y + 68, 0x55000000);
@@ -183,6 +183,7 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
         if(client == null || client.player == null || client.world == null) return;
 
         updatePresetTab();
+        renderBackground(ctx);
         super.render(ctx, mouseX, mouseY, delta);
         RenderSystem.setShaderColor(1f, 1.0F, 1.0F, 1.0F);
 

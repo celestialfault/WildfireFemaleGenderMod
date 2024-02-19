@@ -121,14 +121,15 @@ public class WildfireCharacterSettingsScreen extends BaseWildfireScreen {
     }
 
     @Override
-    public void renderBackground(DrawContext ctx, int mouseX, int mouseY, float delta) {
-        super.renderBackground(ctx, mouseX, mouseY, delta);
+    public void renderBackground(DrawContext ctx) {
+        super.renderBackground(ctx);
         ctx.drawTexture(BACKGROUND, (this.width - 172) / 2, (this.height - 124) / 2, 0, 0, 172, 144);
     }
 
     @Override
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
         if(client == null || client.world == null) return;
+        renderBackground(ctx);
         super.render(ctx, mouseX, mouseY, delta);
         PlayerEntity plrEntity = client.world.getPlayerByUuid(this.playerUUID);
         int x = this.width / 2;

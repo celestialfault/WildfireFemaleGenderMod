@@ -156,7 +156,7 @@ public class GenderArmorLayer<T extends LivingEntity, M extends BipedEntityModel
 				renderBox(armor, matrixStack, overlayVertexConsumer, packedLightIn, OverlayTexture.DEFAULT_UV, 1, 1, 1, 1);
 			}
 
-			ArmorTrim.getTrim(entity.getWorld().getRegistryManager(), armorStack, true).ifPresent((trim) -> {
+			ArmorTrim.getTrim(entity.getWorld().getRegistryManager(), armorStack).ifPresent((trim) -> {
 				renderArmorTrim(armorItem.getMaterial(), matrixStack, vertexConsumerProvider, packedLightIn, trim, hasGlint, side);
 			});
 		} finally {
@@ -168,8 +168,7 @@ public class GenderArmorLayer<T extends LivingEntity, M extends BipedEntityModel
 	                             ArmorTrim trim, boolean hasGlint, BreastSide side) {
 		BreastModelBox trimModelBox = side == BreastSide.LEFT ? lTrim : rTrim;
 		Sprite sprite = this.armorTrimsAtlas.getSprite(trim.getGenericModelId(material));
-		VertexConsumer vertexConsumer = sprite.getTextureSpecificVertexConsumer(
-				vertexConsumerProvider.getBuffer(TexturedRenderLayers.getArmorTrims(trim.getPattern().value().decal())));
+		VertexConsumer vertexConsumer = sprite.getTextureSpecificVertexConsumer(vertexConsumerProvider.getBuffer(TexturedRenderLayers.getArmorTrims()));
 		// Render the armor trim itself
 		renderBox(trimModelBox, matrixStack, vertexConsumer, packedLightIn, OverlayTexture.DEFAULT_UV, 1f, 1f, 1f, 1f);
 		// The enchantment glint however requires special handling; due to how Minecraft's enchant glint rendering works, rendering

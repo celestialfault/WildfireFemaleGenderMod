@@ -89,14 +89,15 @@ public class WardrobeBrowserScreen extends BaseWildfireScreen {
 	}
 
 	@Override
-	public void renderBackground(DrawContext ctx, int mouseX, int mouseY, float delta) {
-		super.renderBackground(ctx, mouseX, mouseY, delta);
+	public void renderBackground(DrawContext ctx) {
+		super.renderBackground(ctx);
 		Identifier backgroundTexture = getPlayer().getGender().canHaveBreasts() ? BACKGROUND_FEMALE : BACKGROUND;
 		ctx.drawTexture(backgroundTexture, (this.width - 248) / 2, (this.height - 134) / 2, 0, 0, 248, 156);
 	}
 
 	@Override
 	public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
+		renderBackground(ctx);
 		super.render(ctx, mouseX, mouseY, delta);
 		int x = this.width / 2;
 	    int y = this.height / 2;
