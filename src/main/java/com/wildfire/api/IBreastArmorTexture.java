@@ -19,24 +19,20 @@
 package com.wildfire.api;
 
 import org.jetbrains.annotations.NotNull;
-import org.joml.Vector2i;
 
 /**
  * Defines the texture data for a given armor piece when covering an entity's breasts
  */
 public interface IBreastArmorTexture {
-	// TODO: Vector2i might not be the best option here due to its mutable nature; would it be worth changing this
-	//       to something else like int[], or possibly implementing a basic record version?
-
 	/**
 	 * The size of the texture file in pixels
 	 *
-	 * @implNote Defaults to {@code new Vector2i(64, 32)}
+	 * @implNote Defaults to {@code new Vec2i(64, 32)}
 	 *
-	 * @return A {@link Vector2i} indicating how large the texture file is
+	 * @return A {@link Vec2i} indicating how large the texture file is
 	 */
-	default @NotNull Vector2i textureSize() {
-		return new Vector2i(64, 32);
+	default @NotNull Vec2i textureSize() {
+		return new Vec2i(64, 32);
 	}
 
 	/**
@@ -45,35 +41,35 @@ public interface IBreastArmorTexture {
 	 * @apiNote The X value of this should be halved from the total chest size to account for each breast side
 	 *          rendering independently of each other.
 	 *
-	 * @implNote Defaults to {@code new Vector2i(4, 5)}
+	 * @implNote Defaults to {@code new Vec2i(4, 5)}
 	 *
-	 * @return A {@link Vector2i} indicating how large of an area should be grabbed from the texture sprite to display over
+	 * @return A {@link Vec2i} indicating how large of an area should be grabbed from the texture sprite to display over
 	 *         the wearer's breasts
 	 */
-	default @NotNull Vector2i dimensions() {
-		return new Vector2i(4, 5);
+	default @NotNull Vec2i dimensions() {
+		return new Vec2i(4, 5);
 	}
 
 	/**
 	 * Where the left breast should grab the texture from on the item's texture
 	 *
-	 * @implNote Defaults to {@code new Vector2i(16, 17)}
+	 * @implNote Defaults to {@code new Vec2i(16, 17)}
 	 *
-	 * @return A {@link Vector2i} indicating where the UV of this item should be
+	 * @return A {@link Vec2i} indicating where the UV of this item should be
 	 */
-	default @NotNull Vector2i leftUv() {
-		return new Vector2i(16, 17);
+	default @NotNull Vec2i leftUv() {
+		return new Vec2i(16, 17);
 	}
 
 	/**
 	 * Where the right breast should grab the texture from on the item's texture
 	 *
-	 * @implNote Defaults to {@code new Vector2i(leftUv().x + dimensions().x, leftUv().y)}
+	 * @implNote Defaults to {@code new Vec2i(leftUv().x + dimensions().x, leftUv().y)}
 	 *
-	 * @return A {@link Vector2i} indicating where the UV of this item should be
+	 * @return A {@link Vec2i} indicating where the UV of this item should be
 	 */
-	default @NotNull Vector2i rightUv() {
-		Vector2i left = leftUv();
-		return new Vector2i(left.x + dimensions().x, left.y);
+	default @NotNull Vec2i rightUv() {
+		Vec2i left = leftUv();
+		return new Vec2i(left.x() + dimensions().x(), left.y());
 	}
 }

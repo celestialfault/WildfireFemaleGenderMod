@@ -22,6 +22,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.wildfire.api.IBreastArmorTexture;
 import com.wildfire.api.IGenderArmor;
+import org.jetbrains.annotations.ApiStatus;
 
 import static com.wildfire.main.WildfireHelper.read;
 
@@ -37,6 +38,7 @@ public record GenderArmor(
 	public static final GenderArmor DEFAULT = new GenderArmor(true, 0.5f, 0f, false, false, DefaultBreastArmorTexture.DEFAULT);
 	public static final GenderArmor EMPTY = new GenderArmor(false, 0f, 0f, false, false, DefaultBreastArmorTexture.DEFAULT);
 
+	@ApiStatus.Internal
 	public static GenderArmor fromJson(JsonObject obj) {
 		if(!read(obj, "covers_breasts", JsonElement::getAsBoolean).orElse(true)) {
 			return EMPTY;
@@ -46,7 +48,7 @@ public record GenderArmor(
 		float tightness = read(obj, "tightness", JsonElement::getAsFloat).orElse(0f);
 		boolean armorStands = read(obj, "render_on_armor_stands", JsonElement::getAsBoolean).orElseGet(() -> resistance == 1f);
 		boolean hidesBreasts = read(obj, "hides_breasts", JsonElement::getAsBoolean).orElse(false);
-		BreastArmorTexture tex = BreastArmorTexture.fromJson(obj);
+		IBreastArmorTexture tex = BreastArmorTexture.fromJson(obj);
 
 		return new GenderArmor(true, resistance, tightness, armorStands, hidesBreasts, tex);
 	}

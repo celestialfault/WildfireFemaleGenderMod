@@ -24,37 +24,42 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.wildfire.api.IBreastArmorTexture;
 import org.jetbrains.annotations.NotNull;
-import org.joml.Vector2i;
+import com.wildfire.api.Vec2i;
+import org.jetbrains.annotations.ApiStatus;
+
+import java.util.Arrays;
 
 import static com.wildfire.main.WildfireHelper.read;
 
-public record BreastArmorTexture(
-		@NotNull Vector2i textureSize, @NotNull Vector2i leftUv, @NotNull Vector2i rightUv, @NotNull Vector2i dimensions
-) implements IBreastArmorTexture {
+public record BreastArmorTexture(@NotNull Vec2i textureSize, @NotNull Vec2i leftUv, @NotNull Vec2i rightUv, @NotNull Vec2i dimensions) implements IBreastArmorTexture {
 
-	private static final Vector2i DEFAULT_TEXTURE_SIZE = new Vector2i(64, 32);
-	private static final Vector2i DEFAULT_DIMENSIONS = new Vector2i(4, 5);
-	private static final Vector2i DEFAULT_LEFT_UV = new Vector2i(16, 17);
+	private static final Vec2i DEFAULT_TEXTURE_SIZE = new Vec2i(64, 32);
+	private static final Vec2i DEFAULT_DIMENSIONS = new Vec2i(4, 5);
+	private static final Vec2i DEFAULT_LEFT_UV = new Vec2i(16, 17);
+	private static final String[] EXPECTED_KEYS = new String[] { "texture_size", "dimensions", "uv", "right_uv" };
 
-	public static BreastArmorTexture fromJson(JsonObject obj) {
-		final Vector2i textureSize = read(obj, "texture_size", BreastArmorTexture::getAsVec2i)
-				.orElseGet(() -> new Vector2i(DEFAULT_TEXTURE_SIZE));
-		final Vector2i dimensions = read(obj, "dimensions", BreastArmorTexture::getAsVec2i)
-				.orElseGet(() -> new Vector2i(DEFAULT_DIMENSIONS));
-		final Vector2i leftUv = read(obj, "uv", BreastArmorTexture::getAsVec2i)
-				.orElseGet(() -> new Vector2i(DEFAULT_LEFT_UV));
-		final Vector2i rightUv = read(obj, "right_uv", BreastArmorTexture::getAsVec2i)
-				.orElseGet(() -> new Vector2i(leftUv.x + dimensions.x, leftUv.y));
+	@ApiStatus.Internal
+	public static IBreastArmorTexture fromJson(JsonObject obj) {
+		// avoid creating redundant record instances if we don't need to
+		if(Arrays.stream(EXPECTED_KEYS).noneMatch(obj::has)) {
+			return DefaultBreastArmorTexture.DEFAULT;
+		}
+
+		final Vec2i textureSize = read(obj, "texture_size", BreastArmorTexture::getAsVec2i).orElse(DEFAULT_TEXTURE_SIZE);
+		final Vec2i dimensions = read(obj, "dimensions", BreastArmorTexture::getAsVec2i).orElse(DEFAULT_DIMENSIONS);
+		final Vec2i leftUv = read(obj, "uv", BreastArmorTexture::getAsVec2i).orElse(DEFAULT_LEFT_UV);
+		final Vec2i rightUv = read(obj, "right_uv", BreastArmorTexture::getAsVec2i)
+				.orElseGet(() -> leftUv.withX(leftUv.x() + dimensions.x()));
 
 		return new BreastArmorTexture(textureSize, leftUv, rightUv, dimensions);
 	}
 
-	private static Vector2i getAsVec2i(JsonElement element) {
+	private static Vec2i getAsVec2i(JsonElement element) {
 		if(element instanceof JsonArray array && array.size() == 2) {
 			if(!array.asList().stream().allMatch(elem -> elem instanceof JsonPrimitive prim && prim.isNumber())) {
 				return null;
 			}
-			return new Vector2i(array.get(0).getAsInt(), array.get(1).getAsInt());
+			return new Vec2i(array.get(0).getAsInt(), array.get(1).getAsInt());
 		}
 		return null;
 	}

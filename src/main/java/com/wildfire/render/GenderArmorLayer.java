@@ -19,6 +19,7 @@
 package com.wildfire.render;
 
 import com.wildfire.api.IBreastArmorTexture;
+import com.wildfire.api.Vec2i;
 import com.wildfire.api.impl.DefaultBreastArmorTexture;
 import com.wildfire.main.WildfireGender;
 import com.wildfire.main.entitydata.EntityConfig;
@@ -132,16 +133,12 @@ public class GenderArmorLayer<S extends BipedEntityRenderState, M extends BipedE
 		}
 
 		textureData = genderArmor.texture();
-		int w = textureData.textureSize().x;
-		int h = textureData.textureSize().y;
-		int x = textureData.dimensions().x;
-		int y = textureData.dimensions().y;
-		int lU = textureData.leftUv().x;
-		int lV = textureData.leftUv().y;
-		lBoobArmor = new BreastModelBox(w, h, lU, lV, -4F, 0.0F, 0F, x, y, 3, 0.0F, false);
-		int rU = textureData.rightUv().x;
-		int rV = textureData.rightUv().y;
-		rBoobArmor = new BreastModelBox(w, h, rU, rV, 0, 0.0F, 0F, x, y, 3, 0.0F, false);
+		Vec2i texSize = textureData.textureSize();
+		Vec2i lUV = textureData.leftUv();
+		Vec2i dim = textureData.dimensions();
+		lBoobArmor = new BreastModelBox(texSize.x(), texSize.y(), lUV.x(), lUV.y(), -4F, 0.0F, 0F, dim.x(), dim.y(), 3, 0.0F, false);
+		Vec2i rUV = textureData.rightUv();
+		rBoobArmor = new BreastModelBox(texSize.x(), texSize.y(), rUV.x(), rUV.y(), 0, 0.0F, 0F, dim.x(), dim.y(), 3, 0.0F, false);
 	}
 
 	@Override
