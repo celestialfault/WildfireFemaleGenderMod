@@ -18,6 +18,9 @@
 
 package com.wildfire.api;
 
+import com.wildfire.api.impl.DefaultBreastArmorTexture;
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Implement this on a custom class for your chestplates or items that go in the chest slot to configure how it interacts with breast rendering.
  */
@@ -95,5 +98,23 @@ public interface IGenderArmor {
      */
     default boolean armorStandsCopySettings() {
         return !alwaysHidesBreasts() && coversBreasts() && physicsResistance() == 1f;
+    }
+
+    /**
+     * <p>Texture values used for rendering this armor.</p>
+     *
+     * <p>Note that the texture is expected to be set by the relevant {@link net.minecraft.item.ArmorMaterial.Layer ArmorMaterial.Layer}s;
+     * if this is not possible (such as if you use a custom renderer for the armor item), then you should instead return {@code true}
+     * in {@link #alwaysHidesBreasts()}.</p>
+     *
+     * @return The relevant {@link IBreastArmorTexture}
+     *
+     * @implNote Defaults to {@link DefaultBreastArmorTexture#DEFAULT}
+     *
+     * @see IBreastArmorTexture
+     * @see com.wildfire.api.impl.BreastArmorTexture
+     */
+    default @NotNull IBreastArmorTexture texture() {
+        return DefaultBreastArmorTexture.DEFAULT;
     }
 }

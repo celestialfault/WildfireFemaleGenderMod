@@ -16,27 +16,16 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-package com.wildfire.render.armor;
+package com.wildfire.api.impl;
 
-import com.wildfire.api.IGenderArmor;
+import com.wildfire.api.IBreastArmorTexture;
 
 /**
- * Implementation of {@link IGenderArmor} for when there is nothing being worn or the item being worn does not cover the breast area.
+ * Default implementation of {@link IBreastArmorTexture} only returning the default implementation values
  */
-public class EmptyGenderArmor implements IGenderArmor {
+public final class DefaultBreastArmorTexture implements IBreastArmorTexture {
+	public static final IBreastArmorTexture DEFAULT = new DefaultBreastArmorTexture();
 
-    public static final EmptyGenderArmor INSTANCE = new EmptyGenderArmor();
-
-    private EmptyGenderArmor() {
-    }
-
-    @Override
-    public boolean coversBreasts() {
-        return false;
-    }
-
-    @Override
-    public boolean armorStandsCopySettings() {
-        return false;
-    }
+	private DefaultBreastArmorTexture() {
+	}
 }

@@ -18,30 +18,21 @@
 
 package com.wildfire.main;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.wildfire.api.IGenderArmor;
 import com.wildfire.api.WildfireAPI;
-import com.wildfire.render.armor.SimpleGenderArmor;
-import com.wildfire.render.armor.EmptyGenderArmor;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.equipment.EquipmentModels;
-import net.minecraft.util.Identifier;
+import com.wildfire.api.impl.GenderArmor;
+import com.wildfire.resources.GenderArmorResourceManager;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
-import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Function;
 
 public final class WildfireHelper {
-    // TODO(celeste) finish that resource pack config branch and replace this insanity with it
-    private static final Map<Identifier, IGenderArmor> VANILLA_ARMORS = Map.of(
-            EquipmentModels.LEATHER, SimpleGenderArmor.LEATHER,
-            EquipmentModels.CHAINMAIL, SimpleGenderArmor.CHAIN_MAIL,
-            EquipmentModels.IRON, SimpleGenderArmor.IRON,
-            EquipmentModels.GOLD, SimpleGenderArmor.GOLD,
-            EquipmentModels.DIAMOND, SimpleGenderArmor.DIAMOND,
-            EquipmentModels.NETHERITE, SimpleGenderArmor.NETHERITE
-    );
-
     private WildfireHelper() {
         throw new UnsupportedOperationException();
     }
@@ -53,24 +44,22 @@ public final class WildfireHelper {
         return (float) ThreadLocalRandom.current().nextDouble(min, (double) max + 1);
     }
 
+    @Environment(EnvType.CLIENT)
     public static IGenderArmor getArmorConfig(ItemStack stack) {
-        if (stack.isEmpty()) {
-            return EmptyGenderArmor.INSTANCE;
+        if(stack.isEmpty()) {
+            return GenderArmor.EMPTY;
         }
 
-        if (WildfireAPI.getGenderArmors().get(stack.getItem()) != null) {
+        // TODO would it be feasible to change this to merge with the mod-provided implementation?
+        if(!GenderArmorResourceManager.has(stack.getItem()) && WildfireAPI.getGenderArmors().containsKey(stack.getItem())) {
             return WildfireAPI.getGenderArmors().get(stack.getItem());
         }
 
-        //TODO: Fabric Alternative to Capabilities? Maybe someone can help with this?
-        // FIXME this is a ridiculous solution that should be replaced with something more sensible as soon
-        //       as reasonably possible
-        var equippable = stack.get(DataComponentTypes.EQUIPPABLE);
-        if(equippable != null && equippable.slot() == EquipmentSlot.CHEST) {
-            var model = equippable.model();
-	        return model.map(VANILLA_ARMORS::get).orElse(SimpleGenderArmor.FALLBACK);
-        }
+        return GenderArmorResourceManager.get(stack.getItem());
+    }
 
-        return EmptyGenderArmor.INSTANCE;
+    public static <T> Optional<T> read(JsonObject obj, String key, Function<JsonElement, T> converter) {
+        if(!obj.has(key)) return Optional.empty();
+        return Optional.ofNullable(converter.apply(obj.get(key)));
     }
 }

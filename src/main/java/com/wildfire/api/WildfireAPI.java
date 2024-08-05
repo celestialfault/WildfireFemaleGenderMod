@@ -44,6 +44,9 @@ public class WildfireAPI {
     /**
      * Add custom physics resistance attributes to a chestplate
      *
+     * @implNote Implementations added through this method are currently ignored if a resource pack defines armor data
+     *           at {@code NAMESPACE:wildfire_gender_data/ITEM.json}, and are only used as a default implementation.
+     *
      * @param  item  the item that you are linking this {@link IGenderArmor} to
      * @param  genderArmor the class implementing the {@link IGenderArmor} to apply to the item
      * @see    IGenderArmor
@@ -90,7 +93,8 @@ public class WildfireAPI {
     /**
      * Get every registered {@link IGenderArmor custom armor configuration}
      *
-     * @implNote This does not provide vanilla armor configurations; see {@link com.wildfire.render.armor.SimpleGenderArmor} for that.
+     * @implNote This does not include armors registered through resource packs;
+     *           see {@link com.wildfire.resources.GenderArmorResourceManager} for that.
      */
     public static Map<Item, IGenderArmor> getGenderArmors() {
         return GENDER_ARMORS;
