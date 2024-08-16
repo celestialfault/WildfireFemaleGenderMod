@@ -29,6 +29,7 @@ import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.entity.feature.FeatureRendererContext;
 import net.minecraft.client.render.entity.model.BipedEntityModel;
+import net.minecraft.client.render.entity.state.BipedEntityRenderState;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.model.BakedModelManager;
 import net.minecraft.client.texture.Sprite;
@@ -36,7 +37,6 @@ import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.DyedColorComponent;
-import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.player.PlayerModelPart;
@@ -48,10 +48,11 @@ import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.ColorHelper;
-import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 
 @Environment(EnvType.CLIENT)
-public class GenderArmorLayer<T extends LivingEntity, M extends BipedEntityModel<T>> extends GenderLayer<T, M> {
+public class GenderArmorLayer<S extends BipedEntityRenderState, M extends BipedEntityModel<S>> extends GenderLayer<S, M> {
 
 	private final SpriteAtlasTexture armorTrimsAtlas;
 	protected static final BreastModelBox lBoobArmor, rBoobArmor;
@@ -66,21 +67,23 @@ public class GenderArmorLayer<T extends LivingEntity, M extends BipedEntityModel
 		rTrim = new BreastModelBox(64, 32, 20, 17, 0, 0.0F, 0F, 4, 5, 4, 0.001F, false);
 	}
 
-	public GenderArmorLayer(FeatureRendererContext<T, M> render, BakedModelManager bakery) {
+	public GenderArmorLayer(FeatureRendererContext<S, M> render, BakedModelManager bakery) {
 		super(render);
 		armorTrimsAtlas = bakery.getAtlas(TexturedRenderLayers.ARMOR_TRIMS_ATLAS_TEXTURE);
 	}
 
 	@Override
-	public void render(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int light, @NotNull T ent, float limbAngle,
-	                   float limbDistance, float partialTicks, float animationProgress, float headYaw, float headPitch) {
+	public void render(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int light, S state, float limbAngle, float limbDistance) {
 		MinecraftClient client = MinecraftClient.getInstance();
 		if(client.player == null) {
 			// we're currently in a menu, give up rendering before we crash the game
 			return;
 		}
 
-		final ItemStack chestplate = ent.getEquippedStack(EquipmentSlot.CHEST);
+		LivingEntity ent = getEntity();
+		if(ent == null) return;
+
+		final ItemStack chestplate = state.equippedChestStack;
 		// If the entity has no armor to render, just immediately give up
 		// Note that we have to be very fast at abandoning rendering here, as this class is also attached to armor stands
 		if(chestplate.isEmpty() || !(chestplate.getItem() instanceof ArmorItem)) return;
@@ -95,14 +98,14 @@ public class GenderArmorLayer<T extends LivingEntity, M extends BipedEntityModel
 			entityConfig = EntityConfig.getEntity(ent);
 			if(entityConfig == null) return;
 
-			if(!setupRender(ent, entityConfig, partialTicks)) return;
+			if(!setupRender(state, entityConfig)) return;
 			if(ent instanceof ArmorStandEntity && !genderArmor.armorStandsCopySettings()) return;
 
 			final RegistryEntry<ArmorMaterial> material = ((ArmorItem) chestplate.getItem()).getMaterial();
-			final int color = chestplate.isIn(ItemTags.DYEABLE) ? ColorHelper.Argb.fullAlpha(DyedColorComponent.getColor(chestplate, -6265536)) : -1;
+			final int color = chestplate.isIn(ItemTags.DYEABLE) ? DyedColorComponent.getColor(chestplate, -6265536) : -1;
 			final boolean glint = chestplate.hasGlint();
 
-			renderSides(ent, getContextModel(), matrixStack, side -> {
+			renderSides(state, getContextModel(), matrixStack, side -> {
 				material.value().layers().forEach(layer -> {
 					int layerColor = layer.isDyeable() ? color : -1;
 					renderBreastArmor(layer.getTexture(false), matrixStack, vertexConsumerProvider, light, side, layerColor, glint);
@@ -124,8 +127,9 @@ public class GenderArmorLayer<T extends LivingEntity, M extends BipedEntityModel
 	}
 
 	@Override
-	protected void setupTransformations(T entity, M model, MatrixStack matrixStack, BreastSide side) {
-		super.setupTransformations(entity, model, matrixStack, side);
+	protected void setupTransformations(S state, M model, MatrixStack matrixStack, BreastSide side) {
+		super.setupTransformations(state, model, matrixStack, side);
+		LivingEntity entity = Objects.requireNonNull(getEntity(), "getEntity()");
 		if((entity instanceof AbstractClientPlayerEntity player && player.isPartVisible(PlayerModelPart.JACKET)) ||
 				(entity instanceof ArmorStandEntity && entityConfig.hasJacketLayer())) {
 			matrixStack.translate(0, 0, -0.015f);
@@ -141,7 +145,7 @@ public class GenderArmorLayer<T extends LivingEntity, M extends BipedEntityModel
 		BreastModelBox armor = side.isLeft ? lBoobArmor : rBoobArmor;
 		RenderLayer armorType = RenderLayer.getArmorCutoutNoCull(texture);
 		VertexConsumer armorVertexConsumer = ItemRenderer.getArmorGlintConsumer(vertexConsumerProvider, armorType, glint);
-		renderBox(armor, matrixStack, armorVertexConsumer, light, OverlayTexture.DEFAULT_UV, ColorHelper.Argb.fullAlpha(color));
+		renderBox(armor, matrixStack, armorVertexConsumer, light, OverlayTexture.DEFAULT_UV, ColorHelper.fullAlpha(color));
 	}
 
 	protected void renderArmorTrim(RegistryEntry<ArmorMaterial> material, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider,

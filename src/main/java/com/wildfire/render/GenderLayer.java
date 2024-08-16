@@ -29,6 +29,7 @@ import com.wildfire.render.WildfireModelRenderer.OverlayModelBox;
 import com.wildfire.render.WildfireModelRenderer.PositionTextureVertex;
 
 import java.lang.Math;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 import net.fabricmc.api.EnvType;
@@ -42,22 +43,25 @@ import net.minecraft.client.render.entity.LivingEntityRenderer;
 import net.minecraft.client.render.entity.feature.FeatureRenderer;
 import net.minecraft.client.render.entity.feature.FeatureRendererContext;
 import net.minecraft.client.render.entity.model.BipedEntityModel;
+import net.minecraft.client.render.entity.state.BipedEntityRenderState;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectUtil;
 import net.minecraft.entity.player.PlayerModelPart;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.*;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.*;
 
 @Environment(EnvType.CLIENT)
-public class GenderLayer<T extends LivingEntity, M extends BipedEntityModel<T>> extends FeatureRenderer<T, M> {
+public class GenderLayer<S extends BipedEntityRenderState, M extends BipedEntityModel<S>> extends FeatureRenderer<S, M> {
+
+	// see comments in the LivingEntityRenderer mixin for details on why this is necessary
+	public static final ThreadLocal<@Nullable Integer> ENTITY_ID = new ThreadLocal<>();
+	public static final ThreadLocal<Float> PARTIAL_TICKS = ThreadLocal.withInitial(() -> 0f);
 
 	private BreastModelBox lBreast, rBreast;
-	private final FeatureRendererContext<T, M> context;
 	private static final OverlayModelBox lBreastWear, rBreastWear;
 
 	private float preBreastSize, preBreastOffsetZ;
@@ -73,43 +77,64 @@ public class GenderLayer<T extends LivingEntity, M extends BipedEntityModel<T>> 
 		rBreastWear = new OverlayModelBox(false, 64, 64, 21, 34, 0, 0.0F, 0F, 4, 5, 3, 0.0F, false);
 	}
 
-	public GenderLayer(FeatureRendererContext<T, M> render) {
+	public GenderLayer(FeatureRendererContext<S, M> render) {
 		super(render);
-		this.context = render;
 		// this can't be static or final as we need the ability to resize this during render time
 		lBreast = new BreastModelBox(64, 64, 16, 17, -4F, 0.0F, 0F, 4, 5, 4, 0.0F, false);
 		rBreast = new BreastModelBox(64, 64, 20, 17, 0, 0.0F, 0F, 4, 5, 4, 0.0F, false);
 	}
 
-	private @Nullable RenderLayer getRenderLayer(T entity) {
-		if(context instanceof LivingEntityRenderer<T, M> renderer) {
-			MinecraftClient client = MinecraftClient.getInstance();
-			boolean bodyVisible = !entity.isInvisible();
-			boolean translucent = !bodyVisible && client.player != null && !entity.isInvisibleTo(client.player);
-			boolean glowing = client.hasOutline(entity);
-			return renderer.getRenderLayer(entity, bodyVisible, translucent, glowing);
+	protected static @Nullable LivingEntity getEntity() {
+		MinecraftClient client = MinecraftClient.getInstance();
+		if(client.world == null) {
+			return null;
 		}
-		throw new IllegalStateException("context renderer is not a LivingEntityRenderer");
+		Integer entityId = ENTITY_ID.get();
+		if(entityId == null) {
+			return null;
+		}
+		// mildly questionable ternary operator usage to safely cast to LivingEntity
+		return client.world.getEntityById(entityId) instanceof LivingEntity livingEntity ? livingEntity : null;
+	}
+
+	/**
+	 * Copy of {@code LivingEntityRenderer#getRenderLayer}
+	 */
+	private @Nullable RenderLayer getRenderLayer(S state) {
+		boolean bodyVisible = !state.invisible;
+		boolean translucent = state.invisible && !state.invisibleToPlayer;
+		boolean glowing = state.hasOutline;
+
+		Identifier texture = this.getTexture(state);
+		if(translucent) {
+			return RenderLayer.getItemEntityTranslucentCull(texture);
+		} else if(bodyVisible) {
+			return this.getContextModel().getLayer(texture);
+		} else {
+			return glowing ? RenderLayer.getOutline(texture) : null;
+		}
 	}
 
 	@Override
-	public void render(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int light, @NotNull T ent, float limbAngle,
-					   float limbDistance, float partialTicks, float animationProgress, float headYaw, float headPitch) {
+	public void render(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int light, S state, float limbAngle, float limbDistance) {
 		MinecraftClient client = MinecraftClient.getInstance();
 		if(client.player == null) {
 			// we're currently in a menu; we won't have any data loaded to begin with, so just give up early
 			return;
 		}
 
+		LivingEntity ent = getEntity();
+		if(ent == null) return;
+
 		EntityConfig entityConfig = EntityConfig.getEntity(ent);
 		if(entityConfig == null) return;
 
 		try {
-			if(!setupRender(ent, entityConfig, partialTicks)) return;
-			int overlay = LivingEntityRenderer.getOverlay(ent, 0);
+			if(!setupRender(state, entityConfig)) return;
+			int overlay = LivingEntityRenderer.getOverlay(state, 0);
 
-			renderSides(ent, getContextModel(), matrixStack, side -> {
-				renderBreast(ent, matrixStack, vertexConsumerProvider, light, overlay, side);
+			renderSides(state, getContextModel(), matrixStack, side -> {
+				renderBreast(state, matrixStack, vertexConsumerProvider, light, overlay, side);
 			});
 		} catch(Exception e) {
 			WildfireGender.LOGGER.error("Failed to render breast layer", e);
@@ -122,8 +147,11 @@ public class GenderLayer<T extends LivingEntity, M extends BipedEntityModel<T>> 
 	 * @return {@code true} if rendering should continue
 	 */
 	@SuppressWarnings("BooleanMethodIsAlwaysInverted")
-	protected boolean setupRender(T entity, EntityConfig entityConfig, float partialTicks) {
-		armorStack = entity.getEquippedStack(EquipmentSlot.CHEST);
+	protected boolean setupRender(S state, EntityConfig entityConfig) {
+		float partialTicks = PARTIAL_TICKS.get();
+		LivingEntity entity = Objects.requireNonNull(getEntity(), "getEntity()");
+
+		armorStack = state.equippedChestStack;
 		//Note: When the stack is empty the helper will fall back to an implementation that returns the proper data
 		genderArmor = WildfireHelper.getArmorConfig(armorStack);
 		isChestplateOccupied = genderArmor.coversBreasts() && !entityConfig.getArmorPhysicsOverride();
@@ -133,7 +161,7 @@ public class GenderLayer<T extends LivingEntity, M extends BipedEntityModel<T>> 
 			return false;
 		}
 
-		RenderLayer type = getRenderLayer(entity);
+		RenderLayer type = getRenderLayer(state);
 		if(type == null && !isChestplateOccupied) {
 			// the entity is invisible and doesn't have a chestplate equipped
 			return false;
@@ -195,11 +223,12 @@ public class GenderLayer<T extends LivingEntity, M extends BipedEntityModel<T>> 
 		}
 	}
 
-	protected void setupTransformations(T entity, M model, MatrixStack matrixStack, BreastSide side) {
-		if(entity.isBaby()) {
-			float f1 = 1f / model.invertedChildBodyScale;
-			matrixStack.scale(f1, f1, f1);
-			matrixStack.translate(0f, model.childBodyYOffset / 16f, 0f);
+	protected void setupTransformations(S state, M model, MatrixStack matrixStack, BreastSide side) {
+		if(state.baby) {
+			matrixStack.scale(state.ageScale, state.ageScale, state.ageScale);
+			// 0.75 appears to work fine for armor stands, but this should probably be revisited later on
+			// if this is ever applied to other entities with baby models
+			matrixStack.translate(0f, 0.75f, 0f);
 		}
 
 		ModelPart body = model.body;
@@ -253,19 +282,20 @@ public class GenderLayer<T extends LivingEntity, M extends BipedEntityModel<T>> 
 		matrixStack.multiply(new Quaternionf().rotationXYZ((float)(-35f * totalRotation * (Math.PI / 180f)), 0, 0));
 
 		if(breathingAnimation) {
-			float f5 = -MathHelper.cos(entity.age * 0.09F) * 0.45F + 0.45F;
+			float f5 = -MathHelper.cos(state.age * 0.09F) * 0.45F + 0.45F;
 			matrixStack.multiply(new Quaternionf().rotationXYZ((float)(f5 * (Math.PI / 180f)), 0, 0));
 		}
 
 		matrixStack.scale(0.9995f, 1f, 1f); //z-fighting FIXXX
 	}
 
-	private void renderBreast(T entity, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int light,
+	private void renderBreast(S state, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int light,
 	                          int overlay, BreastSide side) {
-		RenderLayer breastRenderType = getRenderLayer(entity);
+		LivingEntity entity = Objects.requireNonNull(getEntity(), "getEntity()");
+		RenderLayer breastRenderType = getRenderLayer(state);
 		if(breastRenderType == null) return; // only render if the player is visible in some capacity
 		int alpha = entity.isInvisible() ? ColorHelper.channelFromFloat(0.15f) : 255;
-		int color = ColorHelper.Argb.getArgb(alpha, 255, 255, 255);
+		int color = ColorHelper.getArgb(alpha, 255, 255, 255);
 		VertexConsumer vertexConsumer = vertexConsumerProvider.getBuffer(breastRenderType);
 		renderBox(side.isLeft ? lBreast : rBreast, matrixStack, vertexConsumer, light, overlay, color);
 		if(entity instanceof AbstractClientPlayerEntity player && player.isPartVisible(PlayerModelPart.JACKET)) {
@@ -275,10 +305,10 @@ public class GenderLayer<T extends LivingEntity, M extends BipedEntityModel<T>> 
 		}
 	}
 
-	protected void renderSides(T entity, M model, MatrixStack matrixStack, Consumer<BreastSide> renderer) {
+	protected void renderSides(S state, M model, MatrixStack matrixStack, Consumer<BreastSide> renderer) {
 		matrixStack.push();
 		try {
-			setupTransformations(entity, model, matrixStack, BreastSide.LEFT);
+			setupTransformations(state, model, matrixStack, BreastSide.LEFT);
 			renderer.accept(BreastSide.LEFT);
 		} finally {
 			matrixStack.pop();
@@ -286,7 +316,7 @@ public class GenderLayer<T extends LivingEntity, M extends BipedEntityModel<T>> 
 
 		matrixStack.push();
 		try {
-			setupTransformations(entity, model, matrixStack, BreastSide.RIGHT);
+			setupTransformations(state, model, matrixStack, BreastSide.RIGHT);
 			renderer.accept(BreastSide.RIGHT);
 		} finally {
 			matrixStack.pop();
