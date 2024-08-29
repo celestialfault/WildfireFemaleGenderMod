@@ -64,6 +64,8 @@ public class GenderLayer<S extends BipedEntityRenderState, M extends BipedEntity
 	private BreastModelBox lBreast, rBreast;
 	private static final OverlayModelBox lBreastWear, rBreastWear;
 
+	private final FeatureRendererContext<S, M> context;
+
 	private float preBreastSize, preBreastOffsetZ;
 	private Breasts breasts;
 	protected ItemStack armorStack;
@@ -79,6 +81,7 @@ public class GenderLayer<S extends BipedEntityRenderState, M extends BipedEntity
 
 	public GenderLayer(FeatureRendererContext<S, M> render) {
 		super(render);
+		this.context = render;
 		// this can't be static or final as we need the ability to resize this during render time
 		lBreast = new BreastModelBox(64, 64, 16, 17, -4F, 0.0F, 0F, 4, 5, 4, 0.0F, false);
 		rBreast = new BreastModelBox(64, 64, 20, 17, 0, 0.0F, 0F, 4, 5, 4, 0.0F, false);
@@ -105,7 +108,13 @@ public class GenderLayer<S extends BipedEntityRenderState, M extends BipedEntity
 		boolean translucent = state.invisible && !state.invisibleToPlayer;
 		boolean glowing = state.hasOutline;
 
-		Identifier texture = this.getTexture(state);
+		Identifier texture;
+		if(this.context instanceof LivingEntityRenderer<?, S, M> livingEntityRenderer) {
+			texture = livingEntityRenderer.getTexture(state);
+		} else {
+			throw new IllegalStateException("context renderer is not a LivingEntityRenderer subclass");
+		}
+
 		if(translucent) {
 			return RenderLayer.getItemEntityTranslucentCull(texture);
 		} else if(bodyVisible) {
