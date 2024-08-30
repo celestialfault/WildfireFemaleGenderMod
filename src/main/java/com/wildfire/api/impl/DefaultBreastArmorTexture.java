@@ -21,11 +21,13 @@ package com.wildfire.api.impl;
 import com.wildfire.api.IBreastArmorTexture;
 
 /**
- * Default implementation of {@link IBreastArmorTexture} only returning the default implementation values
+ * Dummy implementation of {@link IBreastArmorTexture} returning default vanilla-compatible values
  */
 public final class DefaultBreastArmorTexture implements IBreastArmorTexture {
+	/**
+	 * Dummy texture object, used to defer to default vanilla-compatible rendering.
+	 */
 	public static final IBreastArmorTexture DEFAULT = new DefaultBreastArmorTexture();
 
-	private DefaultBreastArmorTexture() {
-	}
+	private DefaultBreastArmorTexture() {}
 }

@@ -106,6 +106,7 @@ public class GenderArmorLayer<S extends BipedEntityRenderState, M extends BipedE
 
 			renderSides(state, getContextModel(), matrixStack, side -> {
 				var modelId = component.model().orElseThrow();
+				// TODO is there still a need to allow for overriding the armor texture identifier?
 				equipmentModelLoader.get(modelId).getLayers(EquipmentModel.LayerType.HUMANOID).forEach(layer -> {
 					// mojang what the Optional hell is this
 					int layerColor = layer.dyeable().map(dye -> {

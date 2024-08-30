@@ -27,6 +27,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -44,6 +45,9 @@ public class WildfireAPI {
     /**
      * Add custom physics resistance attributes to a chestplate
      *
+     * @apiNote This method should be considered "soft deprecated", and may be marked for removal in favor
+     *          of resource pack configurations in the future.
+     *
      * @implNote Implementations added through this method are currently ignored if a resource pack defines armor data
      *           at {@code NAMESPACE:wildfire_gender_data/ITEM.json}, and are only used as a default implementation.
      *
@@ -51,6 +55,7 @@ public class WildfireAPI {
      * @param  genderArmor the class implementing the {@link IGenderArmor} to apply to the item
      * @see    IGenderArmor
      */
+    @ApiStatus.Obsolete
     public static void addGenderArmor(Item item, IGenderArmor genderArmor) {
         GENDER_ARMORS.put(item, genderArmor);
     }
@@ -77,6 +82,8 @@ public class WildfireAPI {
         return cfg.getGender();
     }
 
+    // TODO this method currently won't actually do anything if the player isn't in the cache; this should probably
+    //      be revisited at some point to fix this (or at least properly call it out in the documentation)
     /**
      * <p>Load the cached Gender Settings file for the specified {@link UUID}</p>
      *
@@ -93,9 +100,13 @@ public class WildfireAPI {
     /**
      * Get every registered {@link IGenderArmor custom armor configuration}
      *
+     * @apiNote This method should be considered "soft deprecated", and may be marked for removal in favor
+     *          of resource pack configurations in the future.
+     *
      * @implNote This does not include armors registered through resource packs;
      *           see {@link com.wildfire.resources.GenderArmorResourceManager} for that.
      */
+    @ApiStatus.Obsolete
     public static Map<Item, IGenderArmor> getGenderArmors() {
         return GENDER_ARMORS;
     }

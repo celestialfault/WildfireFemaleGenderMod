@@ -18,11 +18,29 @@
 
 package com.wildfire.api;
 
+// TODO this could probably be removed if the mod api is removed as well; as-is, this is only here to ensure
+//      that mods can't easily modify our static default vectors accidentally.
 /**
- * Basic immutable version of a {@link org.joml.Vector2i Vector2i}
+ * Simplified immutable copy of a {@link org.joml.Vector2i Vector2i}
  */
 public record Vec2i(int x, int y) {
+	/**
+	 * @param x The new X value for the returned {@link Vec2i}
+	 * @return A new {@link Vec2i} instance with the provided X value, using the Y value of the current {@link Vec2i}
+	 */
 	public Vec2i withX(int x) {
 		return new Vec2i(x, this.y);
+	}
+
+	/**
+	 * Returns a new {@link Vec2i} with the sum of the provided values and this {@link Vec2i}
+	 *
+	 * @param x The value to add to this vector's X value
+	 * @param y The value to add to this vector's Y value
+	 *
+	 * @return A new {@link Vec2i} with the added values
+	 */
+	public Vec2i add(int x, int y) {
+		return new Vec2i(this.x + x, this.y + y);
 	}
 }

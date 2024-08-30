@@ -22,10 +22,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.wildfire.api.IBreastArmorTexture;
 import com.wildfire.api.IGenderArmor;
-import org.jetbrains.annotations.ApiStatus;
 
 import static com.wildfire.main.WildfireHelper.read;
 
+/**
+ * @see IGenderArmor
+ */
 public record GenderArmor(
 		boolean coversBreasts,
 		float physicsResistance,
@@ -35,10 +37,18 @@ public record GenderArmor(
 		IBreastArmorTexture texture
 ) implements IGenderArmor {
 
+	/**
+	 * Default implementation used to represent armor types that lack any configuration
+	 */
 	public static final GenderArmor DEFAULT = new GenderArmor(true, 0.5f, 0f, false, false, DefaultBreastArmorTexture.DEFAULT);
+
+	/**
+	 * Default implementation used when the player {@link net.minecraft.item.ItemStack#isEmpty() isn't wearing any armor},
+	 * or if the worn chestplate specifies that it doesn't cover the breasts.
+	 */
 	public static final GenderArmor EMPTY = new GenderArmor(false, 0f, 0f, false, false, DefaultBreastArmorTexture.DEFAULT);
 
-	@ApiStatus.Internal
+	// TODO document the json syntax
 	public static GenderArmor fromJson(JsonObject obj) {
 		if(!read(obj, "covers_breasts", JsonElement::getAsBoolean).orElse(true)) {
 			return EMPTY;

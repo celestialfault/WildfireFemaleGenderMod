@@ -64,12 +64,11 @@ public interface IBreastArmorTexture {
 	/**
 	 * Where the right breast should grab the texture from on the item's texture
 	 *
-	 * @implNote Defaults to {@code new Vec2i(leftUv().x + dimensions().x, leftUv().y)}
+	 * @implNote Defaults to {@code leftUv().add(dimensions().x(), 0)}
 	 *
 	 * @return A {@link Vec2i} indicating where the UV of this item should be
 	 */
 	default @NotNull Vec2i rightUv() {
-		Vec2i left = leftUv();
-		return new Vec2i(left.x() + dimensions().x(), left.y());
+		return leftUv().add(dimensions().x(), 0);
 	}
 }

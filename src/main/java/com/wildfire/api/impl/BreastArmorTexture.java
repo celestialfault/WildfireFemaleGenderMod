@@ -25,12 +25,14 @@ import com.google.gson.JsonPrimitive;
 import com.wildfire.api.IBreastArmorTexture;
 import org.jetbrains.annotations.NotNull;
 import com.wildfire.api.Vec2i;
-import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Arrays;
 
 import static com.wildfire.main.WildfireHelper.read;
 
+/**
+ * @see IBreastArmorTexture
+ */
 public record BreastArmorTexture(@NotNull Vec2i textureSize, @NotNull Vec2i leftUv, @NotNull Vec2i rightUv, @NotNull Vec2i dimensions) implements IBreastArmorTexture {
 
 	private static final Vec2i DEFAULT_TEXTURE_SIZE = new Vec2i(64, 32);
@@ -38,7 +40,7 @@ public record BreastArmorTexture(@NotNull Vec2i textureSize, @NotNull Vec2i left
 	private static final Vec2i DEFAULT_LEFT_UV = new Vec2i(16, 17);
 	private static final String[] EXPECTED_KEYS = new String[] { "texture_size", "dimensions", "uv", "right_uv" };
 
-	@ApiStatus.Internal
+	// TODO document the json syntax
 	public static IBreastArmorTexture fromJson(JsonObject obj) {
 		// avoid creating redundant record instances if we don't need to
 		if(Arrays.stream(EXPECTED_KEYS).noneMatch(obj::has)) {

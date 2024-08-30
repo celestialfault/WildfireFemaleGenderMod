@@ -33,7 +33,6 @@ import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.profiler.Profiler;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.io.BufferedReader;
@@ -53,19 +52,19 @@ public final class GenderArmorResourceManager implements IdentifiableResourceRel
 	private static final Gson GSON = new Gson();
 	private @Unmodifiable Map<Identifier, IGenderArmor> configs = Map.of();
 
-	public static @NotNull IGenderArmor get(@NotNull Identifier itemId) {
+	public static IGenderArmor get(Identifier itemId) {
 		return INSTANCE.configs.getOrDefault(itemId, GenderArmor.DEFAULT);
 	}
 
-	public static @NotNull IGenderArmor get(@NotNull Item item) {
+	public static IGenderArmor get(Item item) {
 		return get(Registries.ITEM.getId(item));
 	}
 
-	public static boolean has(@NotNull Identifier itemId) {
+	public static boolean has(Identifier itemId) {
 		return INSTANCE.configs.containsKey(itemId);
 	}
 
-	public static boolean has(@NotNull Item item) {
+	public static boolean has(Item item) {
 		return has(Registries.ITEM.getId(item));
 	}
 
@@ -98,10 +97,10 @@ public final class GenderArmorResourceManager implements IdentifiableResourceRel
 			// make a new json object to hold the merged values
 			final JsonObject data = new JsonObject();
 
-			// note: this relies on the returned Resource list iterating from lowest -> highest
 			for(Resource resource : entry.getValue()) {
 				try(BufferedReader reader = resource.getReader()) {
-					// load each armor data file from resource packs and merge them
+					// load each resource pack's entry for the given item, replacing values from
+					// resource packs lower in the reload order as needed
 					GSON.fromJson(reader, JsonObject.class).asMap().forEach(data::add);
 				} catch(IOException e) {
 					throw new UncheckedIOException(e);
