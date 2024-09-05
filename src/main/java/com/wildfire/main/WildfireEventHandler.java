@@ -107,9 +107,9 @@ public final class WildfireEventHandler {
 	                                         EntityRendererFactory.Context context) {
 		if(entityRenderer instanceof PlayerEntityRenderer playerRenderer) {
 			registrationHelper.register(new GenderLayer<>(playerRenderer));
-			registrationHelper.register(new GenderArmorLayer<>(playerRenderer, context.getModelManager()));
+			registrationHelper.register(new GenderArmorLayer<>(playerRenderer, context.getModelManager(), context.getEquipmentModelLoader()));
 		} else if(entityRenderer instanceof ArmorStandEntityRenderer armorStandRenderer) {
-			registrationHelper.register(new GenderArmorLayer<>(armorStandRenderer, context.getModelManager()));
+			registrationHelper.register(new GenderArmorLayer<>(armorStandRenderer, context.getModelManager(), context.getEquipmentModelLoader()));
 		}
 	}
 
