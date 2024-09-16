@@ -11,6 +11,22 @@ base {
 }
 
 repositories {
+	exclusiveContent {
+		forRepository {
+			maven { url = "https://maven.terraformersmc.com/" }
+		}
+		filter {
+			includeGroup "dev.emi"
+		}
+	}
+	exclusiveContent {
+		forRepository {
+			maven { url = "https://maven.ladysnake.org/releases" }
+		}
+		filter {
+			includeGroup "org.ladysnake.cardinal-components-api"
+		}
+	}
 	maven { url = "https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1" }
 }
 
@@ -27,9 +43,16 @@ dependencies {
 	modRuntimeOnly fabricApi.module("fabric-resource-loader-v0", project.fabric_version)
 	modRuntimeOnly fabricApi.module("fabric-registry-sync-v0", project.fabric_version)
 
+	modRuntimeOnly "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
 	// Allow logging into an actual Minecraft account in a dev env
 	// See https://github.com/DJtheRedstoner/DevAuth
-	modLocalRuntime "me.djtheredstoner:DevAuth-fabric:1.2.0"
+	modLocalRuntime "me.djtheredstoner:DevAuth-fabric:${project.devauth_version}"
+
+	// Mod compatibility; note that we use modCompileOnly to ensure these don't break between version updates
+	modCompileOnly("dev.emi:trinkets:${project.trinkets_version}") {
+		exclude(group: "net.fabricmc.fabric-api")
+	}
 }
 
 processResources {

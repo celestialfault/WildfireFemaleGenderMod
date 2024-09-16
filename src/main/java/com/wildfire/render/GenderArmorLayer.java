@@ -18,6 +18,7 @@
 
 package com.wildfire.render;
 
+import com.wildfire.compat.ModCompat;
 import com.wildfire.main.WildfireGender;
 import com.wildfire.main.entitydata.EntityConfig;
 import com.wildfire.render.WildfireModelRenderer.BreastModelBox;
@@ -80,7 +81,7 @@ public class GenderArmorLayer<T extends LivingEntity, M extends BipedEntityModel
 			return;
 		}
 
-		final ItemStack chestplate = ent.getEquippedStack(EquipmentSlot.CHEST);
+		final ItemStack chestplate = ModCompat.getChestplate(ent);
 		// If the entity has no armor to render, just immediately give up
 		// Note that we have to be very fast at abandoning rendering here, as this class is also attached to armor stands
 		if(chestplate.isEmpty() || !(chestplate.getItem() instanceof ArmorItem)) return;

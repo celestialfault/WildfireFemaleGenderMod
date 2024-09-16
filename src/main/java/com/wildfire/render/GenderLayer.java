@@ -19,6 +19,7 @@
 package com.wildfire.render;
 
 import com.wildfire.api.IGenderArmor;
+import com.wildfire.compat.ModCompat;
 import com.wildfire.main.entitydata.Breasts;
 import com.wildfire.main.WildfireGender;
 import com.wildfire.main.WildfireHelper;
@@ -123,7 +124,7 @@ public class GenderLayer<T extends LivingEntity, M extends BipedEntityModel<T>> 
 	 */
 	@SuppressWarnings("BooleanMethodIsAlwaysInverted")
 	protected boolean setupRender(T entity, EntityConfig entityConfig, float partialTicks) {
-		armorStack = entity.getEquippedStack(EquipmentSlot.CHEST);
+		armorStack = ModCompat.getChestplate(entity);
 		//Note: When the stack is empty the helper will fall back to an implementation that returns the proper data
 		genderArmor = WildfireHelper.getArmorConfig(armorStack);
 		isChestplateOccupied = genderArmor.coversBreasts() && !entityConfig.getArmorPhysicsOverride();

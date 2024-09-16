@@ -19,6 +19,7 @@
 package com.wildfire.main.entitydata;
 
 import com.wildfire.api.IGenderArmor;
+import com.wildfire.compat.ModCompat;
 import com.wildfire.main.WildfireGender;
 import com.wildfire.main.WildfireHelper;
 import com.wildfire.main.config.Configuration;
@@ -28,7 +29,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
-import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -169,7 +169,7 @@ public class EntityConfig {
 
 	@Environment(EnvType.CLIENT)
 	public void tickBreastPhysics(@NotNull LivingEntity entity) {
-		IGenderArmor armor = WildfireHelper.getArmorConfig(entity.getEquippedStack(EquipmentSlot.CHEST));
+		IGenderArmor armor = WildfireHelper.getArmorConfig(ModCompat.getChestplate(entity));
 
 		getLeftBreastPhysics().update(entity, armor);
 		getRightBreastPhysics().update(entity, armor);
