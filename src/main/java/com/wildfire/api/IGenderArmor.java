@@ -33,22 +33,22 @@ public interface IGenderArmor {
 
     Codec<IGenderArmor> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             WildfireHelper.boundedFloat(0f, 1f)
-                    .optionalFieldOf("resistance", 0.5f)
+                    .optionalFieldOf("resistance", GenderArmor.DEFAULT.physicsResistance())
                     .forGetter(IGenderArmor::physicsResistance),
             WildfireHelper.boundedFloat(0f, 1f)
-                    .optionalFieldOf("tightness", 0f)
+                    .optionalFieldOf("tightness", GenderArmor.DEFAULT.tightness())
                     .forGetter(IGenderArmor::tightness),
             Codec.BOOL
-                    .optionalFieldOf("covers_breasts", true)
+                    .optionalFieldOf("covers_breasts", GenderArmor.DEFAULT.coversBreasts())
                     .forGetter(IGenderArmor::coversBreasts),
             Codec.BOOL
-                    .optionalFieldOf("hide_breasts", false)
+                    .optionalFieldOf("hide_breasts", GenderArmor.DEFAULT.alwaysHidesBreasts())
                     .forGetter(IGenderArmor::alwaysHidesBreasts),
             WildfireHelper.TRISTATE
                     .optionalFieldOf("render_on_armor_stands", TriState.DEFAULT)
                     .forGetter(armor -> armor.armorStandsCopySettings() ? TriState.TRUE : TriState.FALSE),
             IBreastArmorTexture.CODEC
-                    .optionalFieldOf("texture", BreastArmorTexture.DEFAULT)
+                    .optionalFieldOf("texture", GenderArmor.DEFAULT.texture())
                     .forGetter(IGenderArmor::texture)
     ).apply(instance, (resistance, tightness, covers, hideBreasts, armorStands, texture) -> {
         if(!covers) {
