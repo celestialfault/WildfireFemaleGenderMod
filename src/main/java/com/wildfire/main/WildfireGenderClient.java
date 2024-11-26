@@ -35,7 +35,7 @@ import java.util.concurrent.Executor;
 
 @Environment(EnvType.CLIENT)
 public class WildfireGenderClient implements ClientModInitializer {
-	private static final Executor LOAD_EXECUTOR = Util.getIoWorkerExecutor().named("wildfire_gender$loadPlayerData");
+	private static final Executor LOAD_EXECUTOR = Util.getIoWorkerExecutor();
 
 	@Override
 	public void onInitializeClient() {

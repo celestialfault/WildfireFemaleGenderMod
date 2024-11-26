@@ -23,13 +23,14 @@ import com.wildfire.main.entitydata.Breasts;
 import com.wildfire.main.WildfireGender;
 import com.wildfire.main.WildfireHelper;
 import com.wildfire.main.entitydata.EntityConfig;
+import com.wildfire.mixins.accessors.AnimalModelAccessor;
+import com.wildfire.mixins.accessors.RenderLayerAccessor;
 import com.wildfire.physics.BreastPhysics;
 import com.wildfire.render.WildfireModelRenderer.BreastModelBox;
 import com.wildfire.render.WildfireModelRenderer.OverlayModelBox;
 import com.wildfire.render.WildfireModelRenderer.PositionTextureVertex;
 
 import java.lang.Math;
-import java.util.Objects;
 import java.util.function.Consumer;
 
 import net.fabricmc.api.EnvType;
@@ -37,31 +38,29 @@ import net.fabricmc.api.Environment;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.model.ModelPart;
+import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
 import net.minecraft.client.render.entity.feature.FeatureRenderer;
 import net.minecraft.client.render.entity.feature.FeatureRendererContext;
 import net.minecraft.client.render.entity.model.BipedEntityModel;
-import net.minecraft.client.render.entity.state.BipedEntityRenderState;
-import net.minecraft.client.render.entity.state.PlayerEntityRenderState;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectUtil;
+import net.minecraft.entity.player.PlayerModelPart;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.*;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.*;
 
 @Environment(EnvType.CLIENT)
-public class GenderLayer<S extends BipedEntityRenderState, M extends BipedEntityModel<S>> extends FeatureRenderer<S, M> {
-
-	private static final float DEG_TO_RAD = (float) (Math.PI / 180);
+public class GenderLayer<T extends LivingEntity, M extends BipedEntityModel<T>> extends FeatureRenderer<T, M> {
 
 	private BreastModelBox lBreast, rBreast;
+	private final FeatureRendererContext<T, M> context;
 	private static final OverlayModelBox lBreastWear, rBreastWear;
-
-	private final FeatureRendererContext<S, M> context;
 
 	private float preBreastSize, preBreastOffsetZ;
 	private Breasts breasts;
@@ -76,7 +75,7 @@ public class GenderLayer<S extends BipedEntityRenderState, M extends BipedEntity
 		rBreastWear = new OverlayModelBox(false, 64, 64, 21, 34, 0, 0.0F, 0F, 4, 5, 3, 0.0F, false);
 	}
 
-	public GenderLayer(FeatureRendererContext<S, M> render) {
+	public GenderLayer(FeatureRendererContext<T, M> render) {
 		super(render);
 		this.context = render;
 		// this can't be static or final as we need the ability to resize this during render time
@@ -84,57 +83,34 @@ public class GenderLayer<S extends BipedEntityRenderState, M extends BipedEntity
 		rBreast = new BreastModelBox(64, 64, 20, 17, 0, 0.0F, 0F, 4, 5, 4, 0.0F, false);
 	}
 
-	/**
-	 * Convenience method for getting the captured entity object from a render state
-	 */
-	protected @Nullable LivingEntity getEntity(S state) {
-		return ((RenderStateEntityCapture)state).getEntity();
-	}
-
-	/**
-	 * Copy of {@code LivingEntityRenderer#getRenderLayer}
-	 */
-	private @Nullable RenderLayer getRenderLayer(S state) {
-		boolean bodyVisible = !state.invisible;
-		boolean translucent = state.invisible && !state.invisibleToPlayer;
-		boolean glowing = state.hasOutline;
-
-		Identifier texture;
-		if(this.context instanceof LivingEntityRenderer<?, S, M> livingEntityRenderer) {
-			texture = livingEntityRenderer.getTexture(state);
-		} else {
-			throw new IllegalStateException("context renderer is not a LivingEntityRenderer subclass");
+	private @Nullable RenderLayer getRenderLayer(T entity) {
+		if(context instanceof LivingEntityRenderer<T, M> renderer) {
+			MinecraftClient client = MinecraftClient.getInstance();
+			boolean bodyVisible = !entity.isInvisible();
+			boolean translucent = !bodyVisible && client.player != null && !entity.isInvisibleTo(client.player);
+			boolean glowing = client.hasOutline(entity);
+			return ((RenderLayerAccessor) renderer).callGetRenderLayer(entity, bodyVisible, translucent, glowing);
 		}
-
-		if(translucent) {
-			return RenderLayer.getItemEntityTranslucentCull(texture);
-		} else if(bodyVisible) {
-			return this.getContextModel().getLayer(texture);
-		} else {
-			return glowing ? RenderLayer.getOutline(texture) : null;
-		}
+		throw new IllegalStateException("context renderer is not a LivingEntityRenderer");
 	}
 
 	@Override
-	public void render(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int light, S state, float limbAngle, float limbDistance) {
+	public void render(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int light, @NotNull T ent, float limbAngle,
+					   float limbDistance, float partialTicks, float animationProgress, float headYaw, float headPitch) {
 		MinecraftClient client = MinecraftClient.getInstance();
 		if(client.player == null) {
 			// we're currently in a menu; we won't have any data loaded to begin with, so just give up early
 			return;
 		}
 
-		LivingEntity ent = getEntity(state);
-		if(ent == null) return;
-
 		EntityConfig entityConfig = EntityConfig.getEntity(ent);
 
 		try {
-			if(!setupRender(state, entityConfig)) return;
-			int overlay = LivingEntityRenderer.getOverlay(state, 0);
+			if(!setupRender(ent, entityConfig, partialTicks)) return;
+			int overlay = LivingEntityRenderer.getOverlay(ent, 0);
 
-			//noinspection CodeBlock2Expr
-			renderSides(state, getContextModel(), matrixStack, side -> {
-				renderBreast(state, matrixStack, vertexConsumerProvider, light, overlay, side);
+			renderSides(ent, getContextModel(), matrixStack, side -> {
+				renderBreast(ent, matrixStack, vertexConsumerProvider, light, overlay, side);
 			});
 		} catch(Exception e) {
 			WildfireGender.LOGGER.error("Failed to render breast layer", e);
@@ -147,11 +123,8 @@ public class GenderLayer<S extends BipedEntityRenderState, M extends BipedEntity
 	 * @return {@code true} if rendering should continue
 	 */
 	@SuppressWarnings("BooleanMethodIsAlwaysInverted")
-	protected boolean setupRender(S state, EntityConfig entityConfig) {
-		float partialTicks = MinecraftClient.getInstance().getRenderTickCounter().getTickDelta(true);
-		LivingEntity entity = Objects.requireNonNull(getEntity(state), "getEntity()");
-
-		armorStack = state.equippedChestStack;
+	protected boolean setupRender(T entity, EntityConfig entityConfig, float partialTicks) {
+		armorStack = entity.getEquippedStack(EquipmentSlot.CHEST);
 		//Note: When the stack is empty the helper will fall back to an implementation that returns the proper data
 		genderArmor = WildfireHelper.getArmorConfig(armorStack);
 		isChestplateOccupied = genderArmor.coversBreasts() && !entityConfig.getArmorPhysicsOverride();
@@ -161,7 +134,9 @@ public class GenderLayer<S extends BipedEntityRenderState, M extends BipedEntity
 			return false;
 		}
 
-		if(!isLayerVisible(state)) {
+		RenderLayer type = getRenderLayer(entity);
+		if(type == null && !isChestplateOccupied) {
+			// the entity is invisible and doesn't have a chestplate equipped
 			return false;
 		}
 
@@ -190,19 +165,13 @@ public class GenderLayer<S extends BipedEntityRenderState, M extends BipedEntity
 			rPhysPositionX = MathHelper.lerp(partialTicks, rightBreastPhysics.getPrePositionX(), rightBreastPhysics.getPositionX());
 			rPhysBounceRotation = MathHelper.lerp(partialTicks, rightBreastPhysics.getPreBounceRotation(), rightBreastPhysics.getBounceRotation());
 		}
+		breastSize = bSize * 1.5f;
+		if(breastSize > 0.7f) breastSize = 0.7f;
+		if(bSize > 0.7f) breastSize = bSize;
+		if(breastSize < 0.02f) return false;
 
-		breastSize = Math.min(bSize * 1.5f, 0.7f); // Limit the max size to 0.7f
-
-		if (bSize > 0.7f) {
-			breastSize = bSize; // If bSize exceeds 0.7f, use bSize
-		}
-
-		if (breastSize < 0.02f) {
-			return false; // Return false if breastSize is too small
-		}
-
-		zOffset = 0.0625f - (bSize * 0.0625f); // Calculate zOffset
-		breastSize += 0.5f * Math.abs(bSize - 0.7f) * 2f; // Adjust breastSize based on bSize
+		zOffset = 0.0625f - (bSize * 0.0625f);
+		breastSize = bSize + 0.5f * Math.abs(bSize - 0.7f) * 2f;
 
 		float resistance = MathHelper.clamp(genderArmor.physicsResistance(), 0, 1);
 		//Note: We only check if the breathing animation should be enabled if the chestplate's physics resistance
@@ -212,10 +181,6 @@ public class GenderLayer<S extends BipedEntityRenderState, M extends BipedEntity
 						entity.getWorld().getBlockState(new BlockPos(entity.getBlockX(), entity.getBlockY(), entity.getBlockZ())).isOf(Blocks.BUBBLE_COLUMN)));
 		bounceEnabled = entityConfig.hasBreastPhysics() && (!isChestplateOccupied || resistance < 1); //oh, you found this?
 		return true;
-	}
-
-	protected boolean isLayerVisible(S state) {
-		return !state.invisibleToPlayer || state.hasOutline;
 	}
 
 	protected void resizeBox(float breastSize) {
@@ -231,16 +196,24 @@ public class GenderLayer<S extends BipedEntityRenderState, M extends BipedEntity
 		}
 	}
 
-	protected void setupTransformations(S state, M model, MatrixStack matrixStack, BreastSide side) {
-		if(state.baby) {
-			matrixStack.scale(state.ageScale, state.ageScale, state.ageScale);
-			matrixStack.translate(0f, 0.75f, 0f);
+	protected void setupTransformations(T entity, M model, MatrixStack matrixStack, BreastSide side) {
+		if(entity.isBaby()) {
+			var accessor = (AnimalModelAccessor) model;
+			float f1 = 1f / accessor.getInvertedChildBodyScale();
+			matrixStack.scale(f1, f1, f1);
+			matrixStack.translate(0f, accessor.getChildBodyYOffset() / 16f, 0f);
 		}
 
 		ModelPart body = model.body;
 		matrixStack.translate(body.pivotX * 0.0625f, body.pivotY * 0.0625f, body.pivotZ * 0.0625f);
-		if(body.roll != 0.0F || body.yaw != 0.0F || body.pitch != 0.0F) {
-			matrixStack.multiply(new Quaternionf().rotationZYX(body.roll, body.yaw, body.pitch));
+		if(body.roll != 0.0F) {
+			matrixStack.multiply(new Quaternionf().rotationXYZ(0f, 0f, body.roll));
+		}
+		if(body.yaw != 0.0F) {
+			matrixStack.multiply(new Quaternionf().rotationXYZ(0f, body.yaw, 0f));
+		}
+		if(body.pitch != 0.0F) {
+			matrixStack.multiply(new Quaternionf().rotationXYZ(body.pitch, 0f, 0f));
 		}
 
 		if(bounceEnabled) {
@@ -260,51 +233,54 @@ public class GenderLayer<S extends BipedEntityRenderState, M extends BipedEntity
 			matrixStack.translate(0.0625f * 2 * (side.isLeft ? 1 : -1), 0, 0);
 		}
 
-		float rotation = breastSize;
+		float rotationMultiplier = 0;
 		if(bounceEnabled) {
 			matrixStack.translate(0, -0.035f * breastSize, 0); //shift down to correct position
-			rotation -= (side.isLeft ? lPhysPositionY : rPhysPositionY) / 12f;
+			rotationMultiplier = -(side.isLeft ? lPhysPositionY : rPhysPositionY) / 12f;
 		}
-
-		rotation = Math.min(rotation, breastSize + 0.2f);
-		rotation = Math.min(rotation, 1); //hard limit for MAX
+		float totalRotation = breastSize + rotationMultiplier;
+		if(!bounceEnabled) {
+			totalRotation = breastSize;
+		}
+		if(totalRotation > breastSize + 0.2F) {
+			totalRotation = breastSize + 0.2F;
+		}
+		totalRotation = Math.min(totalRotation, 1); //hard limit for MAX
 
 		if(isChestplateOccupied) {
 			matrixStack.translate(0, 0, 0.01f);
 		}
 
-		Quaternionf rotationTransform = new Quaternionf()
-				.rotationY((side.isLeft ? outwardAngle : -outwardAngle) * DEG_TO_RAD)
-				.rotateX(-35f * rotation * DEG_TO_RAD);
+		matrixStack.multiply(new Quaternionf().rotationXYZ(0, (float)((side.isLeft ? outwardAngle : -outwardAngle) * (Math.PI / 180f)), 0));
+		matrixStack.multiply(new Quaternionf().rotationXYZ((float)(-35f * totalRotation * (Math.PI / 180f)), 0, 0));
 
 		if(breathingAnimation) {
-			float f5 = -MathHelper.cos(state.age * 0.09F) * 0.45F + 0.45F;
-			rotationTransform.rotateX(f5 * DEG_TO_RAD);
+			float f5 = -MathHelper.cos(entity.age * 0.09F) * 0.45F + 0.45F;
+			matrixStack.multiply(new Quaternionf().rotationXYZ((float)(f5 * (Math.PI / 180f)), 0, 0));
 		}
 
-		matrixStack.multiply(rotationTransform);
 		matrixStack.scale(0.9995f, 1f, 1f); //z-fighting FIXXX
 	}
 
-	private void renderBreast(S state, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int light,
+	private void renderBreast(T entity, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int light,
 	                          int overlay, BreastSide side) {
-		RenderLayer breastRenderType = getRenderLayer(state);
+		RenderLayer breastRenderType = getRenderLayer(entity);
 		if(breastRenderType == null) return; // only render if the player is visible in some capacity
-		int alpha = state.invisible ? ColorHelper.channelFromFloat(0.15f) : 255;
-		int color = ColorHelper.getArgb(alpha, 255, 255, 255);
+		int alpha = entity.isInvisible() ? ColorHelper.channelFromFloat(0.15f) : 255;
+		int color = ColorHelper.Argb.getArgb(alpha, 255, 255, 255);
 		VertexConsumer vertexConsumer = vertexConsumerProvider.getBuffer(breastRenderType);
 		renderBox(side.isLeft ? lBreast : rBreast, matrixStack, vertexConsumer, light, overlay, color);
-		if(state instanceof PlayerEntityRenderState playerState && playerState.jacketVisible) {
+		if(entity instanceof AbstractClientPlayerEntity player && player.isPartVisible(PlayerModelPart.JACKET)) {
 			matrixStack.translate(0, 0, -0.015f);
 			matrixStack.scale(1.05f, 1.05f, 1.05f);
 			renderBox(side.isLeft ? lBreastWear : rBreastWear, matrixStack, vertexConsumer, light, overlay, color);
 		}
 	}
 
-	protected void renderSides(S state, M model, MatrixStack matrixStack, Consumer<BreastSide> renderer) {
+	protected void renderSides(T entity, M model, MatrixStack matrixStack, Consumer<BreastSide> renderer) {
 		matrixStack.push();
 		try {
-			setupTransformations(state, model, matrixStack, BreastSide.LEFT);
+			setupTransformations(entity, model, matrixStack, BreastSide.LEFT);
 			renderer.accept(BreastSide.LEFT);
 		} finally {
 			matrixStack.pop();
@@ -312,7 +288,7 @@ public class GenderLayer<S extends BipedEntityRenderState, M extends BipedEntity
 
 		matrixStack.push();
 		try {
-			setupTransformations(state, model, matrixStack, BreastSide.RIGHT);
+			setupTransformations(entity, model, matrixStack, BreastSide.RIGHT);
 			renderer.accept(BreastSide.RIGHT);
 		} finally {
 			matrixStack.pop();

@@ -73,7 +73,7 @@ public final class CloudSync {
 
 	private static final Object AUTH_LOCK = new Object();
 	private static final Object SYNC_LOCK = new Object();
-	private static final Executor EXECUTOR = Util.getIoWorkerExecutor().named("wildfire_gender$cloudSync");
+	private static final Executor EXECUTOR = Util.getIoWorkerExecutor();
 	private static final Gson GSON = new GsonBuilder().registerTypeAdapter(Instant.class, new InstantTypeAdapter()).create();
 
 	private static final HttpClient CLIENT = HttpClient.newBuilder()

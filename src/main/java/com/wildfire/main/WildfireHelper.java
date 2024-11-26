@@ -30,11 +30,12 @@ import com.wildfire.render.armor.SimpleGenderArmor;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.item.ArmorItem;
+import net.minecraft.item.ArmorMaterial;
+import net.minecraft.item.ArmorMaterials;
 import net.minecraft.item.ItemStack;
 import net.fabricmc.api.EnvType;
-import net.minecraft.item.equipment.EquipmentModels;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.TriState;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.math.MathHelper;
 
 import java.util.Map;
@@ -47,36 +48,14 @@ public final class WildfireHelper {
     }
 
     // TODO migrate this from being hardcoded to being provided by resource packs instead?
-    private static final Map<Identifier, IGenderArmor> VANILLA_ARMORS = Map.of(
-            EquipmentModels.LEATHER, SimpleGenderArmor.LEATHER,
-            EquipmentModels.CHAINMAIL, SimpleGenderArmor.CHAIN_MAIL,
-            EquipmentModels.IRON, SimpleGenderArmor.IRON,
-            EquipmentModels.GOLD, SimpleGenderArmor.GOLD,
-            EquipmentModels.DIAMOND, SimpleGenderArmor.DIAMOND,
-            EquipmentModels.NETHERITE, SimpleGenderArmor.NETHERITE
+    private static final Map<RegistryEntry<ArmorMaterial>, IGenderArmor> VANILLA_ARMORS = Map.of(
+            ArmorMaterials.LEATHER, SimpleGenderArmor.LEATHER,
+            ArmorMaterials.CHAIN, SimpleGenderArmor.CHAIN_MAIL,
+            ArmorMaterials.IRON, SimpleGenderArmor.IRON,
+            ArmorMaterials.GOLD, SimpleGenderArmor.GOLD,
+            ArmorMaterials.DIAMOND, SimpleGenderArmor.DIAMOND,
+            ArmorMaterials.NETHERITE, SimpleGenderArmor.NETHERITE
     );
-
-    public static final PrimitiveCodec<TriState> TRISTATE = new PrimitiveCodec<>() {
-        @Override
-        public <T> DataResult<TriState> read(final DynamicOps<T> ops, final T input) {
-            return DataResult.success(ops.getBooleanValue(input)
-                    .map(v -> v ? TriState.TRUE : TriState.FALSE)
-                    .result().orElse(TriState.DEFAULT));
-        }
-
-        @Override
-        public <T> T write(final DynamicOps<T> ops, final TriState value) {
-            if(value == TriState.DEFAULT) {
-                return ops.empty();
-            }
-            return ops.createBoolean(value == TriState.TRUE);
-        }
-
-        @Override
-        public String toString() {
-            return "TriState";
-        }
-    };
 
     public static int randInt(int min, int max) {
         return ThreadLocalRandom.current().nextInt(min, max + 1);
@@ -95,10 +74,8 @@ public final class WildfireHelper {
         }
 
         //TODO: Fabric Alternative to Capabilities? Maybe someone can help with this?
-        var equippable = stack.get(DataComponentTypes.EQUIPPABLE);
-        if(equippable != null && equippable.slot() == EquipmentSlot.CHEST) {
-            var model = equippable.model();
-            return model.map(VANILLA_ARMORS::get).orElse(SimpleGenderArmor.FALLBACK);
+        if(stack.getItem() instanceof ArmorItem armorItem) {
+            return VANILLA_ARMORS.getOrDefault(armorItem.getMaterial(), SimpleGenderArmor.FALLBACK);
         }
 
         return EmptyGenderArmor.INSTANCE;

@@ -114,7 +114,7 @@ public class WardrobeBrowserScreen extends BaseWildfireScreen {
 		) {
 			@Override
 			protected void drawInner(DrawContext ctx, int mouseX, int mouseY, float partialTicks) {
-				ctx.drawTexture(RenderLayer::getGuiTextured, CLOUD_ICON, getX() + 2, getY() + 2, 0, 0, 20, 14, 32, 26, 32, 26);
+				ctx.drawTexture(CLOUD_ICON, getX() + 2, getY() + 2, 0, 0, 20, 14, 20, 14);
 			}
 		};
 
@@ -149,7 +149,7 @@ public class WardrobeBrowserScreen extends BaseWildfireScreen {
 			case Gender.OTHER -> BACKGROUND_OTHER;
 		};
 
-		ctx.drawTexture(RenderLayer::getGuiTextured, backgroundTexture, (this.width - 272) / 2, (this.height - 138) / 2, 0, 0, 268, 124, 512, 512);
+		ctx.drawTexture(backgroundTexture, (this.width - 272) / 2, (this.height - 138) / 2, 0, 0, 268, 124, 512, 512);
 
 		if(client != null && client.world != null) {
 			int xP = this.width / 2 - 90;
@@ -176,7 +176,7 @@ public class WardrobeBrowserScreen extends BaseWildfireScreen {
 			int bcaY = y - 45;
 			ctx.fill(x - 159, bcaY + 106, x + 159, bcaY + 136, 0x55000000);
 			ctx.drawTextWithShadow(textRenderer, Text.translatable("wildfire_gender.cancer_awareness.title").formatted(Formatting.BOLD, Formatting.ITALIC), this.width / 2 - 148, bcaY + 117, 0xFFFFFF);
-			ctx.drawTexture(RenderLayer::getGuiTextured, TXTR_RIBBON, x + 130, bcaY + 109, 0, 0, 26, 26, 20, 20, 20, 20);
+			ctx.drawTexture(TXTR_RIBBON, x + 130, bcaY + 109, 0, 0, 26, 26, 20, 20, 20, 20);
 		}
 
 		//Render in front of the UI when it's open.

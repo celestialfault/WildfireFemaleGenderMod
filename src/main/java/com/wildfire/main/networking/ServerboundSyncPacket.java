@@ -43,8 +43,8 @@ public final class ServerboundSyncPacket extends AbstractSyncPacket implements C
 		super(plr);
 	}
 
-	private ServerboundSyncPacket(UUID uuid, Gender gender, float bustSize, boolean hurtSounds, float voicePitch, BreastPhysics physics, Breasts breasts) {
-		super(uuid, gender, bustSize, hurtSounds, voicePitch, physics, breasts);
+	private ServerboundSyncPacket(UUID uuid, Gender gender, float bustSize, boolean hurtSounds, BreastPhysics physics, Breasts breasts) {
+		super(uuid, gender, bustSize, hurtSounds, 1f, physics, breasts);
 	}
 
 	@Override

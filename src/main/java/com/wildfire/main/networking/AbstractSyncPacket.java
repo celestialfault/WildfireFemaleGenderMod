@@ -19,7 +19,6 @@
 package com.wildfire.main.networking;
 
 import com.mojang.datafixers.util.Function6;
-import com.mojang.datafixers.util.Function7;
 import com.wildfire.main.entitydata.Breasts;
 import com.wildfire.main.entitydata.PlayerConfig;
 import com.wildfire.main.Gender;
@@ -38,7 +37,8 @@ abstract class AbstractSyncPacket {
                 Gender.CODEC, p -> p.gender,
                 PacketCodecs.FLOAT, p -> p.bustSize,
                 PacketCodecs.BOOL, p -> p.hurtSounds,
-                PacketCodecs.FLOAT, p -> p.voicePitch,
+                // 1.21.1 doesn't have a Function7 #tuple() :(
+//                PacketCodecs.FLOAT, p -> p.voicePitch,
                 BreastPhysics.CODEC, p -> p.physics,
                 Breasts.CODEC, p -> p.breasts,
                 constructor
@@ -99,6 +99,6 @@ abstract class AbstractSyncPacket {
     }
 
     @FunctionalInterface
-    protected interface SyncPacketConstructor<T extends AbstractSyncPacket> extends Function7<UUID, Gender, Float, Boolean, Float, BreastPhysics, Breasts, T> {
+    protected interface SyncPacketConstructor<T extends AbstractSyncPacket> extends Function6<UUID, Gender, Float, Boolean, BreastPhysics, Breasts, T> {
     }
 }

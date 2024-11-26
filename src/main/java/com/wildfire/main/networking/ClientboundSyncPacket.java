@@ -43,8 +43,8 @@ public final class ClientboundSyncPacket extends AbstractSyncPacket implements C
 		super(plr);
 	}
 
-	private ClientboundSyncPacket(UUID uuid, Gender gender, float bustSize, boolean hurtSounds, float voicePitch, BreastPhysics physics, Breasts breasts) {
-		super(uuid, gender, bustSize, hurtSounds, voicePitch, physics,  breasts);
+	private ClientboundSyncPacket(UUID uuid, Gender gender, float bustSize, boolean hurtSounds, BreastPhysics physics, Breasts breasts) {
+		super(uuid, gender, bustSize, hurtSounds, 1f, physics,  breasts);
 	}
 
 	@Override

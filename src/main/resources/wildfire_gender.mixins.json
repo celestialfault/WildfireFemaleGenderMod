@@ -9,8 +9,8 @@
   "client": [
     "BreastPhysicsTickMixin",
     "LivingEntityMixin",
-    "renderstate.LivingEntityRendererMixin",
-    "renderstate.LivingEntityRenderStateMixin"
+    "accessors.AnimalModelAccessor",
+    "accessors.RenderLayerAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
