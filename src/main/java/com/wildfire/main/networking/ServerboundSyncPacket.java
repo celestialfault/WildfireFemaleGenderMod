@@ -27,6 +27,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -54,7 +55,7 @@ public final class ServerboundSyncPacket extends AbstractSyncPacket implements C
 
 	@Environment(EnvType.CLIENT)
 	public static boolean canSend() {
-		return ClientPlayNetworking.canSend(ID);
+		return ClientPlayNetworking.canSend(ID) && !MinecraftClient.getInstance().isInSingleplayer();
 	}
 
 	public void handle(ServerPlayNetworking.Context context) {
