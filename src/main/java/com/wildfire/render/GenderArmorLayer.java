@@ -18,13 +18,12 @@
 
 package com.wildfire.render;
 
-import com.wildfire.api.IBreastArmorTexture;
-import com.wildfire.api.impl.BreastArmorTexture;
 import com.wildfire.main.WildfireGender;
 import com.wildfire.main.entitydata.EntityConfig;
 import com.wildfire.render.WildfireModelRenderer.BreastModelBox;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.impl.client.rendering.ArmorRendererRegistryImpl;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.entity.equipment.EquipmentModelLoader;
@@ -35,7 +34,6 @@ import net.minecraft.client.render.entity.state.BipedEntityRenderState;
 import net.minecraft.client.render.entity.state.PlayerEntityRenderState;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.model.BakedModelManager;
-import net.minecraft.client.texture.MissingSprite;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.math.MatrixStack;
@@ -50,7 +48,6 @@ import net.minecraft.item.equipment.trim.ArmorTrim;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.ColorHelper;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
@@ -59,12 +56,13 @@ public class GenderArmorLayer<S extends BipedEntityRenderState, M extends BipedE
 
 	private final SpriteAtlasTexture armorTrimsAtlas;
 	private final EquipmentModelLoader equipmentModelLoader;
-	protected BreastModelBox lBoobArmor, rBoobArmor;
+	protected static final BreastModelBox lBoobArmor, rBoobArmor;
 	protected static final BreastModelBox lTrim, rTrim;
 	private EntityConfig entityConfig;
-	private @NotNull IBreastArmorTexture textureData = BreastArmorTexture.DEFAULT;
 
 	static {
+		lBoobArmor = new BreastModelBox(64, 32, 16, 17, -4F, 0.0F, 0F, 4, 5, 3, 0.0F, false);
+		rBoobArmor = new BreastModelBox(64, 32, 20, 17, 0, 0.0F, 0F, 4, 5, 3, 0.0F, false);
 		// apply a very slight delta to fix z-fighting with the armor
 		lTrim = new BreastModelBox(64, 32, 16, 17, -4F, 0.0F, 0F, 4, 5, 4, 0.001F, false);
 		rTrim = new BreastModelBox(64, 32, 20, 17, 0, 0.0F, 0F, 4, 5, 4, 0.001F, false);
@@ -74,8 +72,6 @@ public class GenderArmorLayer<S extends BipedEntityRenderState, M extends BipedE
 		super(render);
 		this.armorTrimsAtlas = bakery.getAtlas(TexturedRenderLayers.ARMOR_TRIMS_ATLAS_TEXTURE);
 		this.equipmentModelLoader = equipmentModelLoader;
-		lBoobArmor = new BreastModelBox(64, 32, 16, 17, -4F, 0.0F, 0F, 4, 5, 3, 0.0F, false);
-		rBoobArmor = new BreastModelBox(64, 32, 20, 17, 0, 0.0F, 0F, 4, 5, 3, 0.0F, false);
 	}
 
 	@Override
@@ -93,6 +89,12 @@ public class GenderArmorLayer<S extends BipedEntityRenderState, M extends BipedE
 		// Check if the worn item in the chest slot is actually equippable in the chest slot, and has a model to render
 		var component = chestplate.get(DataComponentTypes.EQUIPPABLE);
 		if(component == null || component.slot() != EquipmentSlot.CHEST || component.model().isEmpty()) return;
+		// And similarly just entirely give up if the item has a renderer registered with Fabric API
+		// This will likely result in the player's breasts sticking out through the armor layer unless the mod in question
+		// implements an IGenderArmor to prevent them from rendering entirely, but oh well; at least we won't be
+		// rendering a pink box.
+		//noinspection UnstableApiUsage
+		if(ArmorRendererRegistryImpl.get(chestplate.getItem()) != null) return;
 
 		try {
 			entityConfig = EntityConfig.getEntity(ent);
@@ -105,7 +107,6 @@ public class GenderArmorLayer<S extends BipedEntityRenderState, M extends BipedE
 
 			renderSides(state, getContextModel(), matrixStack, side -> {
 				var modelId = component.model().orElseThrow();
-				// TODO is there still a need to allow for overriding the armor texture identifier?
 				equipmentModelLoader.get(modelId).getLayers(EquipmentModel.LayerType.HUMANOID).forEach(layer -> {
 					// mojang what the Optional hell is this
 					int layerColor = layer.dyeable().map(dye -> {
@@ -133,17 +134,7 @@ public class GenderArmorLayer<S extends BipedEntityRenderState, M extends BipedE
 
 	@Override
 	protected void resizeBox(float breastSize) {
-		if(genderArmor == null || Objects.equals(textureData, genderArmor.texture())) {
-			return;
-		}
-
-		textureData = genderArmor.texture();
-		var texSize = textureData.textureSize();
-		var lUV = textureData.leftUv();
-		var dim = textureData.dimensions();
-		lBoobArmor = new BreastModelBox(texSize.x(), texSize.y(), lUV.x(), lUV.y(), -4F, 0.0F, 0F, dim.x(), dim.y(), 3, 0.0F, false);
-		var rUV = textureData.rightUv();
-		rBoobArmor = new BreastModelBox(texSize.x(), texSize.y(), rUV.x(), rUV.y(), 0, 0.0F, 0F, dim.x(), dim.y(), 3, 0.0F, false);
+		// this has no relevance to armor
 	}
 
 	@Override
@@ -161,10 +152,6 @@ public class GenderArmorLayer<S extends BipedEntityRenderState, M extends BipedE
 	// TODO eventually expose some way for mods to override this, maybe through a default impl in IGenderArmor or similar
 	protected void renderBreastArmor(Identifier texture, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider,
 	                                 int light, BreastSide side, int color, boolean glint) {
-		if(MinecraftClient.getInstance().getTextureManager().getTexture(texture) == MissingSprite.getMissingSpriteTexture()) {
-			return;
-		}
-
 		BreastModelBox armor = side.isLeft ? lBoobArmor : rBoobArmor;
 		RenderLayer armorType = RenderLayer.getArmorCutoutNoCull(texture);
 		VertexConsumer armorVertexConsumer = ItemRenderer.getArmorGlintConsumer(vertexConsumerProvider, armorType, glint);

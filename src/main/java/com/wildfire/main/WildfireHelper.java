@@ -25,16 +25,19 @@ import com.mojang.serialization.codecs.PrimitiveCodec;
 import com.wildfire.api.IGenderArmor;
 import com.wildfire.api.WildfireAPI;
 import com.wildfire.main.config.FloatConfigKey;
+import com.wildfire.render.armor.EmptyGenderArmor;
+import com.wildfire.render.armor.SimpleGenderArmor;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
-import com.wildfire.api.impl.GenderArmor;
-import com.wildfire.resources.GenderArmorResourceManager;
 import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import net.minecraft.item.equipment.EquipmentModels;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.TriState;
 import net.minecraft.util.math.MathHelper;
 
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 
@@ -42,6 +45,16 @@ public final class WildfireHelper {
     private WildfireHelper() {
         throw new UnsupportedOperationException();
     }
+
+    // TODO migrate this from being hardcoded to being provided by resource packs instead?
+    private static final Map<Identifier, IGenderArmor> VANILLA_ARMORS = Map.of(
+            EquipmentModels.LEATHER, SimpleGenderArmor.LEATHER,
+            EquipmentModels.CHAINMAIL, SimpleGenderArmor.CHAIN_MAIL,
+            EquipmentModels.IRON, SimpleGenderArmor.IRON,
+            EquipmentModels.GOLD, SimpleGenderArmor.GOLD,
+            EquipmentModels.DIAMOND, SimpleGenderArmor.DIAMOND,
+            EquipmentModels.NETHERITE, SimpleGenderArmor.NETHERITE
+    );
 
     public static final PrimitiveCodec<TriState> TRISTATE = new PrimitiveCodec<>() {
         @Override
@@ -72,16 +85,23 @@ public final class WildfireHelper {
         return (float) ThreadLocalRandom.current().nextDouble(min, (double) max + 1);
     }
 
-    @Environment(EnvType.CLIENT)
     public static IGenderArmor getArmorConfig(ItemStack stack) {
-        if(stack.isEmpty()) {
-            return GenderArmor.EMPTY;
+        if (stack.isEmpty()) {
+            return EmptyGenderArmor.INSTANCE;
         }
 
-        return GenderArmorResourceManager.get(stack).orElseGet(() -> {
-            var fallback = stack.contains(DataComponentTypes.EQUIPPABLE) ? GenderArmor.DEFAULT : GenderArmor.EMPTY;
-            return WildfireAPI.getGenderArmors().getOrDefault(stack.getItem(), fallback);
-        });
+        if (WildfireAPI.getGenderArmors().get(stack.getItem()) != null) {
+            return WildfireAPI.getGenderArmors().get(stack.getItem());
+        }
+
+        //TODO: Fabric Alternative to Capabilities? Maybe someone can help with this?
+        var equippable = stack.get(DataComponentTypes.EQUIPPABLE);
+        if(equippable != null && equippable.slot() == EquipmentSlot.CHEST) {
+            var model = equippable.model();
+            return model.map(VANILLA_ARMORS::get).orElse(SimpleGenderArmor.FALLBACK);
+        }
+
+        return EmptyGenderArmor.INSTANCE;
     }
 
     public static Codec<Float> boundedFloat(float minInclusive, float maxInclusive) {
