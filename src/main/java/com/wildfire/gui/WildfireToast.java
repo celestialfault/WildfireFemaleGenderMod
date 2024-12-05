@@ -21,7 +21,6 @@ package com.wildfire.gui;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.wildfire.main.WildfireEventHandler;
 import com.wildfire.main.WildfireGender;
 import com.wildfire.main.WildfireGenderClient;
@@ -41,8 +40,8 @@ import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Nullable;
 
 @Environment(EnvType.CLIENT)
-public class WildfireToast implements Toast {
-    private static final Identifier TEXTURE = Identifier.ofVanilla("toast/tutorial");
+public class WildfireToast /*implements Toast*/ {
+    /*private static final Identifier TEXTURE = Identifier.ofVanilla("toast/tutorial");
     private static final Identifier ICON = Identifier.of(WildfireGender.MODID, "textures/bc_ribbon.png");
     public static final int PROGRESS_BAR_WIDTH = 154;
     public static final int PROGRESS_BAR_HEIGHT = 1;
@@ -124,5 +123,5 @@ public class WildfireToast implements Toast {
 
     public void setProgress(float progress) {
         this.progress = progress;
-    }
+    }*/
 }
