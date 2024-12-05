@@ -7,7 +7,7 @@
     "ArmorStandEntityMixin"
   ],
   "client": [
-    "BreastPhysicsTickMixin",
+    "ItemStackMixin",
     "LivingEntityMixin",
     "accessors.AnimalModelAccessor",
     "accessors.RenderLayerAccessor"

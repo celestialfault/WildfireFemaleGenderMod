@@ -18,31 +18,38 @@
 
 package com.wildfire.mixins;
 
-import com.wildfire.main.entitydata.EntityConfig;
+import com.llamalad7.mixinextras.sugar.Local;
+import com.wildfire.events.ArmorStatsTooltipEvent;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.decoration.ArmorStandEntity;
+import net.minecraft.component.type.AttributeModifiersComponent;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ArmorItem;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.text.Text;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Environment(EnvType.CLIENT)
-@Mixin({ArmorStandEntity.class, PlayerEntity.class})
-abstract class BreastPhysicsTickMixin {
-	@Inject(at = @At("TAIL"), method = "tick")
-	public void wildfiregender$tickBreastPhysics(CallbackInfo info) {
-		LivingEntity entity = (LivingEntity)(Object)this;
-		// Ignore ticks from the singleplayer integrated server
-		if(!entity.getWorld().isClient()) return;
+import java.util.function.Consumer;
 
-		EntityConfig cfg = EntityConfig.getEntity(entity);
-		if(entity instanceof ArmorStandEntity) {
-			cfg.readFromStack(entity.getEquippedStack(EquipmentSlot.CHEST));
+@Mixin(ItemStack.class)
+@Environment(EnvType.CLIENT)
+abstract class ItemStackMixin {
+	@Shadow public abstract Item getItem();
+
+	@Inject(
+			method = "appendAttributeModifiersTooltip",
+			at = @At("TAIL")
+	)
+	public void wildfiregender$armorStats(Consumer<Text> textConsumer, @Nullable PlayerEntity player, CallbackInfo ci, @Local AttributeModifiersComponent attributeModifiersComponent) {
+		if(!attributeModifiersComponent.showInTooltip() || attributeModifiersComponent.modifiers().isEmpty()) return;
+		if(this.getItem() instanceof ArmorItem) {
+			ArmorStatsTooltipEvent.EVENT.invoker().appendTooltips((ItemStack)(Object)this, textConsumer, player);
 		}
-		cfg.tickBreastPhysics(entity);
 	}
 }

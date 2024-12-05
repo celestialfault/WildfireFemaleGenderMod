@@ -28,6 +28,9 @@ public class GlobalConfig extends AbstractConfiguration {
         super(".", "wildfire_gender");
     }
 
+    // note: this option is not intended to be saved in any persistent manner
+    public static boolean RENDER_BREASTS = true;
+
     public static final BooleanConfigKey FIRST_TIME_LOAD = new BooleanConfigKey("firstTimeLoad", true);
     public static final BooleanConfigKey CLOUD_SYNC_ENABLED = new BooleanConfigKey("cloud_sync", false);
     public static final BooleanConfigKey AUTOMATIC_CLOUD_SYNC = new BooleanConfigKey("sync_player_data", false);
@@ -37,6 +40,9 @@ public class GlobalConfig extends AbstractConfiguration {
 
     public static final EnumConfigKey<ShowPlayerListMode> ALWAYS_SHOW_LIST = new EnumConfigKey<>("alwaysShowList", ShowPlayerListMode.MOD_UI_ONLY, ShowPlayerListMode.BY_ID);
 
+    // TODO enable by default? add a ui option?
+    public static final BooleanConfigKey ARMOR_STAT = new BooleanConfigKey("armor_stat", true);
+
     static {
         INSTANCE.setDefault(FIRST_TIME_LOAD);
         INSTANCE.setDefault(CLOUD_SYNC_ENABLED);
@@ -44,6 +50,7 @@ public class GlobalConfig extends AbstractConfiguration {
         INSTANCE.setDefault(CLOUD_SERVER);
         INSTANCE.setDefault(SYNC_VERBOSITY);
         INSTANCE.setDefault(ALWAYS_SHOW_LIST);
+        INSTANCE.setDefault(ARMOR_STAT);
         if(!INSTANCE.exists()) {
             INSTANCE.save();
         }

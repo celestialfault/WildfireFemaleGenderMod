@@ -20,6 +20,7 @@ package com.wildfire.render;
 
 import com.wildfire.api.IGenderArmor;
 import com.wildfire.main.WildfireEventHandler;
+import com.wildfire.main.config.GlobalConfig;
 import com.wildfire.main.entitydata.Breasts;
 import com.wildfire.main.WildfireGender;
 import com.wildfire.main.WildfireHelper;
@@ -99,7 +100,7 @@ public class GenderLayer<T extends LivingEntity, M extends BipedEntityModel<T>> 
 	public void render(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int light, @NotNull T ent, float limbAngle,
 					   float limbDistance, float partialTicks, float animationProgress, float headYaw, float headPitch) {
 		MinecraftClient client = MinecraftClient.getInstance();
-		if(client.player == null || !WildfireEventHandler.getRenderBreasts()) {
+		if(client.player == null) {
 			// we're currently in a menu; we won't have any data loaded to begin with, so just give up early
 			return;
 		}
@@ -125,6 +126,8 @@ public class GenderLayer<T extends LivingEntity, M extends BipedEntityModel<T>> 
 	 */
 	@SuppressWarnings("BooleanMethodIsAlwaysInverted")
 	protected boolean setupRender(T entity, EntityConfig entityConfig, float partialTicks) {
+		if(!GlobalConfig.RENDER_BREASTS) return false;
+
 		armorStack = entity.getEquippedStack(EquipmentSlot.CHEST);
 		//Note: When the stack is empty the helper will fall back to an implementation that returns the proper data
 		genderArmor = WildfireHelper.getArmorConfig(armorStack);

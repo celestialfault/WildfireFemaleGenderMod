@@ -18,15 +18,15 @@
 
 package com.wildfire.mixins;
 
-import com.wildfire.main.WildfireGender;
-import com.wildfire.main.entitydata.PlayerConfig;
+import com.wildfire.events.EntityHurtSoundEvent;
+import com.wildfire.events.EntityTickEvent;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.sound.SoundEvent;
+import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -34,7 +34,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LivingEntity.class)
 @Environment(EnvType.CLIENT)
-abstract class LivingEntityMixin {
+abstract class LivingEntityMixin extends Entity {
+	private LivingEntityMixin(EntityType<?> type, World world) {
+		super(type, world);
+	}
+
+	// TODO would it be worth adding an extra @Inject to #animateDamage(float) to account for servers (namely hypixel)
+	//		using DamageTiltS2CPacket instead of the standard entity damage packet?
 	@Inject(
 		method = "onDamaged",
 		at = @At(
@@ -43,18 +49,12 @@ abstract class LivingEntityMixin {
 		)
 	)
 	public void wildfiregender$playGenderHurtSound(DamageSource damageSource, CallbackInfo ci) {
-		MinecraftClient client = MinecraftClient.getInstance();
-		if(client.player == null || client.world == null) return;
+		EntityHurtSoundEvent.EVENT.invoker().onHurt((LivingEntity)(Object)this, damageSource);
+	}
 
-		if((LivingEntity)(Object)this instanceof PlayerEntity player && player.getWorld().isClient()) {
-			PlayerConfig genderPlayer = WildfireGender.getPlayerById(player.getUuid());
-			if(genderPlayer == null || !genderPlayer.hasHurtSounds()) return;
-
-			SoundEvent hurtSound = genderPlayer.getGender().getHurtSound();
-			if(hurtSound != null) {
-				float pitch = (player.getRandom().nextFloat() - player.getRandom().nextFloat()) * 0.2F /*+ 1.0F*/; // +1 is from getVoicePitch()
-				player.playSound(hurtSound, 1f, pitch + genderPlayer.getVoicePitch());
-			}
-		}
+	@Inject(method = "tick", at = @At("TAIL"))
+	public void wildfiregender$onTick(CallbackInfo ci) {
+		if(!getWorld().isClient()) return; // ignore ticks from the singleplayer integrated server
+		EntityTickEvent.EVENT.invoker().onTick((LivingEntity)(Object)this);
 	}
 }

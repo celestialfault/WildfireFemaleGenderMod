@@ -112,6 +112,7 @@ public record BreastDataComponent(float breastSize, float cleavage, Vector3f off
 	}
 
 	public static void removeFromStack(ItemStack stack) {
+		if(stack.isEmpty()) return;
 		NbtComponent component = stack.get(DataComponentTypes.CUSTOM_DATA);
 		if(component != null && component.contains(KEY)) {
 			NbtComponent.set(DataComponentTypes.CUSTOM_DATA, stack, nbt -> nbt.remove(KEY));

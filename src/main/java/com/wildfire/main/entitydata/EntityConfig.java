@@ -121,6 +121,13 @@ public class EntityConfig {
 	}
 
 	/**
+	 * @return {@code true} if the mod has support for the provided entity
+	 */
+	public static boolean isSupportedEntity(LivingEntity entity) {
+		return entity instanceof PlayerEntity || entity instanceof ArmorStandEntity;
+	}
+
+	/**
 	 * Get the configuration for a given entity
 	 *
 	 * @apiNote Configuration settings for {@link PlayerConfig}s may not be immediately available upon being

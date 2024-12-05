@@ -24,6 +24,7 @@ import com.wildfire.gui.WildfireButton;
 import com.wildfire.gui.WildfireSlider;
 import com.wildfire.main.Gender;
 import com.wildfire.main.WildfireGender;
+import com.wildfire.main.config.GlobalConfig;
 import com.wildfire.main.entitydata.Breasts;
 import com.wildfire.main.entitydata.PlayerConfig;
 import com.wildfire.main.config.Configuration;
@@ -64,7 +65,7 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
 
     //Breast Physics Tab
     private WildfireSlider bounceSlider, floppySlider;
-    private WildfireButton btnHideInArmor, btnOverrideArmorPhys, btnBreastPhysics;
+    private WildfireButton btnHideInArmor, btnOverrideArmorPhys, btnBreastPhysics, btnShowTooltips;
 
     //Miscellaneous Tab
     private WildfireSlider voicePitchSlider;
@@ -245,6 +246,15 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
             }
         }));
 
+        var config = GlobalConfig.INSTANCE;
+
+        this.addDrawableChild(btnShowTooltips = new WildfireButton(this.width / 2 - 36, tabOffsetY + 70, 166, 20,
+                Text.translatable("wildfire_gender.char_settings.show_armor_stat", config.get(GlobalConfig.ARMOR_STAT) ? ENABLED : DISABLED), button -> {
+            config.set(GlobalConfig.ARMOR_STAT, !config.get(GlobalConfig.ARMOR_STAT));
+            config.save();
+            button.setMessage(Text.translatable("wildfire_gender.char_settings.show_armor_stat", config.get(GlobalConfig.ARMOR_STAT) ? ENABLED : DISABLED));
+        }));
+
         //Preset Tab Below
         PRESET_LIST = new WildfireBreastPresetList(this, 156, (j - 48));
         PRESET_LIST.setX(this.width / 2 + 30);
@@ -277,6 +287,7 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
         this.btnHideInArmor.visible = currentTab == 2;
         this.btnHurtSounds.visible = currentTab == 2;
         this.voicePitchSlider.visible = currentTab == 2;
+        this.btnShowTooltips.visible = currentTab == 2;
     }
 
 
@@ -329,7 +340,7 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
         } else if(currentTab == 1) {
             ctx.drawTexture(BACKGROUND_PHYSICS, (this.width) / 2 - 42, (this.height) / 2 - 43, 0, 0, 178, 104, 512, 512);
         } else if(currentTab == 2) {
-            ctx.drawTexture(BACKGROUND_MISC, (this.width) / 2 - 42, (this.height) / 2 - 43, 0, 0, 178, 80, 512, 512);
+            ctx.drawTexture(BACKGROUND_MISC, (this.width) / 2 - 42, (this.height) / 2 - 43, 0, 0, 178, 104, 512, 512);
         }
 
         int x = this.width / 2;

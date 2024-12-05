@@ -1,8 +1,10 @@
 {
-	"category.wildfire_gender.generic": "Wildfire's Female Gender Mod",
+	"category.wildfire_gender.generic": "Female Gender Mod",
 	"key.wildfire_gender.gender_menu": "Female Gender Menu",
 	"key.wildfire_gender.toggle": "Toggle Breast Rendering",
-	"toast.wildfire_gender.get_started": "Press '%s' to get started!",
+	"toast.wildfire_gender.get_started": "Press %s to get started!",
+
+	"wildfire_gender.armor.tooltip": "+1 Breast Support",
 
 	"wildfire_gender.player_list.title": "Female Gender Mod",
 	"wildfire_gender.player_list.settings_button": "Settings",
@@ -22,7 +24,7 @@
 	"wildfire_gender.always_show_list.always": "Always",
 	"wildfire_gender.always_show_list.always.tooltip": "The synced player list will always show",
 
-	"wildfire_gender.wardrobe.title": "Wildfire's Female Gender Mod",
+	"wildfire_gender.wardrobe.title": "Female Gender Mod",
 	"wildfire_gender.breast_customization.tab_customization": "Customization",
 	"wildfire_gender.breast_customization.tab_physics": "Breast Physics",
 	"wildfire_gender.breast_customization.tab_miscellaneous": "Miscellaneous",
@@ -46,6 +48,7 @@
 	"wildfire_gender.tooltip.override_armor_physics.line2": "This is intended for use with resource packs that hide armor, or any similar minimal armor packs",
 
 	"wildfire_gender.char_settings.hide_in_armor": "Hide In Armor: %s",
+	"wildfire_gender.char_settings.show_armor_stat": "Show Armor Tooltip: %s",
 	"wildfire_gender.char_settings.hurt_sounds": "Female Hurt Sounds: %s",
 	"wildfire_gender.tooltip.hurt_sounds": "Your character will play a female hurt sound when taking damage if your gender is set to either Female or Other",
 
@@ -71,7 +74,7 @@
 
 	"wildfire_gender.cancer_awareness.title": "Hey, it's Breast Cancer Awareness Month!",
 
-	"wildfire_gender.first_time_setup.title": "Welcome to Wildfire's Female Gender Mod!",
+	"wildfire_gender.first_time_setup.title": "Welcome to the Female Gender Mod!",
 	"wildfire_gender.first_time_setup.description": "Would you like to enable cloud server syncing for your gender settings? This feature allows other players to view your customized gender appearance, even if the server doesn't have the mod installed.",
 	"wildfire_gender.first_time_setup.notice": "You can always change this setting later in the mod menu.",
 	"wildfire_gender.first_time_setup.enable": "Enable Cloud Syncing",
