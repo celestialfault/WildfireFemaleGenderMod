@@ -3,7 +3,7 @@ plugins {
 	id 'maven-publish'
 }
 
-version = "fabric-${project.mod_version}+${project.minecraft_version}"
+version = "fabric-${project.mod_version}+${project.minecraft_version}-unofficial-backport"
 group = project.maven_group
 
 base {
