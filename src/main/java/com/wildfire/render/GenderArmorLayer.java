@@ -18,6 +18,7 @@
 
 package com.wildfire.render;
 
+import com.wildfire.main.WildfireEventHandler;
 import com.wildfire.main.WildfireGender;
 import com.wildfire.main.entitydata.EntityConfig;
 import com.wildfire.render.WildfireModelRenderer.BreastModelBox;
@@ -75,7 +76,7 @@ public class GenderArmorLayer<T extends LivingEntity, M extends BipedEntityModel
 	public void render(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int light, @NotNull T ent, float limbAngle,
 	                   float limbDistance, float partialTicks, float animationProgress, float headYaw, float headPitch) {
 		MinecraftClient client = MinecraftClient.getInstance();
-		if(client.player == null) {
+		if(client.player == null || !WildfireEventHandler.getRenderBreasts()) {
 			// we're currently in a menu, give up rendering before we crash the game
 			return;
 		}
