@@ -23,13 +23,13 @@
 
 	"wildfire_gender.wardrobe.title": "Mod del Género Femenino de Wildfire",
 	"wildfire_gender.breast_customization.tab_customization": "Personalización",
-	"wildfire_gender.breast_customization.tab_physics": "Físicas del Busto",
+	"wildfire_gender.breast_customization.tab_physics": "Físicas del Pecho",
 	"wildfire_gender.breast_customization.tab_miscellaneous": "Misceláneo",
 
 	"wildfire_gender.breast_customization.presets.add_new": "Agregar nuevo...",
 	"wildfire_gender.breast_customization.presets.delete": "Eliminar",
 
-	"wildfire_gender.wardrobe.slider.breast_size": "Tamaño del Busto: %s%%",
+	"wildfire_gender.wardrobe.slider.breast_size": "Tamaño del Pecho: %s%%",
 	"wildfire_gender.wardrobe.slider.separation": "Separación: %s",
 	"wildfire_gender.wardrobe.slider.height": "Altura: %s",
 	"wildfire_gender.wardrobe.slider.depth": "Profundidad: %s",
@@ -38,7 +38,7 @@
 
 	"wildfire_gender.appearance_settings.title": "Personalización de Personaje",
 	"wildfire_gender.char_settings.title": "Configuración de Personaje (VIEJA)",
-	"wildfire_gender.char_settings.physics": "Físicas del Busto: %s",
+	"wildfire_gender.char_settings.physics": "Físicas del Pecho: %s",
 
 	"wildfire_gender.char_settings.override_armor_physics": "Físicas en la armadura: %s",
 	"wildfire_gender.tooltip.override_armor_physics.line1": "Las físicas ya no se verán limitadas por el tipo de armadura que uses",
@@ -48,7 +48,7 @@
 	"wildfire_gender.char_settings.hurt_sounds": "Sonidos de Mujer: %s",
 	"wildfire_gender.tooltip.hurt_sounds": "Tu personaje producirá sonidos de mujer al recibir daño cuándo se use el género 'Mujer' u 'Otro'",
 
-	"wildfire_gender.breast_customization.dual_physics": "Físicas Dobles: %s",
+	"wildfire_gender.breast_customization.dual_physics": "Físicas Duales: %s",
 
 	"wildfire_gender.label.gender": "Género",
 	"wildfire_gender.label.female": "Mujer",

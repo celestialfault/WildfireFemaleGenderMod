@@ -1,32 +1,40 @@
 /*
-    Wildfire's Female Gender Mod is a female gender mod created for Minecraft.
-    Copyright (C) 2023 WildfireRomeo
-
-    This program is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Lesser General Public
-    License as published by the Free Software Foundation; either
-    version 3 of the License, or (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Lesser General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ * Wildfire's Female Gender Mod is a female gender mod created for Minecraft.
+ * Copyright (C) 2023-present WildfireRomeo
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 package com.wildfire.main.entitydata;
 
 import com.google.gson.JsonObject;
+import com.wildfire.gui.screen.BaseWildfireScreen;
 import com.wildfire.main.WildfireGender;
+import com.wildfire.main.WildfireLocalization;
+import com.wildfire.main.cloud.CloudSync;
+import com.wildfire.main.cloud.SyncLog;
 import com.wildfire.main.config.ConfigKey;
 import com.wildfire.main.config.Configuration;
 import com.wildfire.main.Gender;
+import com.wildfire.main.config.GlobalConfig;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.ItemStack;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 /**
@@ -150,20 +158,40 @@ public class PlayerConfig extends EntityConfig {
 		return plr.toJson();
 	}
 
+	/**
+	 * Returns a copy of the player's current configuration. Note that there are no guarantees of any values being valid
+	 * (either type or number ranges), as this taken directly from the loaded JSON file, which may have been modified
+	 * by the user.
+	 *
+	 * @return A new copy of the player's {@link JsonObject saved config values}
+	 */
 	public JsonObject toJson() {
 		return cfg.SAVE_VALUES.deepCopy();
 	}
 
+	/**
+	 * @return {@code true} if the current player {@link Configuration#exists() has a local config file}
+	 */
 	public boolean hasLocalConfig() {
 		return cfg.exists();
 	}
 
+	/**
+	 * Loads the current player's settings from a file on disk
+	 *
+	 * @param markForSync {@code true} if {@link #needsSync} should be set to true
+	 */
 	public void loadFromDisk(boolean markForSync) {
 		this.syncStatus = SyncStatus.CACHED;
 		cfg.load();
 		loadFromConfig(markForSync);
 	}
 
+	/**
+	 * Loads the current player's settings from the local {@link Configuration}
+	 *
+	 * @param markForSync {@code true} if {@link #needsSync} should be set to true
+	 */
 	public void loadFromConfig(boolean markForSync) {
 		updateGender(cfg.get(Configuration.GENDER));
 		updateBustSize(cfg.get(Configuration.BUST_SIZE));
@@ -200,6 +228,12 @@ public class PlayerConfig extends EntityConfig {
 		return plr;
 	}
 
+	/**
+	 * Save the settings stored in the provided {@link PlayerConfig} to the underlying {@link Configuration},
+	 * and then {@link Configuration#save() attempt to save it to disk}.
+	 *
+	 * @param plr The {@link PlayerConfig} to save
+	 */
 	public static void saveGenderInfo(PlayerConfig plr) {
 		Configuration config = plr.getConfig();
 		config.set(Configuration.USERNAME, plr.uuid);
@@ -231,7 +265,37 @@ public class PlayerConfig extends EntityConfig {
 		throw new UnsupportedOperationException("PlayerConfig does not support #hasJacketLayer(); use PlayerEntity#isPartVisible instead");
 	}
 
-	public void updateFromJson(JsonObject json) {
+	@ApiStatus.Internal
+	public void attemptCloudSync() {
+		var client = MinecraftClient.getInstance();
+		if(client.player == null || !this.uuid.equals(client.player.getUuid())) return;
+		if(!needsCloudSync) return;
+		if(client.currentScreen instanceof BaseWildfireScreen) return;
+		if(!GlobalConfig.INSTANCE.get(GlobalConfig.AUTOMATIC_CLOUD_SYNC)) return;
+		if(CloudSync.syncOnCooldown()) return;
+
+		CompletableFuture.runAsync(() -> {
+			try {
+				CloudSync.sync(this).join();
+				WildfireGender.LOGGER.info("Synced player data to the cloud");
+				SyncLog.add(WildfireLocalization.SYNC_LOG_SYNC_TO_CLOUD);
+			} catch(Exception e) {
+				WildfireGender.LOGGER.error("Failed to sync player data", e);
+				SyncLog.add(WildfireLocalization.SYNC_LOG_FAILED_TO_SYNC_DATA);
+			}
+		});
+		needsCloudSync = false;
+	}
+
+	/**
+	 * Update player data from the provided {@link JsonObject}
+	 *
+	 * @apiNote This method will set the player's {@link #getSyncStatus() sync status} to {@link SyncStatus#SYNCED},
+	 *          as it's expected that this method is only used in such cases where this would be applicable.
+	 *
+	 * @param json The {@link JsonObject} to merge with the existing config for this player
+	 */
+	public void updateFromJson(@NotNull JsonObject json) {
 		json.asMap().forEach(this.cfg.SAVE_VALUES::add);
 		loadFromConfig(false);
 		this.syncStatus = SyncStatus.SYNCED;

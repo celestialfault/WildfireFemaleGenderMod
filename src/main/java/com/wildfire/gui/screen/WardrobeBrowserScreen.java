@@ -1,20 +1,20 @@
 /*
-    Wildfire's Female Gender Mod is a female gender mod created for Minecraft.
-    Copyright (C) 2023 WildfireRomeo
-
-    This program is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Lesser General Public
-    License as published by the Free Software Foundation; either
-    version 3 of the License, or (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Lesser General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ * Wildfire's Female Gender Mod is a female gender mod created for Minecraft.
+ * Copyright (C) 2023-present WildfireRomeo
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 package com.wildfire.gui.screen;
 
@@ -107,7 +107,6 @@ public class WardrobeBrowserScreen extends BaseWildfireScreen {
 		/*this.addDrawableChild(new WildfireButton(this.width / 2 - 42, y - (plr.getGender().canHaveBreasts() ? 12 : 32), 158, 20, Text.translatable("wildfire_gender.char_settings.title").append("..."),
 				button -> client.setScreen(new WildfireCharacterSettingsScreen(WardrobeBrowserScreen.this, this.playerUUID))));*/
 
-		//noinspection ExtractMethodRecommender
 		var cloud = new WildfireButton(
 				this.width / 2 - 36, y + 30, 24, 18, Text.translatable("wildfire_gender.cloud_settings"),
 				button -> client.setScreen(new WildfireCloudSyncScreen(this, this.playerUUID))
@@ -118,13 +117,13 @@ public class WardrobeBrowserScreen extends BaseWildfireScreen {
 			}
 		};
 
-		if(!CloudSync.isAvailable()) {
-			cloud.setTooltip(Tooltip.of(Text.translatable("wildfire_gender.cloud.unavailable_offline")));
+		var cloudUnavailable = CloudSync.unavailableReason();
+		if(cloudUnavailable != null) {
+			cloud.setTooltip(Tooltip.of(cloudUnavailable.text()));
 			cloud.setActive(false);
 		} else {
-			cloud.setTooltip(Tooltip.of(Text.translatable("wildfire_gender.cloud.available_online")));
+			cloud.setTooltip(Tooltip.of(Text.translatable("wildfire_gender.cloud.tooltip")));
 		}
-
 		this.addDrawableChild(cloud);
 
 		/*this.addDrawableChild(new WildfireButton(this.width / 2 + 111, y - 63, 9, 9, Text.literal("X"),
@@ -182,6 +181,7 @@ public class WardrobeBrowserScreen extends BaseWildfireScreen {
 		//Render in front of the UI when it's open.
 		List<PlayerListEntry> syncedPlayers = collectPlayerEntries();
 		GuiUtils.drawSyncedPlayers(ctx, textRenderer, syncedPlayers);
+
 	}
 
 	private void drawCreatorContributorText(DrawContext ctx, int mouseX, int mouseY, int creatorY) {

@@ -1,24 +1,25 @@
 /*
-    Wildfire's Female Gender Mod is a female gender mod created for Minecraft.
-    Copyright (C) 2023 WildfireRomeo
-
-    This program is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Lesser General Public
-    License as published by the Free Software Foundation; either
-    version 3 of the License, or (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Lesser General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ * Wildfire's Female Gender Mod is a female gender mod created for Minecraft.
+ * Copyright (C) 2023-present WildfireRomeo
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 package com.wildfire.render;
 
 import com.wildfire.api.IGenderArmor;
+import com.wildfire.main.WildfireEventHandler;
 import com.wildfire.main.entitydata.Breasts;
 import com.wildfire.main.WildfireGender;
 import com.wildfire.main.WildfireHelper;
@@ -98,7 +99,7 @@ public class GenderLayer<T extends LivingEntity, M extends BipedEntityModel<T>> 
 	public void render(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int light, @NotNull T ent, float limbAngle,
 					   float limbDistance, float partialTicks, float animationProgress, float headYaw, float headPitch) {
 		MinecraftClient client = MinecraftClient.getInstance();
-		if(client.player == null) {
+		if(client.player == null || !WildfireEventHandler.getRenderBreasts()) {
 			// we're currently in a menu; we won't have any data loaded to begin with, so just give up early
 			return;
 		}
@@ -296,7 +297,7 @@ public class GenderLayer<T extends LivingEntity, M extends BipedEntityModel<T>> 
 	}
 
 	protected static void renderBox(WildfireModelRenderer.ModelBox model, MatrixStack matrixStack, VertexConsumer vertexConsumer,
-	                                int light, int overlay, int color) {
+									int light, int overlay, int color) {
 		Matrix4f matrix4f = matrixStack.peek().getPositionMatrix();
 		Matrix3f matrix3f = matrixStack.peek().getNormalMatrix();
 		for(WildfireModelRenderer.TexturedQuad quad : model.quads) {

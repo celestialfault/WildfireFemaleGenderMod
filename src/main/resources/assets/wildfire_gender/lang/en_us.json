@@ -1,6 +1,7 @@
 {
 	"category.wildfire_gender.generic": "Wildfire's Female Gender Mod",
 	"key.wildfire_gender.gender_menu": "Female Gender Menu",
+	"key.wildfire_gender.toggle": "Toggle Breast Rendering",
 	"toast.wildfire_gender.get_started": "Press '%s' to get started!",
 
 	"wildfire_gender.player_list.title": "Female Gender Mod",
@@ -78,8 +79,9 @@
 
 
 	"wildfire_gender.cloud_settings": "Cloud Sync Server Settings",
-	"wildfire_gender.cloud.available_online": "Cloud Sync",
-	"wildfire_gender.cloud.unavailable_offline": "Cloud syncing is unavailable as you aren't currently logged into a valid Minecraft account",
+	"wildfire_gender.cloud.tooltip": "Cloud Sync",
+	"wildfire_gender.cloud.unavailable.invalid_account": "Cloud syncing is unavailable as you aren't currently logged into a valid Minecraft account",
+	"wildfire_gender.cloud.unavailable.offline_server": "Cloud syncing is unavailable as the server you're connected to is in offline mode",
 	"wildfire_gender.cloud.status": "Cloud Sync: %s",
 	"wildfire_gender.cloud.automatic": "Automatic Sync: %s",
 	"wildfire_gender.cloud.automatic.tooltip.line1": "While enabled, your config will automatically be synced to the cloud after making any changes.",
@@ -91,8 +93,6 @@
 
 	"wildfire_gender.cloud.syncing.success": "Synced",
 	"wildfire_gender.cloud.syncing.fail": "Sync Failed",
-	"wildfire_gender.cloud.disclaimer.line1": "Sync Server data may be cached for at least 30 minutes.",
-	"wildfire_gender.cloud.disclaimer.line2": "If changes are not visible, please try re-syncing later.",
 
 	"wildfire_gender.sync_log.authenticating": "Authenticating Account...",
 	"wildfire_gender.sync_log.authentication_success": "Authentication Successful.",

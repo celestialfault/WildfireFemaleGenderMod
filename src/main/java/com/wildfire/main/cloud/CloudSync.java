@@ -1,20 +1,20 @@
 /*
-    Wildfire's Female Gender Mod is a female gender mod created for Minecraft.
-    Copyright (C) 2023 WildfireRomeo
-
-    This program is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Lesser General Public
-    License as published by the Free Software Foundation; either
-    version 3 of the License, or (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Lesser General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ * Wildfire's Female Gender Mod is a female gender mod created for Minecraft.
+ * Copyright (C) 2023-present WildfireRomeo
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 package com.wildfire.main.cloud;
 
@@ -88,7 +88,7 @@ public final class CloudSync {
 
 	private static final Queue<QueuedFetch> QUEUED = new ConcurrentLinkedDeque<>();
 	private static final Cache<UUID, Optional<JsonObject>> FETCH_CACHE = CacheBuilder.newBuilder()
-			.expireAfterAccess(Duration.ofMinutes(10)).concurrencyLevel(6).build();
+			.expireAfterWrite(Duration.ofMinutes(10)).concurrencyLevel(6).build();
 
 	private static final String DEFAULT_CLOUD_URL = "https://wfgm.celestialfault.dev";
 	private static final Duration SYNC_COOLDOWN = Duration.ofSeconds(10);
@@ -110,10 +110,25 @@ public final class CloudSync {
 	}
 
 	/**
-	 * @return {@code true} if syncing is available; currently, this only checks for a valid Minecraft session.
+	 * @return A {@link SyncUnavailable} enum indicating the reason for syncing being unavailable, or {@code null} if available
+	 */
+	public static @Nullable SyncUnavailable unavailableReason() {
+		if(MinecraftClient.getInstance().getSession().getAccountType() != Session.AccountType.MSA) {
+			return SyncUnavailable.INVALID_ACCOUNT;
+		}
+		var client = MinecraftClient.getInstance();
+		var netHandler = client.getNetworkHandler();
+		if(!client.isInSingleplayer() && netHandler != null && !netHandler.getConnection().isEncrypted()) {
+			return SyncUnavailable.OFFLINE_SERVER;
+		}
+		return null;
+	}
+
+	/**
+	 * @return {@code true} if syncing is available; this method is shorthand for {@code unavailableReason() == null}.
 	 */
 	public static boolean isAvailable() {
-		return MinecraftClient.getInstance().getSession().getAccountType() == Session.AccountType.MSA;
+		return unavailableReason() == null;
 	}
 
 	/**
@@ -287,7 +302,7 @@ public final class CloudSync {
 			var url = URI.create(getCloudServer() + "/" + uuid);
 			var request = createRequest(url).GET().build();
 			var response = CLIENT.sendAsync(request, HttpResponse.BodyHandlers.ofString()).join();
-			if(response.statusCode() == 404) {
+			if(response.statusCode() == 404 || response.statusCode() == 204) {
 				WildfireGender.LOGGER.debug("Server replied no data for {}", uuid);
 				FETCH_CACHE.put(uuid, Optional.empty());
 				return null;

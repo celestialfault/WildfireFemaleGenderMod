@@ -1,29 +1,27 @@
 /*
-    Wildfire's Female Gender Mod is a female gender mod created for Minecraft.
-    Copyright (C) 2023 WildfireRomeo
-
-    This program is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Lesser General Public
-    License as published by the Free Software Foundation; either
-    version 3 of the License, or (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Lesser General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ * Wildfire's Female Gender Mod is a female gender mod created for Minecraft.
+ * Copyright (C) 2023-present WildfireRomeo
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 package com.wildfire.main;
 
 import com.wildfire.gui.GuiUtils;
-import com.wildfire.gui.screen.BaseWildfireScreen;
 import com.wildfire.gui.screen.WardrobeBrowserScreen;
 import com.wildfire.gui.screen.WildfireFirstTimeSetupScreen;
 import com.wildfire.main.cloud.CloudSync;
-import com.wildfire.main.cloud.SyncLog;
 import com.wildfire.main.config.GlobalConfig;
 import com.wildfire.main.entitydata.EntityConfig;
 import com.wildfire.main.entitydata.PlayerConfig;
@@ -53,13 +51,20 @@ import net.minecraft.client.render.entity.ArmorStandEntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
 import net.minecraft.client.render.entity.PlayerEntityRenderer;
+import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Util;
 import net.minecraft.world.World;
 import org.lwjgl.glfw.GLFW;
@@ -67,7 +72,6 @@ import org.lwjgl.glfw.GLFW;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
 
 public final class WildfireEventHandler {
 	private WildfireEventHandler() {
@@ -75,8 +79,14 @@ public final class WildfireEventHandler {
 	}
 
 	private static final KeyBinding CONFIG_KEYBIND;
+	private static final KeyBinding TOGGLE_KEYBIND;
 	private static int timer = 0;
 
+	private static boolean RENDER_BREASTS = true; //This is just a toggle to render it in game quickly, I'm not putting this in the config to be saved.
+
+	public static boolean getRenderBreasts() {
+		return RENDER_BREASTS;
+	}
 	static {
 		if(FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
 			// this has to be wrapped in a lambda to ensure that a dedicated server won't crash during startup
@@ -86,8 +96,15 @@ public final class WildfireEventHandler {
 				KeyBindingHelper.registerKeyBinding(keybind);
 				return keybind;
 			});
+			TOGGLE_KEYBIND = Util.make(() -> {
+				KeyBinding keybind = new KeyBinding("key.wildfire_gender.toggle", InputUtil.UNKNOWN_KEY.getCode(), "category.wildfire_gender.generic");
+				KeyBindingHelper.registerKeyBinding(keybind);
+				return keybind;
+			});
+
 		} else {
 			CONFIG_KEYBIND = null;
+			TOGGLE_KEYBIND = null;
 		}
 	}
 
@@ -109,6 +126,16 @@ public final class WildfireEventHandler {
 		ClientPlayConnectionEvents.DISCONNECT.register(WildfireEventHandler::clientDisconnect);
 		LivingEntityFeatureRendererRegistrationCallback.EVENT.register(WildfireEventHandler::registerRenderLayers);
 		HudRenderCallback.EVENT.register(WildfireEventHandler::renderHud);
+		//ItemTooltipCallback.EVENT.register(WildfireEventHandler::renderTooltip); disabled for now
+	}
+
+	@Environment(EnvType.CLIENT)
+	private static void renderTooltip(ItemStack stack, Item.TooltipContext tooltipContext, TooltipType type, List<Text> lines) {
+		if (stack.getItem() == Items.LEATHER_CHESTPLATE) {
+
+			lines.add(1, Text.literal("+1 Breast Support")
+					.formatted(Formatting.AQUA));
+		}
 	}
 
 	@Environment(EnvType.CLIENT)
@@ -118,6 +145,14 @@ public final class WildfireEventHandler {
 			return;
 		}
 
+		/*if(MinecraftClient.getInstance().player != null) {
+			PlayerConfig pCfg = WildfireGender.getPlayerById(MinecraftClient.getInstance().player.getUuid());
+			if(pCfg != null) {
+				context.drawText(textRenderer, "Physics Debug", 5, 5, 0xFFFFFF, true);
+				context.drawText(textRenderer, "Position: " + pCfg.getLeftBreastPhysics().getPositionX() + "," + pCfg.getLeftBreastPhysics().getPositionY(), 5, 15, 0xFFFFFF, true);
+				context.drawText(textRenderer, "Breast Size: " + pCfg.getLeftBreastPhysics().getBreastSize(tickCounter.getTickDelta(false)), 5, 35, 0xFFFFFF, true);
+			}
+		}*/
 		boolean shouldShow = switch(GlobalConfig.INSTANCE.get(GlobalConfig.ALWAYS_SHOW_LIST)) {
 			case MOD_UI_ONLY -> false;
 			case TAB_LIST_OPEN -> MinecraftClient.getInstance().options.playerListKey.isPressed();
@@ -173,23 +208,13 @@ public final class WildfireEventHandler {
 
 		if(timer % 40 == 0) {
 			CloudSync.sendNextQueueBatch();
-			if(clientConfig != null && clientConfig.needsCloudSync && !(client.currentScreen instanceof BaseWildfireScreen)) {
-				if(GlobalConfig.INSTANCE.get(GlobalConfig.AUTOMATIC_CLOUD_SYNC) && !CloudSync.syncOnCooldown()) {
-					CompletableFuture.runAsync(() -> {
-						try {
-							CloudSync.sync(clientConfig).join();
-							WildfireGender.LOGGER.info("Synced player data to the cloud");
-							SyncLog.add(WildfireLocalization.SYNC_LOG_SYNC_TO_CLOUD);
-						} catch(Exception e) {
-							WildfireGender.LOGGER.error("Failed to sync player data", e);
-							SyncLog.add(WildfireLocalization.SYNC_LOG_FAILED_TO_SYNC_DATA);
-						}
-					});
-					clientConfig.needsCloudSync = false;
-				}
-			}
+			if(clientConfig != null) clientConfig.attemptCloudSync();
 		}
 
+
+		if(TOGGLE_KEYBIND.wasPressed() && client.currentScreen == null) {
+			RENDER_BREASTS ^= true;
+		}
 		if(CONFIG_KEYBIND.wasPressed() && client.currentScreen == null) {
 			if(GlobalConfig.INSTANCE.get(GlobalConfig.FIRST_TIME_LOAD) && CloudSync.isAvailable()) {
 				client.setScreen(new WildfireFirstTimeSetupScreen(null, client.player.getUuid()));

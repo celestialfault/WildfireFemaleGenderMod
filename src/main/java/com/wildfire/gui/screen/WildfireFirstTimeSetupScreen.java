@@ -1,20 +1,20 @@
 /*
-	Wildfire's Female Gender Mod is a female gender mod created for Minecraft.
-	Copyright (C) 2023 WildfireRomeo
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU Lesser General Public
-	License as published by the Free Software Foundation; either
-	version 3 of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-	Lesser General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ * Wildfire's Female Gender Mod is a female gender mod created for Minecraft.
+ * Copyright (C) 2023-present WildfireRomeo
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 package com.wildfire.gui.screen;
 
@@ -22,6 +22,7 @@ import com.wildfire.gui.GuiUtils;
 import com.wildfire.gui.WildfireButton;
 import com.wildfire.main.WildfireGender;
 import com.wildfire.main.WildfireGenderClient;
+import com.wildfire.main.WildfireHelper;
 import com.wildfire.main.config.GlobalConfig;
 import com.wildfire.main.entitydata.PlayerConfig;
 import net.fabricmc.api.EnvType;
@@ -33,7 +34,10 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.MathHelper;
+import org.joml.Quaternionf;
 
+import java.text.Normalizer;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -67,7 +71,7 @@ public class WildfireFirstTimeSetupScreen extends BaseWildfireScreen {
 			WildfireButton no = null;
 		};
 
-		this.addDrawableChild(new WildfireButton(x, y + 74, 128 - 5 - 1, 20,
+		this.addDrawableChild(new WildfireButton(x + 3, y + 74, 128, 20,
 				ENABLE_CLOUD_SYNCING,
 				button -> {
 					var config = GlobalConfig.INSTANCE;
@@ -85,7 +89,7 @@ public class WildfireFirstTimeSetupScreen extends BaseWildfireScreen {
 				}));
 
 
-		this.addDrawableChild(ref.no = new WildfireButton(x - 128 + 6, y + 74, 128 - 5 - 1, 20,
+		this.addDrawableChild(ref.no = new WildfireButton(x - 131, y + 74, 128, 20,
 				DISABLE_CLOUD_SYNCING,
 				button -> {
 					var config = GlobalConfig.INSTANCE;
@@ -128,7 +132,7 @@ public class WildfireFirstTimeSetupScreen extends BaseWildfireScreen {
 	@Override
 	public void renderBackground(DrawContext ctx, int mouseX, int mouseY, float delta) {
 		this.renderInGameBackground(ctx);
-		ctx.drawTexture(BACKGROUND, (this.width - 256) / 2, (this.height - 200) / 2, 0, 0, 256, 200, 256, 256);
+		ctx.drawTexture(BACKGROUND, (this.width - 274) / 2, (this.height - 200) / 2, 0, 0, 274, 200, 512, 512);
 	}
 
 	@Override
@@ -141,19 +145,33 @@ public class WildfireFirstTimeSetupScreen extends BaseWildfireScreen {
 		int x = this.width / 2;
 		int y = this.height / 2;
 
-		GuiUtils.drawCenteredText(ctx, textRenderer, TITLE, x, y - 20, 0x000000);
+		GuiUtils.drawCenteredText(ctx, textRenderer, TITLE, x, y - 24, 4210752);
 
-		GuiUtils.drawCenteredTextWrapped(ctx, textRenderer, DESCRIPTION, x, y - 5, (int) ((256-10)), 4210752);
+		GuiUtils.drawCenteredTextWrapped(ctx, textRenderer, Text.literal("Keira Emberlyn:").formatted(Formatting.LIGHT_PURPLE), x + 32, y - 10, (int) ((256-65)), 0xFFFFFF);
+
+		//TODO: Vertical scroll bar for longer text?
+		GuiUtils.drawCenteredTextWrapped(ctx, textRenderer, DESCRIPTION, x + 32, y + 2, (int) ((256-65)), 0xFFFFFF);
 
 
 		mStack.push();
 			mStack.translate(x, y + 47, 0);
 			mStack.scale(0.8f, 0.8f, 1);
 			mStack.translate(-x, -y - 47, 0);
-		GuiUtils.drawCenteredTextWrapped(ctx, textRenderer, NOTICE, x, y + 65, (int) ((256-10) * 1.2f), 4210752);
+		GuiUtils.drawCenteredTextWrapped(ctx, textRenderer, NOTICE, x, y + 68, (int) ((256-10) * 1.2f), 4210752);
 		mStack.pop();
 
+		int keiraX = x - 133;
+		int keiraY = y - 12;
+		int keiraW = 60;
+		int keiraH = (int) (keiraW * ((float)KEIRA_HEIGHT / KEIRA_WIDTH));
 
+		ctx.drawTexture(KEIRA_WAVE, keiraX, keiraY, 0, 0, keiraW, keiraH, KEIRA_WIDTH, KEIRA_HEIGHT, KEIRA_WIDTH, KEIRA_HEIGHT);
+
+		/*mStack.push();
+			mStack.translate(keiraX + (keiraW / 2), keiraY + (keiraH / 2), 0);
+			mStack.multiply(new Quaternionf().rotateZ(-25 * MathHelper.RADIANS_PER_DEGREE));
+			ctx.drawTexture(RenderLayer::getGuiTextured, KEIRA_LOOK, -keiraW / 2, -keiraH / 2, 0, 0, keiraW, keiraH, KEIRA_WIDTH, KEIRA_HEIGHT, KEIRA_WIDTH, KEIRA_HEIGHT);
+		mStack.pop();*/
 	}
 
 	@Override

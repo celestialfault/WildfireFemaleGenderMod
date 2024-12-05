@@ -1,3 +1,21 @@
+/*
+ * Wildfire's Female Gender Mod is a female gender mod created for Minecraft.
+ * Copyright (C) 2023-present WildfireRomeo
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.wildfire.gui;
 
 import com.wildfire.gui.screen.WildfireBreastCustomizationScreen;
@@ -49,7 +67,6 @@ public class WildfireBreastPresetList extends EntryListWidget<WildfireBreastPres
 
     public WildfireBreastPresetList(WildfireBreastCustomizationScreen parent, int listWidth, int top) {
         super(MinecraftClient.getInstance(), 156, parent.height, top, 32);
-        this.setRenderHeader(false, 0);
         this.parent = parent;
         this.listWidth = listWidth;
         this.refreshList();
@@ -83,7 +100,7 @@ public class WildfireBreastPresetList extends EntryListWidget<WildfireBreastPres
 
     @Override
     public int getRowTop(int index) {
-        return this.getY() - (int)this.getScrollAmount() + index * this.itemHeight + this.headerHeight;
+        return this.getY() - (int)this.getScrollY() + index * this.itemHeight + this.headerHeight;
     }
 
     @Override
@@ -106,7 +123,7 @@ public class WildfireBreastPresetList extends EntryListWidget<WildfireBreastPres
             System.out.println("Preset Name: " + presetCfg.get(BreastPresetConfiguration.PRESET_NAME));
             tmpPresets.add(new BreastPresetListEntry(presetCfg.get(BreastPresetConfiguration.PRESET_NAME), presetCfg));
         }
-        BREAST_PRESETS = tmpPresets.toArray(new BreastPresetListEntry[tmpPresets.size()]);
+        BREAST_PRESETS = tmpPresets.toArray(BreastPresetListEntry[]::new);
 
         if(this.client.world == null || this.client.player == null) return;
 

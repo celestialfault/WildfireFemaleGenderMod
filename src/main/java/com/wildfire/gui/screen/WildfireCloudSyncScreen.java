@@ -1,20 +1,20 @@
 /*
-	Wildfire's Female Gender Mod is a female gender mod created for Minecraft.
-	Copyright (C) 2023 WildfireRomeo
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU Lesser General Public
-	License as published by the Free Software Foundation; either
-	version 3 of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-	Lesser General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ * Wildfire's Female Gender Mod is a female gender mod created for Minecraft.
+ * Copyright (C) 2023-present WildfireRomeo
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 package com.wildfire.gui.screen;
 
@@ -45,10 +45,6 @@ public class WildfireCloudSyncScreen extends BaseWildfireScreen {
 
 	private static final Identifier BACKGROUND = Identifier.of(WildfireGender.MODID, "textures/gui/sync_bg_v2.png");
 
-	private WildfireButton btnAutomaticSync = null;
-	private WildfireButton btnSyncNow = null;
-	private WildfireButton btnHelp = null;
-
 	protected WildfireCloudSyncScreen(Screen parent, UUID uuid) {
 		super(Text.translatable("wildfire_gender.cloud_settings"), parent, uuid);
 	}
@@ -60,6 +56,9 @@ public class WildfireCloudSyncScreen extends BaseWildfireScreen {
 		int yPos = y - 47;
 		int xPos = x - 156 / 2 - 1;
 
+		final var ref = new Object() {
+			WildfireButton btnSyncNow, btnAutomaticSync;
+		};
 
 		this.addDrawableChild(new WildfireButton(xPos, yPos, 157, 20,
 				Text.translatable("wildfire_gender.cloud.status", CloudSync.isEnabled() ? WildfireLocalization.ENABLED : WildfireLocalization.DISABLED),
@@ -67,12 +66,12 @@ public class WildfireCloudSyncScreen extends BaseWildfireScreen {
 					var config = GlobalConfig.INSTANCE;
 					config.set(GlobalConfig.CLOUD_SYNC_ENABLED, !config.get(GlobalConfig.CLOUD_SYNC_ENABLED));
 					button.setMessage(Text.translatable("wildfire_gender.cloud.status", CloudSync.isEnabled() ? WildfireLocalization.ENABLED : WildfireLocalization.DISABLED));
-					btnAutomaticSync.setActive(CloudSync.isEnabled());
-					btnAutomaticSync.setMessage(Text.translatable("wildfire_gender.cloud.automatic", CloudSync.isEnabled() ? (GlobalConfig.INSTANCE.get(GlobalConfig.AUTOMATIC_CLOUD_SYNC) ? WildfireLocalization.ENABLED : WildfireLocalization.DISABLED) : WildfireLocalization.OFF));
-					btnSyncNow.visible = GlobalConfig.INSTANCE.get(GlobalConfig.CLOUD_SYNC_ENABLED);
+					ref.btnAutomaticSync.setActive(CloudSync.isEnabled());
+					ref.btnAutomaticSync.setMessage(Text.translatable("wildfire_gender.cloud.automatic", CloudSync.isEnabled() ? (GlobalConfig.INSTANCE.get(GlobalConfig.AUTOMATIC_CLOUD_SYNC) ? WildfireLocalization.ENABLED : WildfireLocalization.DISABLED) : WildfireLocalization.OFF));
+					ref.btnSyncNow.visible = GlobalConfig.INSTANCE.get(GlobalConfig.CLOUD_SYNC_ENABLED);
 				}));
 
-		this.addDrawableChild(btnAutomaticSync = new WildfireButton(xPos, yPos + 20, 157, 20,
+		this.addDrawableChild(ref.btnAutomaticSync = new WildfireButton(xPos, yPos + 20, 157, 20,
 				Text.translatable("wildfire_gender.cloud.automatic", CloudSync.isEnabled() ? (GlobalConfig.INSTANCE.get(GlobalConfig.AUTOMATIC_CLOUD_SYNC) ? WildfireLocalization.ENABLED : WildfireLocalization.DISABLED) : WildfireLocalization.OFF),
 				button -> {
 					var config = GlobalConfig.INSTANCE;
@@ -80,29 +79,26 @@ public class WildfireCloudSyncScreen extends BaseWildfireScreen {
 					config.set(GlobalConfig.AUTOMATIC_CLOUD_SYNC, newVal);
 					button.setMessage(Text.translatable("wildfire_gender.cloud.automatic", newVal ? WildfireLocalization.ENABLED : WildfireLocalization.DISABLED));
 				}));
-		btnAutomaticSync.setTooltip(Tooltip.of(Text.empty()
+		ref.btnAutomaticSync.setTooltip(Tooltip.of(Text.empty()
 				.append(Text.translatable("wildfire_gender.cloud.automatic.tooltip.line1"))
 				.append("\n\n")
 				.append(Text.translatable("wildfire_gender.cloud.automatic.tooltip.line2"))));
-		btnAutomaticSync.setActive(CloudSync.isEnabled());
+		ref.btnAutomaticSync.setActive(CloudSync.isEnabled());
 
-		btnSyncNow = new WildfireButton(xPos + 98, yPos + 42, 60, 15, Text.translatable("wildfire_gender.cloud.sync"), this::sync);
+		ref.btnSyncNow = new WildfireButton(xPos + 98, yPos + 42, 60, 15, Text.translatable("wildfire_gender.cloud.sync"), this::sync);
 		//btnSyncNow.setTooltip(Tooltip.of(Text.empty()
 		//		.append(Text.literal("Sync Server data is cached for a minimum time of 30 minutes. If you do not see any changes please try to re-sync later."))));
-		btnSyncNow.visible = GlobalConfig.INSTANCE.get(GlobalConfig.CLOUD_SYNC_ENABLED);
-		this.addDrawableChild(btnSyncNow);
+		ref.btnSyncNow.visible = GlobalConfig.INSTANCE.get(GlobalConfig.CLOUD_SYNC_ENABLED);
+		this.addDrawableChild(ref.btnSyncNow);
 
 		this.addDrawableChild(new WildfireButton(this.width / 2 + 73, yPos - 11, 9, 9, Text.literal("X"),
 				button -> close(), text -> GuiUtils.doneNarrationText()));
 
-		this.addDrawableChild(btnHelp = new WildfireButton(this.width / 2 + 73 - 10, yPos - 11, 9, 9, Text.literal("?"),
+		/*this.addDrawableChild(btnHelp = new WildfireButton(this.width / 2 + 73 - 10, yPos - 11, 9, 9, Text.literal("?"),
 				button -> {
 					//client.setScreen(new WildfireCloudDetailsScreen(this, client.player.getUuid())); // Disabled for now. Not complete
 					// BUTTON IS SUPPOSED TO DO NOTHING AT THE MOMENT
-				}, text -> GuiUtils.doneNarrationText()));
-		btnHelp.setTooltip(Tooltip.of(Text.translatable("wildfire_gender.cloud.disclaimer.line1")
-				.append("\n\n")
-				.append(Text.translatable("wildfire_gender.cloud.disclaimer.line2"))));
+				}));*/
 
 		super.init();
 	}
