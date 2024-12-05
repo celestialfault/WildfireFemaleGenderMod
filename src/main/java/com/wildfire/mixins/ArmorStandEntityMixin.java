@@ -19,15 +19,7 @@
 package com.wildfire.mixins;
 
 import com.llamalad7.mixinextras.sugar.Local;
-<<<<<<< HEAD
-import com.wildfire.api.IGenderArmor;
-import com.wildfire.main.WildfireGender;
-import com.wildfire.main.entitydata.BreastDataComponent;
-import com.wildfire.main.entitydata.PlayerConfig;
-import com.wildfire.main.WildfireHelper;
-=======
 import com.wildfire.events.ArmorStandInteractEvents;
->>>>>>> upstream/fabric-1.21.4
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
