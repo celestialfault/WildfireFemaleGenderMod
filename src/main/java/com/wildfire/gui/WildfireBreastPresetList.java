@@ -100,7 +100,7 @@ public class WildfireBreastPresetList extends EntryListWidget<WildfireBreastPres
 
     @Override
     public int getRowTop(int index) {
-        return this.getY() - (int)this.getScrollY() + index * this.itemHeight + this.headerHeight;
+        return this.getY() - (int)this.getScrollAmount() + index * this.itemHeight + this.headerHeight;
     }
 
     @Override
