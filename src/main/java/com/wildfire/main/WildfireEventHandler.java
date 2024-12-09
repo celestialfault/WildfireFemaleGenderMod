@@ -19,10 +19,7 @@
 package com.wildfire.main;
 
 import com.wildfire.api.IGenderArmor;
-import com.wildfire.events.ArmorStandInteractEvents;
-import com.wildfire.events.ArmorStatsTooltipEvent;
-import com.wildfire.events.EntityHurtSoundEvent;
-import com.wildfire.events.EntityTickEvent;
+import com.wildfire.events.*;
 import com.wildfire.gui.GuiUtils;
 import com.wildfire.gui.screen.WardrobeBrowserScreen;
 import com.wildfire.gui.screen.WildfireFirstTimeSetupScreen;
@@ -49,11 +46,13 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.RenderTickCounter;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.ArmorStandEntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
@@ -62,6 +61,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.*;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -140,6 +141,29 @@ public final class WildfireEventHandler {
 		ArmorStatsTooltipEvent.EVENT.register(WildfireEventHandler::renderTooltip);
 		EntityHurtSoundEvent.EVENT.register(WildfireEventHandler::onEntityHurt);
 		EntityTickEvent.EVENT.register(WildfireEventHandler::onEntityTick);
+		PlayerNametagRenderEvent.EVENT.register(WildfireEventHandler::onPlayerNametag);
+	}
+
+	@Environment(EnvType.CLIENT)
+	private static void onPlayerNametag(AbstractClientPlayerEntity player, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, Consumer<Text> renderHelper) {
+		var nametag = WildfireGenderClient.getNametag(player.getUuid());
+		if(nametag == null) return;
+
+		matrixStack.push();
+		float translationAmt = switch(player.getPose()) {
+			case EntityPose.CROUCHING -> 0.8f;
+			case EntityPose.SLEEPING -> 0.125f;
+			case EntityPose.SWIMMING -> 0.3f;
+			case EntityPose.FALL_FLYING -> 0.3f;
+			case EntityPose.SITTING -> 0.275f; //not tested; sitting on a pig doesn't work apparently.
+            default -> 0.95f;
+        };
+		matrixStack.translate(0f, translationAmt, 0f);
+		matrixStack.scale(0.5f, 0.5f, 0.5f);
+		renderHelper.accept(nametag);
+		matrixStack.pop();
+		// shift the rest of the name tag up a little bit
+		matrixStack.translate(0f, 2.15F * 1.15F * 0.025F, 0f);
 	}
 
 	@Environment(EnvType.CLIENT)
@@ -149,7 +173,8 @@ public final class WildfireEventHandler {
 		if(playerConfig == null || !playerConfig.getGender().canHaveBreasts()) return;
 
 		if(!(item.getItem() instanceof ArmorItem armorItem) || armorItem.getSlotType() != EquipmentSlot.CHEST) return;
-		tooltipAppender.accept(Text.translatable("wildfire_gender.armor.tooltip").formatted(Formatting.LIGHT_PURPLE));
+		float physResistance = (WildfireHelper.getArmorConfig(item).physicsResistance());
+		tooltipAppender.accept(Text.translatable("wildfire_gender.armor.tooltip", Math.floor(physResistance * 100f) / 100f).formatted(Formatting.LIGHT_PURPLE));
 	}
 
 	@Environment(EnvType.CLIENT)

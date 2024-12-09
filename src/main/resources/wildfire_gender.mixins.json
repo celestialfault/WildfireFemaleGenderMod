@@ -9,8 +9,12 @@
   "client": [
     "ItemStackMixin",
     "LivingEntityMixin",
+    "PlayerEntityRendererMixin",
     "accessors.AnimalModelAccessor",
-    "accessors.RenderLayerAccessor"
+    "accessors.RenderLayerAccessor",
+    "cape.PlayerListEntryMixin",
+    "cape.SkinTexturesWildfireImplMixin",
+    "cape.SkinTexturesMixin"
   ],
   "injectors": {
     "defaultRequire": 1

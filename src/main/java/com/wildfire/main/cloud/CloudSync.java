@@ -167,6 +167,27 @@ public final class CloudSync {
 				.timeout(Duration.ofSeconds(5));
 	}
 
+	public static CompletableFuture<Map<UUID, ContributorNametag>> getContributors() {
+		return CompletableFuture.supplyAsync(() -> {
+			var request = createRequest(URI.create(getCloudServer() + "/contributors")).GET().build();
+			var response = CLIENT.sendAsync(request, HttpResponse.BodyHandlers.ofString()).join();
+			if(response.statusCode() != 200) {
+				WildfireGender.LOGGER.warn("Couldn't fetch contributor nametags: server responded {}", response.statusCode());
+				return Map.of();
+			}
+
+			try {
+				var json = GSON.fromJson(response.body(), JsonObject.class);
+				var map = new HashMap<UUID, ContributorNametag>();
+				json.asMap().forEach((k, v) -> map.put(UUID.fromString(k), GSON.fromJson(v, ContributorNametag.class)));
+				return Collections.unmodifiableMap(map);
+			} catch(Exception e) {
+				WildfireGender.LOGGER.error("Failed to parse contributor list", e);
+				return Map.of();
+			}
+		}, EXECUTOR);
+	}
+
 	private static String generateServerId() {
 		// https://github.com/hibiii/Kappa/blob/main/src/main/java/hibiii/kappa/Provider.java#L40-L42
 		BigInteger intA = new BigInteger(128, new Random());
