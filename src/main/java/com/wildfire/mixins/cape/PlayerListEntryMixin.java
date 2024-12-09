@@ -18,7 +18,6 @@
 
 package com.wildfire.mixins.cape;
 
-
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.mojang.authlib.GameProfile;
 import com.wildfire.main.cape.CapeProvider;

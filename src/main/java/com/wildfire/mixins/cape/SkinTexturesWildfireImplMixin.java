@@ -18,7 +18,6 @@
 
 package com.wildfire.mixins.cape;
 
-
 import com.wildfire.main.cape.SkinTexturesWildfire;
 import net.minecraft.client.util.SkinTextures;
 import net.minecraft.util.Identifier;
