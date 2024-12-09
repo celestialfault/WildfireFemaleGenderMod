@@ -110,7 +110,7 @@ public class CapeProvider {
         NativeImage out = new NativeImage(64 * zoom, 32 * zoom, true);
         for (int x = 0; x < srcWidth; x++) {
             for (int y = 0; y < srcHeight; y++) {
-                out.setColorArgb(x, y, in.getColorArgb(x, y));
+                out.setColor(x, y, in.getColor(x, y));
             }
         }
         return out;
