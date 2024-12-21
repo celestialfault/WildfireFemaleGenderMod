@@ -19,9 +19,13 @@
 package com.wildfire.main;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.DynamicOps;
+import com.mojang.serialization.codecs.PrimitiveCodec;
 import com.wildfire.api.IGenderArmor;
 import com.wildfire.api.WildfireAPI;
 import com.wildfire.main.config.FloatConfigKey;
+import net.fabricmc.fabric.api.util.TriState;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ItemStack;
@@ -38,6 +42,28 @@ public final class WildfireHelper {
     private WildfireHelper() {
         throw new UnsupportedOperationException();
     }
+
+    public static final PrimitiveCodec<TriState> TRISTATE = new PrimitiveCodec<>() {
+        @Override
+        public <T> DataResult<TriState> read(final DynamicOps<T> ops, final T input) {
+            return DataResult.success(ops.getBooleanValue(input)
+                    .map(v -> v ? TriState.TRUE : TriState.FALSE)
+                    .result().orElse(TriState.DEFAULT));
+        }
+
+        @Override
+        public <T> T write(final DynamicOps<T> ops, final TriState value) {
+            if(value == TriState.DEFAULT) {
+                return ops.empty();
+            }
+            return ops.createBoolean(value == TriState.TRUE);
+        }
+
+        @Override
+        public String toString() {
+            return "TriState";
+        }
+    };
 
     public static int randInt(int min, int max) {
         return ThreadLocalRandom.current().nextInt(min, max + 1);

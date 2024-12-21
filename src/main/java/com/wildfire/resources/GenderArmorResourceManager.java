@@ -56,7 +56,7 @@ public final class GenderArmorResourceManager extends JsonDataLoader implements 
 	public static Optional<IGenderArmor> get(ItemStack item) {
 		return Optional.ofNullable(item)
 				.map(v -> v.getItem() instanceof ArmorItem armorItem ? armorItem : null)
-				.map(v -> v .getMaterial().getIdAsString())
+				.map(v -> v.getMaterial().getIdAsString())
 				.map(Identifier::of)
 				.map(GenderArmorResourceManager::get);
 	}
@@ -71,7 +71,7 @@ public final class GenderArmorResourceManager extends JsonDataLoader implements 
 		var built = new HashMap<Identifier, IGenderArmor>();
 		//noinspection CodeBlock2Expr
 		prepared.forEach((k, v) -> {
-			built.put(k, IGenderArmor.CODEC.decode(JsonOps.INSTANCE, v).getOrThrow().getFirst());
+			built.put(k, IGenderArmor.CODEC.parse(JsonOps.INSTANCE, v).getOrThrow());
 		});
 		this.configs = Collections.unmodifiableMap(built);
 	}

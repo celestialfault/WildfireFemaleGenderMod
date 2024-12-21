@@ -23,7 +23,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.wildfire.api.impl.BreastArmorTexture;
 import com.wildfire.api.impl.GenderArmor;
 import com.wildfire.main.WildfireHelper;
-import net.minecraft.util.TriState;
+import net.fabricmc.fabric.api.util.TriState;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -54,7 +54,7 @@ public interface IGenderArmor {
         if(!covers) {
             return GenderArmor.EMPTY;
         }
-        return new GenderArmor(resistance, tightness, true, hideBreasts, armorStands.asBoolean(resistance == 1f), texture);
+        return new GenderArmor(resistance, tightness, true, hideBreasts, armorStands.orElse(resistance == 1f), texture);
     }));
 
     /**
