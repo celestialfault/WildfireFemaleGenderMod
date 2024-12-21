@@ -18,7 +18,6 @@
 
 package com.wildfire.main;
 
-import com.wildfire.api.IGenderArmor;
 import com.wildfire.events.*;
 import com.wildfire.gui.GuiUtils;
 import com.wildfire.gui.screen.WardrobeBrowserScreen;
@@ -351,12 +350,9 @@ public final class WildfireEventHandler {
 			return;
 		}
 
-		IGenderArmor armorConfig = WildfireHelper.getArmorConfig(item);
-		if(armorConfig.armorStandsCopySettings()) {
-			BreastDataComponent component = BreastDataComponent.fromPlayer(player, playerConfig);
-			if(component != null) {
-				component.write(player.getWorld().getRegistryManager(), item);
-			}
+		BreastDataComponent component = BreastDataComponent.fromPlayer(player, playerConfig);
+		if(component != null) {
+			component.write(player.getWorld().getRegistryManager(), item);
 		}
 	}
 

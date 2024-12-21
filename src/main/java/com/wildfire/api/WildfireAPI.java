@@ -44,10 +44,17 @@ public class WildfireAPI {
     /**
      * Add custom physics resistance attributes to a chestplate
      *
+     * @apiNote This method should be considered "soft deprecated", and may be marked for removal in favor
+     *          of resource pack configurations in the future.
+     *
+     * @implNote Implementations added through this method are presently ignored if a resource pack defines armor data
+     *           at {@code NAMESPACE:wildfire_gender_data/MODEL.json}, and are only used as a default implementation.
+     *
      * @param  item  the item that you are linking this {@link IGenderArmor} to
      * @param  genderArmor the class implementing the {@link IGenderArmor} to apply to the item
      * @see    IGenderArmor
      */
+    @ApiStatus.Obsolete
     public static void addGenderArmor(Item item, IGenderArmor genderArmor) {
         GENDER_ARMORS.put(item, genderArmor);
     }
@@ -85,7 +92,7 @@ public class WildfireAPI {
      * first loading a player's config; the exact return type of this method may also change between versions.</p>
      *
      * @param  uuid  the uuid of the target {@link PlayerEntity}
-     * @param  markForSync true if you want to send the gender settings to the server upon loading.
+     * @param  markForSync {@code true} if player data should be synced to the server upon being loaded; this only has an effect on the client player.
      */
     @ApiStatus.Obsolete // further discourage use of this
     @Environment(EnvType.CLIENT)
@@ -96,8 +103,15 @@ public class WildfireAPI {
     /**
      * Get every registered {@link IGenderArmor custom armor configuration}
      *
-     * @implNote This does not provide vanilla armor configurations; see {@link com.wildfire.render.armor.SimpleGenderArmor} for that.
+     * @apiNote This method should be considered "soft deprecated", and may be marked for removal in favor
+     *          of resource pack configurations in the future.
+     *
+     * @implNote This does not include armors registered through resource packs;
+     *           see {@link com.wildfire.resources.GenderArmorResourceManager} for that.
+     *
+     * @see #addGenderArmor
      */
+    @ApiStatus.Obsolete
     public static Map<Item, IGenderArmor> getGenderArmors() {
         return GENDER_ARMORS;
     }

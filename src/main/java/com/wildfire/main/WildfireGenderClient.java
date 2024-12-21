@@ -23,11 +23,14 @@ import com.wildfire.main.cloud.CloudSync;
 import com.wildfire.main.cloud.ContributorNametag;
 import com.wildfire.main.entitydata.PlayerConfig;
 import com.wildfire.main.networking.WildfireSync;
+import com.wildfire.resources.GenderArmorResourceManager;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -48,6 +51,7 @@ public class WildfireGenderClient implements ClientModInitializer {
 		WildfireSounds.register();
 		WildfireSync.registerClient();
 		WildfireEventHandler.registerClientEvents();
+		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(GenderArmorResourceManager.INSTANCE);
 	}
 
 	public static CompletableFuture<@Nullable PlayerConfig> loadGenderInfo(UUID uuid, boolean markForSync, boolean bypassQueue) {

@@ -18,7 +18,8 @@
 
 package com.wildfire.render;
 
-import com.wildfire.main.WildfireEventHandler;
+import com.wildfire.api.IBreastArmorTexture;
+import com.wildfire.api.impl.BreastArmorTexture;
 import com.wildfire.main.WildfireGender;
 import com.wildfire.main.entitydata.EntityConfig;
 import com.wildfire.render.WildfireModelRenderer.BreastModelBox;
@@ -32,6 +33,7 @@ import net.minecraft.client.render.entity.feature.FeatureRendererContext;
 import net.minecraft.client.render.entity.model.BipedEntityModel;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.model.BakedModelManager;
+import net.minecraft.client.texture.MissingSprite;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.math.MatrixStack;
@@ -51,17 +53,18 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.ColorHelper;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 @Environment(EnvType.CLIENT)
 public class GenderArmorLayer<T extends LivingEntity, M extends BipedEntityModel<T>> extends GenderLayer<T, M> {
 
 	private final SpriteAtlasTexture armorTrimsAtlas;
-	protected static final BreastModelBox lBoobArmor, rBoobArmor;
+	protected BreastModelBox lBoobArmor, rBoobArmor;
 	protected static final BreastModelBox lTrim, rTrim;
 	private EntityConfig entityConfig;
+	private @NotNull IBreastArmorTexture textureData = BreastArmorTexture.DEFAULT;
 
 	static {
-		lBoobArmor = new BreastModelBox(64, 32, 16, 17, -4F, 0.0F, 0F, 4, 5, 3, 0.0F, false);
-		rBoobArmor = new BreastModelBox(64, 32, 20, 17, 0, 0.0F, 0F, 4, 5, 3, 0.0F, false);
 		// apply a very slight delta to fix z-fighting with the armor
 		lTrim = new BreastModelBox(64, 32, 16, 17, -4F, 0.0F, 0F, 4, 5, 4, 0.001F, false);
 		rTrim = new BreastModelBox(64, 32, 20, 17, 0, 0.0F, 0F, 4, 5, 4, 0.001F, false);
@@ -70,6 +73,8 @@ public class GenderArmorLayer<T extends LivingEntity, M extends BipedEntityModel
 	public GenderArmorLayer(FeatureRendererContext<T, M> render, BakedModelManager bakery) {
 		super(render);
 		armorTrimsAtlas = bakery.getAtlas(TexturedRenderLayers.ARMOR_TRIMS_ATLAS_TEXTURE);
+		lBoobArmor = new BreastModelBox(64, 32, 16, 17, -4F, 0.0F, 0F, 4, 5, 3, 0.0F, false);
+		rBoobArmor = new BreastModelBox(64, 32, 20, 17, 0, 0.0F, 0F, 4, 5, 3, 0.0F, false);
 	}
 
 	@Override
@@ -120,7 +125,17 @@ public class GenderArmorLayer<T extends LivingEntity, M extends BipedEntityModel
 
 	@Override
 	protected void resizeBox(float breastSize) {
-		// this has no relevance to armor
+		if(genderArmor == null || Objects.equals(textureData, genderArmor.texture())) {
+			return;
+		}
+
+		textureData = genderArmor.texture();
+		var texSize = textureData.textureSize();
+		var lUV = textureData.leftUv();
+		var dim = textureData.dimensions();
+		lBoobArmor = new BreastModelBox(texSize.x(), texSize.y(), lUV.x(), lUV.y(), -4F, 0.0F, 0F, dim.x(), dim.y(), 3, 0.0F, false);
+		var rUV = textureData.rightUv();
+		rBoobArmor = new BreastModelBox(texSize.x(), texSize.y(), rUV.x(), rUV.y(), 0, 0.0F, 0F, dim.x(), dim.y(), 3, 0.0F, false);
 	}
 
 	@Override
@@ -138,6 +153,10 @@ public class GenderArmorLayer<T extends LivingEntity, M extends BipedEntityModel
 	// TODO eventually expose some way for mods to override this, maybe through a default impl in IGenderArmor or similar
 	protected void renderBreastArmor(Identifier texture, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider,
 	                                 int light, BreastSide side, int color, boolean glint) {
+		if(MinecraftClient.getInstance().getTextureManager().getTexture(texture) == MissingSprite.getMissingSpriteTexture()) {
+			return;
+		}
+
 		BreastModelBox armor = side.isLeft ? lBoobArmor : rBoobArmor;
 		RenderLayer armorType = RenderLayer.getArmorCutoutNoCull(texture);
 		VertexConsumer armorVertexConsumer = ItemRenderer.getArmorGlintConsumer(vertexConsumerProvider, armorType, glint);

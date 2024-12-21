@@ -19,26 +19,18 @@
 package com.wildfire.main;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
-import com.mojang.serialization.DynamicOps;
-import com.mojang.serialization.codecs.PrimitiveCodec;
 import com.wildfire.api.IGenderArmor;
 import com.wildfire.api.WildfireAPI;
 import com.wildfire.main.config.FloatConfigKey;
-import com.wildfire.render.armor.EmptyGenderArmor;
-import com.wildfire.render.armor.SimpleGenderArmor;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ArmorItem;
-import net.minecraft.item.ArmorMaterial;
-import net.minecraft.item.ArmorMaterials;
 import net.minecraft.item.ItemStack;
+import com.wildfire.api.impl.GenderArmor;
+import com.wildfire.resources.GenderArmorResourceManager;
 import net.fabricmc.api.EnvType;
-import net.minecraft.registry.entry.RegistryEntry;
+import net.fabricmc.api.Environment;
 import net.minecraft.util.math.MathHelper;
 
-import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 
@@ -47,16 +39,6 @@ public final class WildfireHelper {
         throw new UnsupportedOperationException();
     }
 
-    // TODO migrate this from being hardcoded to being provided by resource packs instead?
-    private static final Map<RegistryEntry<ArmorMaterial>, IGenderArmor> VANILLA_ARMORS = Map.of(
-            ArmorMaterials.LEATHER, SimpleGenderArmor.LEATHER,
-            ArmorMaterials.CHAIN, SimpleGenderArmor.CHAIN_MAIL,
-            ArmorMaterials.IRON, SimpleGenderArmor.IRON,
-            ArmorMaterials.GOLD, SimpleGenderArmor.GOLD,
-            ArmorMaterials.DIAMOND, SimpleGenderArmor.DIAMOND,
-            ArmorMaterials.NETHERITE, SimpleGenderArmor.NETHERITE
-    );
-
     public static int randInt(int min, int max) {
         return ThreadLocalRandom.current().nextInt(min, max + 1);
     }
@@ -64,21 +46,16 @@ public final class WildfireHelper {
         return (float) ThreadLocalRandom.current().nextDouble(min, (double) max + 1);
     }
 
+    @Environment(EnvType.CLIENT)
     public static IGenderArmor getArmorConfig(ItemStack stack) {
-        if (stack.isEmpty()) {
-            return EmptyGenderArmor.INSTANCE;
+        if(stack.isEmpty()) {
+            return GenderArmor.EMPTY;
         }
 
-        if (WildfireAPI.getGenderArmors().get(stack.getItem()) != null) {
-            return WildfireAPI.getGenderArmors().get(stack.getItem());
-        }
-
-        //TODO: Fabric Alternative to Capabilities? Maybe someone can help with this?
-        if(stack.getItem() instanceof ArmorItem armorItem) {
-            return VANILLA_ARMORS.getOrDefault(armorItem.getMaterial(), SimpleGenderArmor.FALLBACK);
-        }
-
-        return EmptyGenderArmor.INSTANCE;
+        return GenderArmorResourceManager.get(stack).orElseGet(() -> {
+            var fallback = stack.getItem() instanceof ArmorItem ? GenderArmor.DEFAULT : GenderArmor.EMPTY;
+            return WildfireAPI.getGenderArmors().getOrDefault(stack.getItem(), fallback);
+        });
     }
 
     public static Codec<Float> boundedFloat(float minInclusive, float maxInclusive) {
