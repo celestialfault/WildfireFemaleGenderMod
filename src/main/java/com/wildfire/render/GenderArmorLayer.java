@@ -117,8 +117,8 @@ public class GenderArmorLayer<S extends BipedEntityRenderState, M extends BipedE
 				equipmentModelLoader.get(modelId).getLayers(EquipmentModel.LayerType.HUMANOID).forEach(layer -> {
 					// mojang what the Optional hell is this
 					int layerColor = layer.dyeable().map(dye -> {
-						int defaultColor = dye.colorWhenUndyed().map(ColorHelper::fullAlpha).orElse(-1);
-						return color != -1 ? color : defaultColor;
+						int defaultColor = dye.colorWhenUndyed().map(ColorHelper::fullAlpha).orElse(0);
+						return color != 0 ? color : defaultColor;
 					}).orElse(-1);
 					var texture = layer.getFullTextureId(EquipmentModel.LayerType.HUMANOID);
 					renderBreastArmor(texture, matrixStack, vertexConsumerProvider, light, side, layerColor, glint);
