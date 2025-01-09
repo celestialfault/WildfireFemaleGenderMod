@@ -273,9 +273,9 @@ public class BreastPhysics {
 			if(swingDuration < 6) {
 				rawAmplifier = 0.15f * (6 - swingDuration);
 			} else if(swingDuration > 6) {
-				rawAmplifier = -0.067f * (swingDuration - 6);
+				rawAmplifier = -0.055f * (swingDuration - 6);
 			}
-			// Cap our amplifier at the swing durations of Mining Fatigue III/Haste II
+			// Cap our amplifier at the swing durations of Mining Fatigue IV/Haste II
 			float amplifier = MathHelper.clamp(1 + rawAmplifier, 0.6f, 1.3f);
 
 			Arm swingingArm = entity.preferredHand == Hand.MAIN_HAND ? entity.getMainArm() : entity.getMainArm().getOpposite();
@@ -287,7 +287,12 @@ public class BreastPhysics {
 			int everyNthTick = MathHelper.clamp(swingDuration - 1, 1, 5);
 			if(entity.handSwinging && entity.age % everyNthTick == 0) {
 				this.targetBounceY += (Math.random() > 0.5 ? -0.25f : 0.25f) * amplifier * bounceIntensity;
-				this.targetBounceX = (0.175f * MathHelper.clamp(1 + rawAmplifier, 0.25f, 1.3f) * bounceIntensity) * (swingingArm == Arm.RIGHT ? -1f : 1f);
+				// The regular amplifier here makes this look relatively unnatural at high levels of mining fatigue,
+				// so instead we're increasing the potency of negative amplifiers (and decreasing positive amplifiers),
+				// and clamping this at a lower range than normal.
+				// The effective range of these numbers is around the swing durations of Mining Fatigue V to Haste II.
+				var xAmp = MathHelper.clamp(1 + (rawAmplifier * (rawAmplifier < 0 ? 1.625f : 0.8f)), 0.25f, 1.225f);
+				this.targetBounceX = (0.25f * xAmp * bounceIntensity) * (swingingArm == Arm.RIGHT ? -1f : 1f);
 			}
 
 			if(swingTickDelta < 0 && lastSwingTick != lastSwingDuration - 1) {
