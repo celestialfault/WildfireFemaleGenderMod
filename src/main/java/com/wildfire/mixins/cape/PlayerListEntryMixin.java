@@ -31,7 +31,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(PlayerListEntry.class)
-public abstract class PlayerListEntryMixin {
+abstract class PlayerListEntryMixin {
     @Shadow
     @Final
     private GameProfile profile;
@@ -42,7 +42,7 @@ public abstract class PlayerListEntryMixin {
         var cape = CapeProvider.CACHE.getUnchecked(profile);
         var duck = ((SkinTexturesWildfire)(Object)original);
         var tex = cape.getNow(null);
-        duck.overrideCapeTexture(tex != null && !tex.equals(CapeProvider.NO_CAPE) ? tex : null);
+        duck.wildfiregender$overrideCapeTexture(tex != null && !tex.equals(CapeProvider.NO_CAPE) ? tex : null);
         return original;
     }
 }
