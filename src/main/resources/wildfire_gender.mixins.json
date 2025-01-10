@@ -10,9 +10,7 @@
     "ItemStackMixin",
     "LivingEntityMixin",
     "PlayerEntityRendererMixin",
-    "accessors.EquipmentRendererAccessor",
     "accessors.TextureManagerAccessor",
-    "accessors.TrimSpriteKeyConstructorAccessor",
     "renderstate.LivingEntityRendererMixin",
     "renderstate.LivingEntityRenderStateMixin",
 

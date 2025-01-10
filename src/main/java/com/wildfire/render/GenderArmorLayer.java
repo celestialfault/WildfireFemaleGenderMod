@@ -22,24 +22,22 @@ import com.wildfire.api.IBreastArmorTexture;
 import com.wildfire.api.impl.BreastArmorTexture;
 import com.wildfire.main.WildfireGender;
 import com.wildfire.main.entitydata.EntityConfig;
-import com.wildfire.mixins.accessors.EquipmentRendererAccessor;
 import com.wildfire.mixins.accessors.TextureManagerAccessor;
-import com.wildfire.mixins.accessors.TrimSpriteKeyConstructorAccessor;
 import com.wildfire.render.WildfireModelRenderer.BreastModelBox;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
-import net.minecraft.client.render.entity.equipment.EquipmentModel;
 import net.minecraft.client.render.entity.equipment.EquipmentModelLoader;
-import net.minecraft.client.render.entity.equipment.EquipmentRenderer;
 import net.minecraft.client.render.entity.feature.FeatureRendererContext;
 import net.minecraft.client.render.entity.model.BipedEntityModel;
 import net.minecraft.client.render.entity.state.ArmorStandEntityRenderState;
 import net.minecraft.client.render.entity.state.BipedEntityRenderState;
 import net.minecraft.client.render.entity.state.PlayerEntityRenderState;
 import net.minecraft.client.render.item.ItemRenderer;
+import net.minecraft.client.render.model.BakedModelManager;
 import net.minecraft.client.texture.Sprite;
+import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.DyedColorComponent;
@@ -47,9 +45,8 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.equipment.EquipmentAsset;
+import net.minecraft.item.equipment.EquipmentModel;
 import net.minecraft.item.equipment.trim.ArmorTrim;
-import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
@@ -62,7 +59,7 @@ import java.util.function.Function;
 @Environment(EnvType.CLIENT)
 public class GenderArmorLayer<S extends BipedEntityRenderState, M extends BipedEntityModel<S>> extends GenderLayer<S, M> {
 
-	private final EquipmentRenderer equipmentRenderer;
+	private final SpriteAtlasTexture armorTrimsAtlas;
 	private final EquipmentModelLoader equipmentModelLoader;
 	protected BreastModelBox lBoobArmor, rBoobArmor;
 	protected static final BreastModelBox lTrim, rTrim;
@@ -81,9 +78,9 @@ public class GenderArmorLayer<S extends BipedEntityRenderState, M extends BipedE
 		rTrim = new BreastModelBox(64, 32, 20, 17, 0, 0.0F, 0F, 4, 5, 4, 0.001F, false);
 	}
 
-	public GenderArmorLayer(FeatureRendererContext<S, M> render, EquipmentModelLoader equipmentModelLoader, EquipmentRenderer equipmentRenderer) {
+	public GenderArmorLayer(FeatureRendererContext<S, M> render, BakedModelManager bakery, EquipmentModelLoader equipmentModelLoader) {
 		super(render);
-		this.equipmentRenderer = equipmentRenderer;
+		this.armorTrimsAtlas = bakery.getAtlas(TexturedRenderLayers.ARMOR_TRIMS_ATLAS_TEXTURE);
 		this.equipmentModelLoader = equipmentModelLoader;
 		lBoobArmor = new BreastModelBox(64, 32, 16, 17, -4F, 0.0F, 0F, 4, 5, 3, 0.0F, false);
 		rBoobArmor = new BreastModelBox(64, 32, 20, 17, 0, 0.0F, 0F, 4, 5, 3, 0.0F, false);
@@ -103,7 +100,7 @@ public class GenderArmorLayer<S extends BipedEntityRenderState, M extends BipedE
 		final ItemStack chestplate = state.equippedChestStack;
 		// Check if the worn item in the chest slot is actually equippable in the chest slot, and has a model to render
 		var component = chestplate.get(DataComponentTypes.EQUIPPABLE);
-		if(component == null || component.slot() != EquipmentSlot.CHEST || component.assetId().isEmpty()) return;
+		if(component == null || component.slot() != EquipmentSlot.CHEST || component.model().isEmpty()) return;
 
 		try {
 			entityConfig = EntityConfig.getEntity(ent);
@@ -115,9 +112,9 @@ public class GenderArmorLayer<S extends BipedEntityRenderState, M extends BipedE
 			boolean glint = chestplate.hasGlint();
 
 			renderSides(state, getContextModel(), matrixStack, side -> {
-				var asset = component.assetId().orElseThrow();
+				var modelId = component.model().orElseThrow();
 				// TODO is there still a need to allow for overriding the armor texture identifier?
-				equipmentModelLoader.get(asset).getLayers(EquipmentModel.LayerType.HUMANOID).forEach(layer -> {
+				equipmentModelLoader.get(modelId).getLayers(EquipmentModel.LayerType.HUMANOID).forEach(layer -> {
 					// mojang what the Optional hell is this
 					int layerColor = layer.dyeable().map(dye -> {
 						int defaultColor = dye.colorWhenUndyed().map(ColorHelper::fullAlpha).orElse(-1);
@@ -129,7 +126,7 @@ public class GenderArmorLayer<S extends BipedEntityRenderState, M extends BipedE
 
 				var trim = armorStack.get(DataComponentTypes.TRIM);
 				if(trim != null) {
-					renderArmorTrim(asset, matrixStack, vertexConsumerProvider, light, trim, glint, side);
+					renderArmorTrim(modelId, matrixStack, vertexConsumerProvider, light, trim, glint, side);
 				}
 			});
 		} catch(Exception e) {
@@ -182,27 +179,21 @@ public class GenderArmorLayer<S extends BipedEntityRenderState, M extends BipedE
 		renderBox(armor, matrixStack, armorVertexConsumer, light, OverlayTexture.DEFAULT_UV, ColorHelper.fullAlpha(color));
 	}
 
-	protected void renderArmorTrim(RegistryKey<EquipmentAsset> armorModel, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider,
-								   int light, ArmorTrim trim, boolean hasGlint, BreastSide side) {
+	protected void renderArmorTrim(Identifier model, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider,
+	                               int packedLightIn, ArmorTrim trim, boolean hasGlint, BreastSide side) {
 		BreastModelBox trimModelBox = side.isLeft ? lTrim : rTrim;
-
-		// this sucks, but it sucks less than simply copy/pasting the entire relevant block of code, and is
-		// (at least theoretically) more compatible with other mods, assuming they simply mixin to TrimSpriteKey
-		// to modify the armor trim sprite location.
-		var key = TrimSpriteKeyConstructorAccessor.newKey(trim, EquipmentModel.LayerType.HUMANOID, armorModel);
-		Sprite sprite = ((EquipmentRendererAccessor)equipmentRenderer).getTrimSprites().apply(key);
-
-		var buffer = vertexConsumerProvider.getBuffer(TexturedRenderLayers.getArmorTrims(trim.pattern().value().decal()));
-		var vertexConsumer = sprite.getTextureSpecificVertexConsumer(buffer);
+		Sprite sprite = this.armorTrimsAtlas.getSprite(trim.getTexture(EquipmentModel.LayerType.HUMANOID, model));
+		VertexConsumer vertexConsumer = sprite.getTextureSpecificVertexConsumer(
+				vertexConsumerProvider.getBuffer(TexturedRenderLayers.getArmorTrims(trim.pattern().value().decal())));
 		// Render the armor trim itself
-		renderBox(trimModelBox, matrixStack, vertexConsumer, light, OverlayTexture.DEFAULT_UV, -1);
+		renderBox(trimModelBox, matrixStack, vertexConsumer, packedLightIn, OverlayTexture.DEFAULT_UV, -1);
 		// The enchantment glint however requires special handling; due to how Minecraft's enchant glint rendering works, rendering
 		// it at the same time as the trim itself results in the glint not rendering in sync with the rest of the armor.
 		// We *also* can't simply render the glint for both the trim and armor at the same time, due to the slight delta we apply
 		// to fix z-fighting between the trim and armor - and as such - a glint has to be rendered for each respective layer.
 		if(hasGlint) {
-			var glintBuffer = vertexConsumerProvider.getBuffer(RenderLayer.getArmorEntityGlint());
-			renderBox(trimModelBox, matrixStack, glintBuffer, light, OverlayTexture.DEFAULT_UV, -1);
+			renderBox(trimModelBox, matrixStack, vertexConsumerProvider.getBuffer(RenderLayer.getArmorEntityGlint()),
+					packedLightIn, OverlayTexture.DEFAULT_UV, -1);
 		}
 	}
 }

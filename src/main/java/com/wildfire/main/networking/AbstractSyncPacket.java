@@ -18,6 +18,7 @@
 
 package com.wildfire.main.networking;
 
+import com.mojang.datafixers.util.Function6;
 import com.mojang.datafixers.util.Function7;
 import com.wildfire.main.entitydata.Breasts;
 import com.wildfire.main.entitydata.PlayerConfig;
@@ -36,7 +37,7 @@ abstract class AbstractSyncPacket {
                 Uuids.PACKET_CODEC, p -> p.uuid,
                 Gender.CODEC, p -> p.gender,
                 PacketCodecs.FLOAT, p -> p.bustSize,
-                PacketCodecs.BOOLEAN, p -> p.hurtSounds,
+                PacketCodecs.BOOL, p -> p.hurtSounds,
                 PacketCodecs.FLOAT, p -> p.voicePitch,
                 BreastPhysics.CODEC, p -> p.physics,
                 Breasts.CODEC, p -> p.breasts,
@@ -78,8 +79,8 @@ abstract class AbstractSyncPacket {
     protected record BreastPhysics(boolean physics, boolean showInArmor, float bounceMultiplier, float floppyMultiplier) {
 
         public static final PacketCodec<ByteBuf, BreastPhysics> CODEC = PacketCodec.tuple(
-                PacketCodecs.BOOLEAN, BreastPhysics::physics,
-                PacketCodecs.BOOLEAN, BreastPhysics::showInArmor,
+                PacketCodecs.BOOL, BreastPhysics::physics,
+                PacketCodecs.BOOL, BreastPhysics::showInArmor,
                 PacketCodecs.FLOAT, BreastPhysics::bounceMultiplier,
                 PacketCodecs.FLOAT, BreastPhysics::floppyMultiplier,
                 BreastPhysics::new

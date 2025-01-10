@@ -48,7 +48,7 @@ public class WildfireAPI {
      *          of resource pack configurations in the future.
      *
      * @implNote Implementations added through this method are presently ignored if a resource pack defines armor data
-     *           at {@code NAMESPACE:wildfire_gender_data/ASSET_ID.json}, and are only used as a default implementation.
+     *           at {@code NAMESPACE:wildfire_gender_data/MODEL.json}, and are only used as a default implementation.
      *
      * @param  item  the item that you are linking this {@link IGenderArmor} to
      * @param  genderArmor the class implementing the {@link IGenderArmor} to apply to the item

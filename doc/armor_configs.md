@@ -1,7 +1,7 @@
 # Armor Resource Configs
 
-Armor physics values can be modified by a resource pack by placing a JSON file at `assets/NAMESPACE/wildfire_gender_data/ASSET_ID.json`,
-where `NAMESPACE` and `ASSET_ID` are replaced with the respective values (such as `assets/minecraft/wildfire_gender_data/iron.json`).
+Armor physics values can be modified by a resource pack by placing a JSON file at `assets/NAMESPACE/wildfire_gender_data/MODEL.json`,
+where `NAMESPACE` and `MODEL` are replaced with the respective values (such as `assets/minecraft/wildfire_gender_data/iron.json`).
 
 The full schema with default values is as follows:
 

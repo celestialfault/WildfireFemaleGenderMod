@@ -37,7 +37,7 @@ public final class Breasts {
             PacketCodecs.FLOAT, Breasts::getXOffset,
             PacketCodecs.FLOAT, Breasts::getYOffset,
             PacketCodecs.FLOAT, Breasts::getZOffset,
-            PacketCodecs.BOOLEAN, Breasts::isUniboob,
+            PacketCodecs.BOOL, Breasts::isUniboob,
             PacketCodecs.FLOAT, Breasts::getCleavage,
             (x, y, z, uniboob, cleavage) -> {
                 Breasts breasts = new Breasts();
