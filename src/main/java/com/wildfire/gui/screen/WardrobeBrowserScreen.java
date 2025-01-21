@@ -56,6 +56,7 @@ public class WardrobeBrowserScreen extends BaseWildfireScreen {
 
 	private static final Identifier TXTR_RIBBON = Identifier.of(WildfireGender.MODID, "textures/bc_ribbon.png");
 	private static final Identifier CLOUD_ICON = Identifier.of(WildfireGender.MODID, "textures/cloud.png");
+	private static final Identifier PRONOUNS_ICON = Identifier.of(WildfireGender.MODID, "textures/chatcloud.png");
 
 	private static final boolean isBreastCancerAwarenessMonth = Calendar.getInstance().get(Calendar.MONTH) == Calendar.OCTOBER;
 
@@ -128,6 +129,16 @@ public class WardrobeBrowserScreen extends BaseWildfireScreen {
 
 		/*this.addDrawableChild(new WildfireButton(this.width / 2 + 111, y - 63, 9, 9, Text.literal("X"),
 			button -> close(), text -> GuiUtils.doneNarrationText()));*/
+
+		var pronoun = new WildfireButton(
+			this.width / 2 - 36, y + 30, 32, 18, Text.translatable("wildfire_gender.cloud_settings"),
+			button -> client.setScreen(new WildfireCloudSyncScreen(this, this.playerUUID))
+		) {
+			@Override
+			protected void drawInner(DrawContext ctx, int mouseX, int mouseY, float partialTicks) {
+				ctx.drawTexture(RenderLayer::getGuiTextured, PRONOUNS_ICON, getX() + 2, getY() + 2, 0, 0, 20, 14, 32, 26, 32, 26);
+			}
+		};
 
 	    super.init();
   	}
