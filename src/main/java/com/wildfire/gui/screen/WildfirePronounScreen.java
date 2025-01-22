@@ -22,7 +22,7 @@ import com.wildfire.gui.GuiUtils;
 import com.wildfire.gui.WildfireButton;
 import com.wildfire.main.WildfireGender;
 import com.wildfire.main.WildfireLocalization;
-import com.wildfire.main.cloud.SyncLog;
+import com.wildfire.main.config.Configuration;
 import com.wildfire.main.config.GlobalConfig;
 import com.wildfire.main.config.enums.Pronoun;
 import net.fabricmc.api.EnvType;
@@ -30,6 +30,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.RenderLayer;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -41,7 +42,7 @@ public class WildfirePronounScreen extends BaseWildfireScreen {
     private static final Identifier BACKGROUND = Identifier.of(WildfireGender.MODID, "textures/gui/pronouns_bg.png");
 
     protected WildfirePronounScreen(Screen parent, UUID uuid) {
-		super(Text.translatable("wildfire_gender.cloud_settings"), parent, uuid);
+		super(Text.translatable("wildfire_gender.pronoun.settings"), parent, uuid);
 	}
 
     @Override
@@ -50,29 +51,23 @@ public class WildfirePronounScreen extends BaseWildfireScreen {
 		int y = this.height / 2;
 		int yPos = y - 47;
 		int xPos = x - 156 / 2 - 1;
-        Pronoun pronoun;
-        String pronouns = switch (pronoun) {
-            case SHE -> "SHE";
-            case HE -> "HE";
-            case THEY -> "THEY";
-            case IT -> "IT";
-        };
+        String pronouns = null;
         this.addDrawableChild(new WildfireButton(xPos, yPos, 157, 20,
             Text.translatable("wildfire_gender.pronoun.status", Pronoun.SHE, Objects.equals(pronouns, "SHE") ? WildfireLocalization.ENABLED : WildfireLocalization.DISABLED),
             button -> {
                 //Doesn't do anything
             }));
-        this.addDrawableChild(new WildfireButton(xPos, yPos, 157, 20,
+        this.addDrawableChild(new WildfireButton(xPos, yPos + 20, 157, 20,
             Text.translatable("wildfire_gender.pronoun.status", Pronoun.HE, Objects.equals(pronouns, "HE") ? WildfireLocalization.ENABLED : WildfireLocalization.DISABLED),
             button -> {
                 //Doesn't do anything
             }));
-        this.addDrawableChild(new WildfireButton(xPos, yPos, 157, 20,
+        this.addDrawableChild(new WildfireButton(xPos, yPos + 40, 157, 20,
             Text.translatable("wildfire_gender.pronoun.status", Pronoun.THEY, Objects.equals(pronouns, "THEY") ? WildfireLocalization.ENABLED : WildfireLocalization.DISABLED),
             button -> {
                 //Doesn't do anything
             }));
-        this.addDrawableChild(new WildfireButton(xPos, yPos, 157, 20,
+        this.addDrawableChild(new WildfireButton(xPos, yPos + 60, 157, 20,
             Text.translatable("wildfire_gender.pronoun.status", Pronoun.IT, Objects.equals(pronouns, "IT") ? WildfireLocalization.ENABLED : WildfireLocalization.DISABLED),
             button -> {
                 //Doesn't do anything
@@ -97,20 +92,7 @@ public class WildfirePronounScreen extends BaseWildfireScreen {
         y -= 47;
 
         GuiUtils.drawScrollableTextWithoutShadow(GuiUtils.Justify.LEFT, ctx, textRenderer, getTitle(),
-                x - 79, y - 12, x - 79 + 141, y - 11 + 10, 4473924);
-        GuiUtils.drawScrollableTextWithoutShadow(GuiUtils.Justify.LEFT, ctx, textRenderer, Text.translatable("wildfire_gender.cloud.status_log"),
-                x - 79, y + 47, x - 79 + 95, y + 48 + 10, 4473924);
-
-        for (int i = SyncLog.SYNC_LOG.size() - 1; i >= 0; i--) {
-            int reverseIndex = SyncLog.SYNC_LOG.size() - 1 - i;
-            var entry = SyncLog.SYNC_LOG.get(i);
-
-            if (reverseIndex < 6) {
-                int ey = y + 110 - (reverseIndex * 10);
-                GuiUtils.drawScrollableTextWithoutShadow(GuiUtils.Justify.LEFT, ctx, textRenderer, entry.text(),
-                        x - 78, ey, x - 78 + 156, ey + 10, entry.color());
-            }
-        }
+				x - 79, y - 12, x - 79 + 141, y - 11 + 10, 4473924);
     }
 
     @Override
