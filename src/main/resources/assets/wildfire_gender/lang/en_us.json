@@ -123,5 +123,6 @@
 	"wildfire_gender.tooltip.holiday_themes.line1": "When enabled, this feature automatically showcases cosmetics like Santa hats and other holiday-themed items during their respective holidays.",
 
 	"wildfire_gender.pronoun.status": "Show %s: %s",
-	"wildfire_gender.pronoun.settings": "Pronoun settings"
+	"wildfire_gender.pronoun.settings": "Pronoun Settings",
+	"wildfire_gender.pronoun.swap": "Swap Pronouns Positions"
 }

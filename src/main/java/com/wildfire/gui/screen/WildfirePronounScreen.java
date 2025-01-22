@@ -72,6 +72,11 @@ public class WildfirePronounScreen extends BaseWildfireScreen {
             button -> {
                 //Doesn't do anything
             }));
+        this.addDrawableChild(new WildfireButton(xPos, yPos+77, 157, 25,
+            Text.translatable("wildfire_gender.pronoun.swap"),
+            button -> {
+                //Doesn't do anything, supposed to do swap the pronouns (she/he -> he/she)
+        }));
 
         super.init();
     }

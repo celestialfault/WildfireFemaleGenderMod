@@ -131,7 +131,7 @@ public class WardrobeBrowserScreen extends BaseWildfireScreen {
 			button -> close(), text -> GuiUtils.doneNarrationText()));*/
 
 		var pronoun = new WildfireButton(
-			this.width / 2 - 10, y + 30, 24, 18, Text.translatable("wildfire_gender.pronoun.settings"),
+			this.width / 2 + 2, y + 30, 24, 18, Text.translatable("wildfire_gender.pronoun.settings"),
 			button -> client.setScreen(new WildfirePronounScreen(this, this.playerUUID))
 		) {
 			@Override
