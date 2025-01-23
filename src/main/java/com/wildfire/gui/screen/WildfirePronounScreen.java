@@ -44,8 +44,8 @@ public class WildfirePronounScreen extends BaseWildfireScreen {
     protected WildfirePronounScreen(Screen parent, UUID uuid) {
 		super(Text.translatable("wildfire_gender.pronoun.settings"), parent, uuid);
 	}
-
     Pronoun pronoun;
+//    private Configuration cfg;
 
     @Override
     public void init() {
@@ -53,7 +53,7 @@ public class WildfirePronounScreen extends BaseWildfireScreen {
 		int y = this.height / 2;
 		int yPos = y - 47;
 		int xPos = x - 156 / 2 - 1;
-        String pronouns = pronoun.subjective;
+         String pronouns = String.valueOf(Configuration.PRONOUNS);
         this.addDrawableChild(new WildfireButton(xPos, yPos, 157, 20,
             Text.translatable("wildfire_gender.pronoun.status", Pronoun.SHE, Objects.equals(pronouns, "SHE") ? WildfireLocalization.ENABLED : WildfireLocalization.DISABLED),
             button -> {
@@ -74,7 +74,7 @@ public class WildfirePronounScreen extends BaseWildfireScreen {
             button -> {
                 //Doesn't do anything
             }));
-        this.addDrawableChild(new WildfireButton(xPos, yPos+77, 157, 25,
+        this.addDrawableChild(new WildfireButton(xPos, yPos + 97, 157, 25,
             Text.translatable("wildfire_gender.pronoun.swap"),
             button -> {
                 //Doesn't do anything, supposed to do swap the pronouns (she/he -> he/she)
