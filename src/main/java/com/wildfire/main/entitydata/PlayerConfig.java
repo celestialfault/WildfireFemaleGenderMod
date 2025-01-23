@@ -24,10 +24,12 @@ import com.wildfire.main.WildfireGender;
 import com.wildfire.main.WildfireLocalization;
 import com.wildfire.main.cloud.CloudSync;
 import com.wildfire.main.cloud.SyncLog;
+import com.wildfire.main.config.enums.Pronoun;
 import com.wildfire.main.config.keys.ConfigKey;
 import com.wildfire.main.config.Configuration;
 import com.wildfire.main.Gender;
 import com.wildfire.main.config.GlobalConfig;
+import com.wildfire.main.config.keys.SizedListConfigKey;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.ApiStatus;
@@ -51,6 +53,7 @@ public class PlayerConfig extends EntityConfig {
 	protected boolean holidayThemes = Configuration.HOLIDAY_THEMES.getDefault();
 	protected boolean armorPhysOverride = Configuration.ARMOR_PHYSICS_OVERRIDE.getDefault();
 	protected boolean showBreastsInArmor = Configuration.SHOW_IN_ARMOR.getDefault();
+	protected SizedListConfigKey.LimitedArrayList<Pronoun> pronoun = Configuration.PRONOUNS.getDefault();
 
 	/**
 	 * @deprecated Use {@link #updateGender(Gender)} instead
@@ -164,6 +167,10 @@ public class PlayerConfig extends EntityConfig {
 		return updateValue(Configuration.FLOPPY_MULTIPLIER, value, v -> this.floppyMultiplier = v);
 	}
 
+	public boolean updatePronouns(SizedListConfigKey.LimitedArrayList<Pronoun> value) {
+		return updateValue(Configuration.PRONOUNS, value, v -> this.pronoun = v);
+	}
+
 	public SyncStatus getSyncStatus() {
 		return this.syncStatus;
 	}
@@ -223,6 +230,7 @@ public class PlayerConfig extends EntityConfig {
 		updateArmorPhysicsOverride(cfg.get(Configuration.ARMOR_PHYSICS_OVERRIDE));
 		updateBounceMultiplier(cfg.get(Configuration.BOUNCE_MULTIPLIER));
 		updateFloppiness(cfg.get(Configuration.FLOPPY_MULTIPLIER));
+		updatePronouns(cfg.get(Configuration.PRONOUNS));
 
 		breasts.updateXOffset(cfg.get(Configuration.BREASTS_OFFSET_X));
 		breasts.updateYOffset(cfg.get(Configuration.BREASTS_OFFSET_Y));

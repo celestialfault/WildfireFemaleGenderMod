@@ -45,13 +45,15 @@ public class WildfirePronounScreen extends BaseWildfireScreen {
 		super(Text.translatable("wildfire_gender.pronoun.settings"), parent, uuid);
 	}
 
+    Pronoun pronoun;
+
     @Override
     public void init() {
         int x = this.width / 2;
 		int y = this.height / 2;
 		int yPos = y - 47;
 		int xPos = x - 156 / 2 - 1;
-        String pronouns = null;
+        String pronouns = pronoun.subjective;
         this.addDrawableChild(new WildfireButton(xPos, yPos, 157, 20,
             Text.translatable("wildfire_gender.pronoun.status", Pronoun.SHE, Objects.equals(pronouns, "SHE") ? WildfireLocalization.ENABLED : WildfireLocalization.DISABLED),
             button -> {
