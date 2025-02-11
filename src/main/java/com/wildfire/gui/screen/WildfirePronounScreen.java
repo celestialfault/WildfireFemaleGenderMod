@@ -30,7 +30,6 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -42,55 +41,46 @@ public class WildfirePronounScreen extends BaseWildfireScreen {
     private static final Identifier BACKGROUND = Identifier.of(WildfireGender.MODID, "textures/gui/pronouns_bg.png");
 
     protected WildfirePronounScreen(Screen parent, UUID uuid) {
-		super(Text.translatable("wildfire_gender.pronoun.settings"), parent, uuid);
-	}
+        super(Text.translatable("wildfire_gender.pronoun.settings"), parent, uuid);
+    }
+
     Pronoun pronoun;
 //    private Configuration cfg;
 
     @Override
     public void init() {
         int x = this.width / 2;
-		int y = this.height / 2;
-		int yPos = y - 47;
-		int xPos = x - 156 / 2 - 1;
-         String pronouns = String.valueOf(Configuration.PRONOUNS);
-        this.addDrawableChild(new WildfireButton(xPos, yPos, 157, 20,
-            Text.translatable("wildfire_gender.pronoun.status", Pronoun.SHE, Objects.equals(pronouns, "SHE") ? WildfireLocalization.ENABLED : WildfireLocalization.DISABLED),
-            button -> {
-                //Doesn't do anything
-            }));
-        this.addDrawableChild(new WildfireButton(xPos, yPos + 20, 157, 20,
-            Text.translatable("wildfire_gender.pronoun.status", Pronoun.HE, Objects.equals(pronouns, "HE") ? WildfireLocalization.ENABLED : WildfireLocalization.DISABLED),
-            button -> {
-                //Doesn't do anything
-            }));
-        this.addDrawableChild(new WildfireButton(xPos, yPos + 40, 157, 20,
-            Text.translatable("wildfire_gender.pronoun.status", Pronoun.THEY, Objects.equals(pronouns, "THEY") ? WildfireLocalization.ENABLED : WildfireLocalization.DISABLED),
-            button -> {
-                //Doesn't do anything
-            }));
-        this.addDrawableChild(new WildfireButton(xPos, yPos + 60, 157, 20,
-            Text.translatable("wildfire_gender.pronoun.status", Pronoun.IT, Objects.equals(pronouns, "IT") ? WildfireLocalization.ENABLED : WildfireLocalization.DISABLED),
-            button -> {
-                //Doesn't do anything
-            }));
-        this.addDrawableChild(new WildfireButton(xPos, yPos + 97, 157, 25,
-            Text.translatable("wildfire_gender.pronoun.swap"),
-            button -> {
-                //Doesn't do anything, supposed to do swap the pronouns (she/he -> he/she)
+        int y = this.height / 2;
+        int yPos = y - 47;
+        int xPos = x - 156 / 2 - 1;
+        String pronouns = String.valueOf(Configuration.PRONOUNS);
+        this.addDrawableChild(new WildfireButton(xPos, yPos, 157, 20, Text.translatable("wildfire_gender.pronoun.status", Pronoun.SHE, Objects.equals(pronouns, "SHE") ? WildfireLocalization.ENABLED : WildfireLocalization.DISABLED), button -> {
+            //Doesn't do anything
+        }));
+        this.addDrawableChild(new WildfireButton(xPos, yPos + 20, 157, 20, Text.translatable("wildfire_gender.pronoun.status", Pronoun.HE, Objects.equals(pronouns, "HE") ? WildfireLocalization.ENABLED : WildfireLocalization.DISABLED), button -> {
+            //Doesn't do anything
+        }));
+        this.addDrawableChild(new WildfireButton(xPos, yPos + 40, 157, 20, Text.translatable("wildfire_gender.pronoun.status", Pronoun.THEY, Objects.equals(pronouns, "THEY") ? WildfireLocalization.ENABLED : WildfireLocalization.DISABLED), button -> {
+            //Doesn't do anything
+        }));
+        this.addDrawableChild(new WildfireButton(xPos, yPos + 60, 157, 20, Text.translatable("wildfire_gender.pronoun.status", Pronoun.IT, Objects.equals(pronouns, "IT") ? WildfireLocalization.ENABLED : WildfireLocalization.DISABLED), button -> {
+            //Doesn't do anything
+        }));
+        this.addDrawableChild(new WildfireButton(xPos, yPos + 97, 157, 25, Text.translatable("wildfire_gender.pronoun.swap"), button -> {
+            //Doesn't do anything, supposed to do swap the pronouns (she/he -> he/she)
         }));
 
         super.init();
     }
 
     @Override
-	public void renderBackground(DrawContext ctx, int mouseX, int mouseY, float delta) {
-		this.renderInGameBackground(ctx);
-		ctx.drawTexture(RenderLayer::getGuiTextured, BACKGROUND, (this.width - 172) / 2, (this.height - 124) / 2, 0, 0, 172, 144, 256, 256);
-	}
+    public void renderBackground(DrawContext ctx, int mouseX, int mouseY, float delta) {
+        this.renderInGameBackground(ctx);
+        ctx.drawTexture(RenderLayer::getGuiTextured, BACKGROUND, (this.width - 172) / 2, (this.height - 124) / 2, 0, 0, 172, 144, 256, 256);
+    }
 
-	@Override
-	public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
+    @Override
+    public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
         if (client == null || client.world == null) return;
         super.render(ctx, mouseX, mouseY, delta);
 
@@ -98,13 +88,12 @@ public class WildfirePronounScreen extends BaseWildfireScreen {
         int y = this.height / 2;
         y -= 47;
 
-        GuiUtils.drawScrollableTextWithoutShadow(GuiUtils.Justify.LEFT, ctx, textRenderer, getTitle(),
-				x - 79, y - 12, x - 79 + 141, y - 11 + 10, 4473924);
+        GuiUtils.drawScrollableTextWithoutShadow(GuiUtils.Justify.LEFT, ctx, textRenderer, getTitle(), x - 79, y - 12, x - 79 + 141, y - 11 + 10, 4473924);
     }
 
     @Override
-	public void close() {
-		GlobalConfig.INSTANCE.save();
-		super.close();
-	}
+    public void close() {
+        GlobalConfig.INSTANCE.save();
+        super.close();
+    }
 }
