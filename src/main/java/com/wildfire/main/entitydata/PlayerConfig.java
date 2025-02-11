@@ -167,9 +167,7 @@ public class PlayerConfig extends EntityConfig {
 		return updateValue(Configuration.FLOPPY_MULTIPLIER, value, v -> this.floppyMultiplier = v);
 	}
 
-	public boolean updatePronouns(SizedListConfigKey.LimitedArrayList<Pronoun> value) {
-		return updateValue(Configuration.PRONOUNS, value, v -> this.pronoun = v);
-	}
+
 
 	public SyncStatus getSyncStatus() {
 		return this.syncStatus;
@@ -230,7 +228,6 @@ public class PlayerConfig extends EntityConfig {
 		updateArmorPhysicsOverride(cfg.get(Configuration.ARMOR_PHYSICS_OVERRIDE));
 		updateBounceMultiplier(cfg.get(Configuration.BOUNCE_MULTIPLIER));
 		updateFloppiness(cfg.get(Configuration.FLOPPY_MULTIPLIER));
-		updatePronouns(cfg.get(Configuration.PRONOUNS));
 
 		breasts.updateXOffset(cfg.get(Configuration.BREASTS_OFFSET_X));
 		breasts.updateYOffset(cfg.get(Configuration.BREASTS_OFFSET_Y));
