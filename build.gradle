@@ -1,44 +1,16 @@
 plugins {
-	id 'fabric-loom' version '0.12-SNAPSHOT'
+	id 'fabric-loom' version '1.9-SNAPSHOT'
 	id 'maven-publish'
 }
 
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
+base {
+	archivesName = project.archives_base_name
+}
 
-archivesBaseName = project.archives_base_name
 version = project.mod_version
 group = project.maven_group
 
 repositories {
-	maven {
-		name = "Jitpack"
-		url 'https://jitpack.io'
-	}
-	maven {
-		url "https://maven.terraformersmc.com/"
-	}
-	maven {
-		url "https://maven.jamieswhiteshirt.com/libs-release/"
-	}
-	maven {
-		url "https://maven.shedaniel.me/"
-	}
-	maven {
-		url = 'https://maven.cafeteria.dev'
-		content {
-			includeGroup 'net.adriantodt.fabricmc'
-		}
-	}
-	maven {
-		name = "Ladysnake Libs"
-		url = 'https://ladysnake.jfrog.io/artifactory/mods'
-	}
-	maven {
-		url = 'https://repo.minelittlepony-mod.com/maven/release'
-	}
-	mavenCentral()
-
 }
 
 dependencies {
@@ -62,6 +34,11 @@ processResources {
 tasks.withType(JavaCompile).configureEach {
 	// Minecraft 1.18 (1.18-pre2) upwards uses Java 17.
 	it.options.release = 17
+}
+
+java {
+	sourceCompatibility = JavaVersion.VERSION_17
+	targetCompatibility = JavaVersion.VERSION_17
 }
 
 jar {

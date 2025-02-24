@@ -30,8 +30,8 @@ import com.wildfire.render.WildfireModelRenderer.PositionTextureVertex;
 
 import java.lang.Math;
 import java.util.ConcurrentModificationException;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
@@ -97,7 +97,7 @@ public class GenderLayer<T extends LivingEntity, M extends BipedEntityModel<T>> 
 	}
 
 	@Override
-	public void render(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int packedLightIn, @Nonnull T ent, float limbAngle,
+	public void render(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int packedLightIn, @NotNull T ent, float limbAngle,
 					   float limbDistance, float partialTicks, float animationProgress, float headYaw, float headPitch) {
 		MinecraftClient client = MinecraftClient.getInstance();
 		if(client.player == null) {

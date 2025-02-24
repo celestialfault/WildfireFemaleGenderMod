@@ -38,7 +38,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -129,7 +129,7 @@ public class WildfireHelper {
      *
      * @see EntityConfig#readFromStack
      */
-    public static void writeToNbt(@Nonnull PlayerEntity player, @Nonnull PlayerConfig config, @Nonnull ItemStack armor) {
+    public static void writeToNbt(@NotNull PlayerEntity player, @NotNull PlayerConfig config, @NotNull ItemStack armor) {
         NbtCompound nbt = new NbtCompound();
         nbt.putFloat("BreastSize", config.getGender().canHaveBreasts() && config.showBreastsInArmor() ? config.getBustSize() : 0f);
         nbt.putFloat("Cleavage", config.getBreasts().getCleavage());
