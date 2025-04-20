@@ -52,6 +52,7 @@ public class GlobalConfig extends AbstractConfiguration {
     // Development environment-only toggle; forces the client player's nametag to always render when set to true,
     // intended to allow for debugging nametag-related features.
     public static final BooleanConfigKey DEBUG_SHOW_NAMETAG = new BooleanConfigKey("showClientPlayerNametag", false);
+    public static final BooleanConfigKey HIDE_OWN_CONTRIBUTOR_TAG = new BooleanConfigKey("hide_own_contributor_nametag", false);
 
     static {
         INSTANCE.setDefault(FIRST_TIME_LOAD);
@@ -62,6 +63,7 @@ public class GlobalConfig extends AbstractConfiguration {
         INSTANCE.setDefault(ALWAYS_SHOW_LIST);
         INSTANCE.setDefault(ARMOR_STAT);
         // DEBUG_SHOW_NAMETAG is intentionally omitted as it's only ever used in a development environment
+        INSTANCE.setDefault(HIDE_OWN_CONTRIBUTOR_TAG);
         if(!INSTANCE.exists()) {
             INSTANCE.save();
         }
