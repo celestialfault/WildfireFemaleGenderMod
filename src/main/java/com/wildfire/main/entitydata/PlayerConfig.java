@@ -24,10 +24,12 @@ import com.wildfire.main.WildfireGender;
 import com.wildfire.main.WildfireLocalization;
 import com.wildfire.main.cloud.CloudSync;
 import com.wildfire.main.cloud.SyncLog;
+import com.wildfire.main.config.enums.Pronoun;
 import com.wildfire.main.config.keys.ConfigKey;
 import com.wildfire.main.config.Configuration;
 import com.wildfire.main.Gender;
 import com.wildfire.main.config.GlobalConfig;
+import com.wildfire.main.config.keys.SizedListConfigKey;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.ApiStatus;
@@ -164,6 +166,10 @@ public class PlayerConfig extends EntityConfig {
 		return updateValue(Configuration.FLOPPY_MULTIPLIER, value, v -> this.floppyMultiplier = v);
 	}
 
+    public boolean updatePronouns(SizedListConfigKey.LimitedArrayList<Pronoun> value) {
+		return updateValue(Configuration.PRONOUNS, value, v -> this.pronouns = v);
+	}
+
 	public SyncStatus getSyncStatus() {
 		return this.syncStatus;
 	}
@@ -216,6 +222,7 @@ public class PlayerConfig extends EntityConfig {
 		updateHurtSounds(cfg.get(Configuration.HURT_SOUNDS));
 		updateVoicePitch(cfg.get(Configuration.VOICE_PITCH));
 		updateHolidayThemes(cfg.get(Configuration.HOLIDAY_THEMES));
+		updatePronouns(cfg.get(Configuration.PRONOUNS));
 
 		//physics
 		updateBreastPhysics(cfg.get(Configuration.BREAST_PHYSICS));
@@ -261,6 +268,7 @@ public class PlayerConfig extends EntityConfig {
 		config.set(Configuration.HURT_SOUNDS, plr.hasHurtSounds());
 		config.set(Configuration.VOICE_PITCH, plr.getVoicePitch());
 		config.set(Configuration.HOLIDAY_THEMES, plr.hasHolidayThemes());
+		config.set(Configuration.PRONOUNS,plr.getPronouns());
 
 		//physics
 		config.set(Configuration.BREAST_PHYSICS, plr.hasBreastPhysics());

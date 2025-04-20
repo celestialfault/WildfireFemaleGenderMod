@@ -24,15 +24,16 @@ import com.wildfire.gui.WildfireButton;
 import com.wildfire.gui.WildfireSlider;
 import com.wildfire.main.Gender;
 import com.wildfire.main.WildfireGender;
+import com.wildfire.main.config.BreastPresetConfiguration;
+import com.wildfire.main.config.Configuration;
 import com.wildfire.main.config.GlobalConfig;
+import com.wildfire.main.config.enums.Pronoun;
+import com.wildfire.main.config.keys.SizedListConfigKey;
 import com.wildfire.main.entitydata.Breasts;
 import com.wildfire.main.entitydata.PlayerConfig;
-import com.wildfire.main.config.Configuration;
-import com.wildfire.main.config.BreastPresetConfiguration;
 import it.unimi.dsi.fastutil.floats.FloatConsumer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.Tooltip;
@@ -69,8 +70,7 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
 
     //Miscellaneous Tab
     private WildfireSlider voicePitchSlider;
-    private WildfireButton btnHurtSounds, btnHideInArmor, btnShowTooltips;
-    private WildfireButton btnHolidayThemes;
+    private WildfireButton btnHurtSounds, btnHideInArmor, btnShowTooltips, btnHolidayThemes, btnPronounSub, btnPronounObj;
 
     //Presets Code
     //private WildfireButton btnAddPreset, btnDeletePreset;
@@ -267,6 +267,45 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
                 .append(Text.translatable("wildfire_gender.tooltip.holiday_themes.line2")))*/
         ));
 
+        this.addDrawableChild(btnPronounSub = new WildfireButton(this.width / 2 - 36, tabOffsetY + 118, 140/*166*/, 20,
+                Text.translatable("wildfire_gender.pronoun.subjective.text", Objects.requireNonNull(Pronoun.format(plr.getConfig().get(Configuration.PRONOUNS))).substring(0, Objects.requireNonNull(Pronoun.format(plr.getConfig().get(Configuration.PRONOUNS))).indexOf("/"))), button -> {
+            SizedListConfigKey.LimitedArrayList<Pronoun> pronouns = plr.getConfig().get(Configuration.PRONOUNS);
+            Pronoun pronoun = switch (pronouns.getFirst()) {
+                case SHE -> Pronoun.HE;
+                case HE -> Pronoun.THEY;
+                case THEY -> Pronoun.IT;
+                case IT -> Pronoun.SHE;
+            };
+            pronouns.set(0, pronoun);
+            if (plr.updatePronouns(pronouns)) {
+                PlayerConfig.saveGenderInfo(plr);
+                button.setMessage(Text.translatable("wildfire_gender.pronoun.subjective.text", Objects.requireNonNull(Pronoun.format(plr.getConfig().get(Configuration.PRONOUNS))).substring(0, Objects.requireNonNull(Pronoun.format(plr.getConfig().get(Configuration.PRONOUNS))).indexOf("/")))); //Could me replace by a regex probaly
+                btnPronounObj.setMessage(Text.translatable(Objects.requireNonNull(Pronoun.format(plr.getConfig().get(Configuration.PRONOUNS))).substring(Objects.requireNonNull(Pronoun.format(plr.getConfig().get(Configuration.PRONOUNS))).indexOf("/") + 1)));
+            }
+        }));
+
+        this.addDrawableChild(btnPronounObj = new WildfireButton(this.width / 2 + 104, tabOffsetY + 118, 26, 20,
+                Text.translatable(Objects.requireNonNull(Pronoun.format(plr.getConfig().get(Configuration.PRONOUNS))).substring(Objects.requireNonNull(Pronoun.format(plr.getConfig().get(Configuration.PRONOUNS))).indexOf("/") + 1)), button -> {
+            SizedListConfigKey.LimitedArrayList<Pronoun> pronouns = plr.getConfig().get(Configuration.PRONOUNS);
+            Pronoun pronoun = switch (pronouns.getFirst()) {
+                case SHE -> Pronoun.HE;
+                case HE -> Pronoun.THEY;
+                case THEY -> Pronoun.IT;
+                case IT -> null;
+                case null -> Pronoun.SHE;
+            };
+            try {
+                if (pronoun != null) pronouns.set(1, pronoun);
+                else pronouns.remove(1);
+            } catch (IndexOutOfBoundsException e) {
+                if (pronoun != null) pronouns.add(1, pronoun);
+            }
+            if (plr.updatePronouns(pronouns)) {
+                PlayerConfig.saveGenderInfo(plr);
+                button.setMessage(Text.translatable(Objects.requireNonNull(Pronoun.format(plr.getConfig().get(Configuration.PRONOUNS))).substring(Objects.requireNonNull(Pronoun.format(plr.getConfig().get(Configuration.PRONOUNS))).indexOf("/") + 1)));
+            }
+        }));
+
         //Preset Tab Below
         PRESET_LIST = new WildfireBreastPresetList(this, 156, (j - 48));
         PRESET_LIST.setX(this.width / 2 + 30);
@@ -301,6 +340,8 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
         this.voicePitchSlider.visible = currentTab == 2;
         this.btnShowTooltips.visible = currentTab == 2;
         this.btnHolidayThemes.visible = currentTab == 2;
+        this.btnPronounSub.visible = currentTab == 2;
+        this.btnPronounObj.visible = currentTab == 2;
     }
 
 
@@ -353,7 +394,7 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
         } else if(currentTab == 1) {
             ctx.drawTexture(RenderLayer::getGuiTextured, BACKGROUND_PHYSICS, (this.width) / 2 - 42, (this.height) / 2 - 43, 0, 0, 178, 104, 512, 512);
         } else if(currentTab == 2) {
-            ctx.drawTexture(RenderLayer::getGuiTextured, BACKGROUND_MISC, (this.width) / 2 - 42, (this.height) / 2 - 43, 0, 0, 178, 128, 512, 512);
+            ctx.drawTexture(RenderLayer::getGuiTextured, BACKGROUND_MISC, (this.width) / 2 - 42, (this.height) / 2 - 43, 0, 0, 178, 152, 512, 512);
         }
 
         int x = this.width / 2;

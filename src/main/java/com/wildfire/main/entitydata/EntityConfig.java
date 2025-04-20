@@ -26,6 +26,8 @@ import com.wildfire.main.WildfireGender;
 import com.wildfire.main.WildfireHelper;
 import com.wildfire.main.config.Configuration;
 import com.wildfire.main.Gender;
+import com.wildfire.main.config.enums.Pronoun;
+import com.wildfire.main.config.keys.SizedListConfigKey;
 import com.wildfire.physics.BreastPhysics;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -67,6 +69,7 @@ public class EntityConfig {
 	protected boolean breastPhysics = Configuration.BREAST_PHYSICS.getDefault();
 	protected float bounceMultiplier = Configuration.BOUNCE_MULTIPLIER.getDefault();
 	protected float floppyMultiplier = Configuration.FLOPPY_MULTIPLIER.getDefault();
+	protected SizedListConfigKey.LimitedArrayList<Pronoun> pronouns = Configuration.PRONOUNS.getDefault();
 
 	protected float voicePitch = Configuration.VOICE_PITCH.getDefault();
 
@@ -177,6 +180,10 @@ public class EntityConfig {
 
 	public float getVoicePitch() {
 		return this.voicePitch;
+	}
+
+	public @NotNull SizedListConfigKey.LimitedArrayList<Pronoun> getPronouns() {
+		return pronouns;
 	}
 
 	public @NotNull BreastPhysics getLeftBreastPhysics() {

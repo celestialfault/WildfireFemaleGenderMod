@@ -128,5 +128,6 @@
 	"wildfire_gender.pronoun.subjective.they": "hen", "__comment":"Could also be \"zij\"",
 	"wildfire_gender.pronoun.objective.they": "hun",
 	"wildfire_gender.pronoun.subjective.it": "het",
-	"wildfire_gender.pronoun.objective.it": "hets", "__comment": "Only logical one"
+	"wildfire_gender.pronoun.objective.it": "hets", "__comment": "Only logical one",
+	"wildfire_gender.pronoun.subjective.text": "Bezittelijke voornaamwoorden: %s"
 }
