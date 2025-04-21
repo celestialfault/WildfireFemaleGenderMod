@@ -12,6 +12,7 @@
     "LivingEntityMixin",
     "PlayerEntityRendererMixin",
     "accessors.EquipmentRendererAccessor",
+    "accessors.LivingEntityRendererAccessor",
     "accessors.TextureManagerAccessor",
     "accessors.TrimSpriteKeyConstructorAccessor",
     "cape.PlayerListEntryMixin",
