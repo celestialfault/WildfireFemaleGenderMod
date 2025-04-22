@@ -65,6 +65,7 @@
 	"wildfire_gender.label.off": "Off",
 	"wildfire_gender.label.yes": "Yes",
 	"wildfire_gender.label.no": "No",
+	"wildfire_gender.label.none": "None",
 	"wildfire_gender.label.with_creator": "You are playing on a server with the creator of this mod!",
 	"wildfire_gender.label.with_contributor": "You are playing on a server with a contributor of this mod!",
 	"wildfire_gender.label.with_both": "You are playing on a server with the creator and a contributor of this mod!",

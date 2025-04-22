@@ -65,6 +65,7 @@
 	"wildfire_gender.label.off": "Uit",
 	"wildfire_gender.label.yes": "Ja",
 	"wildfire_gender.label.no": "Nee",
+	"wildfire_gender.label.none": "Geen",
 	"wildfire_gender.label.with_creator": "Je speelt op een server met de maker van deze mod!",
 	"wildfire_gender.label.with_contributor": "Je speelt op een server met een bijdrager van deze mod!",
 	"wildfire_gender.label.with_both": "Je speelt op een server met de maker en een bijdrager van deze mod!",
