@@ -18,6 +18,8 @@
 
 package com.wildfire.main.config.enums;
 
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.function.ValueLists;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,7 +37,8 @@ public enum Pronoun {
 
 	;
 
-	public static final IntFunction<Pronoun> BY_ID = ValueLists.createIdToValueFunction(Pronoun::ordinal, values(), ValueLists.OutOfBoundsHandling.ZERO);
+	//Broken and unused
+//	public static final IntFunction<Pronoun> BY_ID = ValueLists.createIdToValueFunction(Pronoun::ordinal, values(), ValueLists.OutOfBoundsHandling.ZERO);
 
 	public final String subjective;
 	public final String objective;
@@ -57,6 +60,30 @@ public enum Pronoun {
 		return switch(pronouns.size()) {
 			case 1 -> first.toString();
 			case 2 -> first.subjective + "/" + second.subjective;
+			default -> throw new UnsupportedOperationException();
+		};
+	}
+
+	/*public static @Nullable Text localFormat(List<Pronoun> pronouns) {
+		if (pronouns.isEmpty()) return null;
+		var first = pronouns.getFirst();
+		var second = pronouns.size() == 2 ? pronouns.getLast() : null;
+		return switch (pronouns.size()) {
+			case 1 ->
+					Text.translatable("wildfire_gender.pronoun.subjective." + first.subjective + "/" + "wildfire_gender.pronoun.objective." + first.subjective);
+			case 2 ->
+					Text.translatable("wildfire_gender.pronoun.subjective." + first.subjective + "/" + "wildfire_gender.pronoun.subjective." + second.subjective);
+			default -> throw new UnsupportedOperationException();
+		};
+	}*/
+
+	public static MutableText localFormat(List<Pronoun> pronouns) {
+		if (pronouns.isEmpty()) return  null;
+		Pronoun first = pronouns.getFirst();
+		Pronoun second = pronouns.size() == 2 ? pronouns.getLast() : null;
+		return switch (pronouns.size()) {
+			case 1 -> Text.translatable("wildfire_gender.pronoun.subjective." + first.subjective).append("/").append(Text.translatable("wildfire_gender.pronoun.objective." + first.subjective));
+			case 2 -> Text.translatable("wildfire_gender.pronoun.subjective." + first.subjective).append("/").append(Text.translatable("wildfire_gender.pronoun.subjective." + second.subjective));
 			default -> throw new UnsupportedOperationException();
 		};
 	}
