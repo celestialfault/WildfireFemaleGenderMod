@@ -43,6 +43,7 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import org.spongepowered.asm.mixin.injection.Next;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -71,7 +72,6 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
     //Miscellaneous Tab
     private WildfireSlider voicePitchSlider;
     private WildfireButton btnHurtSounds, btnHideInArmor, btnShowTooltips, btnHolidayThemes, btnPronounSub, btnPronounObj;
-    private boolean pronounEnabled = !Objects.requireNonNull(getPlayer(), "getPlayer()").getConfig().get(Configuration.PRONOUNS).isEmpty();
 
     //Presets Code
     //private WildfireButton btnAddPreset, btnDeletePreset;
@@ -269,7 +269,7 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
         ));
 
         this.addDrawableChild(btnPronounSub = new WildfireButton(this.width / 2 - 36, tabOffsetY + 118, 140/*166*/, 20,
-                Text.translatable("wildfire_gender.pronoun.subjective.text", !plr.getConfig().get(Configuration.PRONOUNS).isEmpty() ? Objects.requireNonNull(Pronoun.format(plr.getConfig().get(Configuration.PRONOUNS))).substring(0, Objects.requireNonNull(Pronoun.format(plr.getConfig().get(Configuration.PRONOUNS))).indexOf("/")) : Text.translatable("wildfire_gender.label.none")), button -> {
+                Text.translatable("wildfire_gender.pronoun.subjective.text", !plr.getConfig().get(Configuration.PRONOUNS).isEmpty() ? Pronoun.local(plr.getConfig().get(Configuration.PRONOUNS).getFirst(), true) : Text.translatable("wildfire_gender.label.none")), button -> {
             SizedListConfigKey.LimitedArrayList<Pronoun> pronouns = plr.getConfig().get(Configuration.PRONOUNS);
             Pronoun pronoun;
             if (!pronouns.isEmpty()) {
@@ -287,13 +287,13 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
             if (plr.updatePronouns(pronouns)) {
                 PlayerConfig.saveGenderInfo(plr);
                 btnPronounObj.active = !plr.getConfig().get(Configuration.PRONOUNS).isEmpty();
-                button.setMessage(Text.translatable("wildfire_gender.pronoun.subjective.text", !plr.getConfig().get(Configuration.PRONOUNS).isEmpty() ? Text.translatable(Objects.requireNonNull(Pronoun.format(plr.getConfig().get(Configuration.PRONOUNS))).substring(0, Objects.requireNonNull(Pronoun.format(plr.getConfig().get(Configuration.PRONOUNS))).indexOf("/")))    : "None")); //Could me replace by a regex probaly
-                btnPronounObj.setMessage(Text.translatable(!plr.getConfig().get(Configuration.PRONOUNS).isEmpty() ? Objects.requireNonNull(Pronoun.format(plr.getConfig().get(Configuration.PRONOUNS))).substring(Objects.requireNonNull(Pronoun.format(plr.getConfig().get(Configuration.PRONOUNS))).indexOf("/") + 1) : "wildfire_gender.label.none"));
+                button.setMessage(Text.translatable("wildfire_gender.pronoun.subjective.text", !plr.getConfig().get(Configuration.PRONOUNS).isEmpty() ? Pronoun.local(plr.getConfig().get(Configuration.PRONOUNS).getFirst(), true) : Text.translatable("wildfire_gender.label.none"))); //Could me replace by a regex probaly
+                btnPronounObj.setMessage(!plr.getConfig().get(Configuration.PRONOUNS).isEmpty() ? Pronoun.local(plr.getConfig().get(Configuration.PRONOUNS).getLast(), !(plr.getConfig().get(Configuration.PRONOUNS).size() == 1)) : Text.translatable("wildfire_gender.label.none"));
             }
         }));
 
         this.addDrawableChild(btnPronounObj = new WildfireButton(this.width / 2 + 104, tabOffsetY + 118, 26, 20,
-                Text.translatable(!plr.getConfig().get(Configuration.PRONOUNS).isEmpty() ? Objects.requireNonNull(Pronoun.format(plr.getConfig().get(Configuration.PRONOUNS))).substring(Objects.requireNonNull(Pronoun.format(plr.getConfig().get(Configuration.PRONOUNS))).indexOf("/") + 1) : "wildfire_gender.label.none"), button -> {
+                !plr.getConfig().get(Configuration.PRONOUNS).isEmpty() ? Pronoun.local(plr.getConfig().get(Configuration.PRONOUNS).getLast(), !(plr.getConfig().get(Configuration.PRONOUNS).size() == 1)) : Text.translatable("wildfire_gender.label.none"), button -> {
             SizedListConfigKey.LimitedArrayList<Pronoun> pronouns = plr.getConfig().get(Configuration.PRONOUNS);
             Pronoun pronoun;
             if (pronouns.size() > 1) {
@@ -313,7 +313,7 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
             }
             if (plr.updatePronouns(pronouns)) {
                 PlayerConfig.saveGenderInfo(plr);
-                button.setMessage(Text.translatable(!plr.getConfig().get(Configuration.PRONOUNS).isEmpty() ? Objects.requireNonNull(Pronoun.format(plr.getConfig().get(Configuration.PRONOUNS))).substring(Objects.requireNonNull(Pronoun.format(plr.getConfig().get(Configuration.PRONOUNS))).indexOf("/") + 1) : "wildfire_gender.label.none"));
+                button.setMessage(!plr.getConfig().get(Configuration.PRONOUNS).isEmpty() ? Pronoun.local(plr.getConfig().get(Configuration.PRONOUNS).getLast(), !(plr.getConfig().get(Configuration.PRONOUNS).size() == 1)) : Text.translatable("wildfire_gender.label.none"));
             }
         }));
         btnPronounObj.active = !plr.getConfig().get(Configuration.PRONOUNS).isEmpty();

@@ -51,7 +51,7 @@ public class GlobalConfig extends AbstractConfiguration {
 
     // Development environment-only toggle; forces the client player's nametag to always render when set to true,
     // intended to allow for debugging nametag-related features.
-    public static final BooleanConfigKey DEBUG_SHOW_NAMETAG = new BooleanConfigKey("showClientPlayerNametag", true);
+    public static final BooleanConfigKey DEBUG_SHOW_NAMETAG = new BooleanConfigKey("showClientPlayerNametag", false);
     public static final BooleanConfigKey HIDE_OWN_CONTRIBUTOR_TAG = new BooleanConfigKey("hide_own_contributor_nametag", false);
 
     static {
