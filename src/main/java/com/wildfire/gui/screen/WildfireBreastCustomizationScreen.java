@@ -43,7 +43,6 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
-import org.spongepowered.asm.mixin.injection.Next;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -272,15 +271,8 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
                 Text.translatable("wildfire_gender.pronoun.subjective.text", !plr.getConfig().get(Configuration.PRONOUNS).isEmpty() ? Pronoun.local(plr.getConfig().get(Configuration.PRONOUNS).getFirst(), true) : Text.translatable("wildfire_gender.label.none")), button -> {
             SizedListConfigKey.LimitedArrayList<Pronoun> pronouns = plr.getConfig().get(Configuration.PRONOUNS);
             Pronoun pronoun;
-            if (!pronouns.isEmpty()) {
-                pronoun = switch (pronouns.getFirst()) {
-                    case SHE -> Pronoun.HE;
-                    case HE -> Pronoun.THEY;
-                    case THEY -> Pronoun.IT;
-                    case IT -> null;
-                    case null -> Pronoun.SHE;
-                };
-            } else pronoun = Pronoun.SHE;
+            if (!pronouns.isEmpty()) pronoun = Pronoun.next(pronouns.getFirst());
+            else pronoun = Pronoun.SHE;
             if (pronoun == null) pronouns.clear();
             else if (!pronouns.isEmpty()) pronouns.set(0, pronoun);
             else pronouns.addFirst(pronoun);
@@ -296,15 +288,8 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
                 !plr.getConfig().get(Configuration.PRONOUNS).isEmpty() ? Pronoun.local(plr.getConfig().get(Configuration.PRONOUNS).getLast(), !(plr.getConfig().get(Configuration.PRONOUNS).size() == 1)) : Text.translatable("wildfire_gender.label.none"), button -> {
             SizedListConfigKey.LimitedArrayList<Pronoun> pronouns = plr.getConfig().get(Configuration.PRONOUNS);
             Pronoun pronoun;
-            if (pronouns.size() > 1) {
-                pronoun = switch (pronouns.getLast()) {
-                    case SHE -> Pronoun.HE;
-                    case HE -> Pronoun.THEY;
-                    case THEY -> Pronoun.IT;
-                    case IT -> null;
-                    case null -> Pronoun.SHE;
-                };
-            } else pronoun = Pronoun.SHE;
+            if (pronouns.size() > 1) pronoun = Pronoun.next(pronouns.getLast());
+            else pronoun = Pronoun.SHE;
             try {
                 if (pronoun != null) pronouns.set(1, pronoun);
                 else pronouns.remove(1);

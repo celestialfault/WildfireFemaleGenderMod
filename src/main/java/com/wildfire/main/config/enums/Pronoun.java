@@ -20,11 +20,9 @@ package com.wildfire.main.config.enums;
 
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.util.function.ValueLists;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.function.IntFunction;
 
 public enum Pronoun {
 	// Normative
@@ -90,6 +88,16 @@ public enum Pronoun {
 			case 1 -> Text.translatable("wildfire_gender.pronoun.subjective." + first.subjective).append("/").append(Text.translatable("wildfire_gender.pronoun.objective." + first.subjective));
 			case 2 -> Text.translatable("wildfire_gender.pronoun.subjective." + first.subjective).append("/").append(Text.translatable("wildfire_gender.pronoun.subjective." + second.subjective));
 			default -> throw new UnsupportedOperationException();
+		};
+	}
+
+	public static Pronoun next(Pronoun pronoun) {
+		return switch (pronoun) {
+			case SHE -> HE;
+			case HE -> THEY;
+			case THEY -> IT;
+			case IT -> null;
+			case null -> SHE;
 		};
 	}
 }
