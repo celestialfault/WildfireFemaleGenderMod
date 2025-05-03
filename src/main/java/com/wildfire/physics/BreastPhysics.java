@@ -59,51 +59,49 @@ public class BreastPhysics {
 	}
 
 	private static boolean vehicleSuppressesRotation(Entity vehicle) {
-		return (
+		return
 				// while you aren't able to normally ride chickens in vanilla, it is still possible through
 				// means like /ride, and as chickens attempt to force the rider's body yaw to the same yaw
-				// as the chicken (which is likely intended only for baby zombies), which results in unintended
+				// as the chicken (which is likely intended only for baby zombies), this results in unintended
 				// behavior with what we're doing
 				vehicle instanceof ChickenEntity
 				// unsaddled horses (and llamas, which also extend AbstractDonkeyEntity?) also break rotation
 				// physics, despite acting similarly to other entities where the rider's body yaw is allowed to
 				// (somewhat) freely move around
-				|| vehicle instanceof AbstractHorseEntity horseLike && !horseLike.hasSaddleEquipped()
+				|| vehicle instanceof AbstractHorseEntity horseLike && !horseLike.isSaddled()
 				// camels also suffer from largely the same issue as unsaddled horses when sitting or standing up
-				|| vehicle instanceof CamelEntity camel && camel.isStationary()
-		);
+				|| vehicle instanceof CamelEntity camel && camel.isStationary();
 	}
 
 	private static boolean shouldUseVehicleYaw(LivingEntity rider, Entity vehicle) {
-		return (
-				vehicle.hasControllingPassenger()
+		return vehicle.hasControllingPassenger()
 				// boats will typically be caught by the above #hasControllingPassenger() check, but still
 				// special case these to catch any weird modded cases that might arise
 				|| vehicle instanceof BoatEntity
 				// general catch-all for other entities that force the rider's body yaw to match theirs,
 				// such as horses
-				|| vehicle.getBodyYaw() == rider.getBodyYaw()
-		);
+				|| vehicle.getBodyYaw() == rider.getBodyYaw();
 	}
 
-	private float calcRotation(LivingEntity entity, float bounceIntensity) {
+	private static float calcRotation(LivingEntity entity, float bounceIntensity) {
 		Entity vehicle = entity.getVehicle();
 		if(vehicle != null) {
 			if(vehicleSuppressesRotation(vehicle)) {
 				return 0f;
 			} else if(shouldUseVehicleYaw(entity, vehicle)) {
-				float previous = vehicle instanceof LivingEntity living ? living.lastBodyYaw : vehicle.lastYaw;
-				return -((vehicle.getBodyYaw() - previous) / 15f) * bounceIntensity;
+				if(vehicle instanceof LivingEntity livingVehicle) {
+					return -((livingVehicle.bodyYaw - livingVehicle.prevBodyYaw) / 15f) * bounceIntensity;
+				} else {
+					return -((vehicle.getYaw() - vehicle.prevYaw) / 15f) * bounceIntensity;
+				}
 			}
 		}
 
-		return -((entity.bodyYaw - entity.lastBodyYaw) / 15f) * bounceIntensity;
+		return -((entity.bodyYaw - entity.prevBodyYaw) / 15f) * bounceIntensity;
 	}
 
 	// this class cannot be blanket marked as client-side only, as this is referenced in the constructor for EntityConfig;
 	// as such, the best we can get here is marking this method as such.
-	// TODO there's a lot of unused code here; this function should also ideally be broken up to make reading
-	// 		through it not as much of a chore (especially the vehicle physics)
 	@Environment(EnvType.CLIENT)
 	public void update(LivingEntity entity, IGenderArmor armor) {
 		// always suppress the full physics calculations on armor stands
@@ -207,7 +205,7 @@ public class BreastPhysics {
 
 		this.targetBounceY = (float) motion.y * bounceIntensity;
 		this.targetBounceY += breastWeight;
-//		float horizVel = (float) Math.sqrt(Math.pow(motion.x, 2) + Math.pow(motion.z, 2)) * (bounceIntensity);
+		float horizVel = (float) Math.sqrt(Math.pow(motion.x, 2) + Math.pow(motion.z, 2)) * (bounceIntensity);
 
 		this.targetRotVel = calcRotation(entity, bounceIntensity);
 		this.targetRotVel += (float) motion.y * bounceIntensity * randomB;
@@ -217,7 +215,7 @@ public class BreastPhysics {
 		float f2 = (float) entity.getVelocity().lengthSquared() / 0.2F;
 		f2 = f2 * f2 * f2;
 		if(f2 < 1.0F) f2 = 1.0F;
-		this.targetBounceY += MathHelper.cos(entity.limbAnimator.getAnimationProgress() * 0.6662F + (float)Math.PI) * 0.5F * entity.limbAnimator.getSpeed() * 0.5F / f2;
+		this.targetBounceY += MathHelper.cos(entity.limbAnimator.getPos() * 0.6662F + (float)Math.PI) * 0.5F * entity.limbAnimator.getSpeed() * 0.5F / f2;
 
 		EntityPose pose = entity.getPose();
 		if(pose != lastPose) {
@@ -232,8 +230,8 @@ public class BreastPhysics {
 		//button option for extra entities
 		switch(entity.getVehicle()) {
 			case BoatEntity boat -> {
-				int rowTime = (int) boat.lerpPaddlePhase(0, entity.limbAnimator.getAnimationProgress());
-				int rowTime2 = (int) boat.lerpPaddlePhase(1, entity.limbAnimator.getAnimationProgress());
+				int rowTime = (int) boat.lerpPaddlePhase(0, entity.limbAnimator.getPos());
+				int rowTime2 = (int) boat.lerpPaddlePhase(1, entity.limbAnimator.getPos());
 
 				float rotationL = (float) MathHelper.clampedLerp(-(float)Math.PI / 3F, -0.2617994F, (double) ((MathHelper.sin(-rowTime2) + 1.0F) / 2.0F));
 				float rotationR = (float) MathHelper.clampedLerp(-(float)Math.PI / 4F, (float)Math.PI / 4F, (double) ((MathHelper.sin(-rowTime + 1.0F) + 1.0F) / 2.0F));
@@ -264,7 +262,7 @@ public class BreastPhysics {
 			}
 			case StriderEntity strider -> {
 				double heightOffset = (double)strider.getHeight() - 0.19
-						+ (double)(0.12F * MathHelper.cos(strider.limbAnimator.getAnimationProgress() * 1.5f)
+						+ (double)(0.12F * MathHelper.cos(strider.limbAnimator.getPos() * 1.5f)
 						* 2F * Math.min(0.25F, strider.limbAnimator.getSpeed()));
 				this.targetBounceY += ((float) (heightOffset * 3f) - 4.5f) * bounceIntensity;
 			}
@@ -299,7 +297,7 @@ public class BreastPhysics {
 				// and clamping this at a lower range than normal.
 				// The effective range of these numbers is around the swing durations of Mining Fatigue V to Haste II.
 				var xAmp = MathHelper.clamp(1 + (rawAmplifier * (rawAmplifier < 0 ? 1.625f : 0.8f)), 0.25f, 1.225f);
-				this.targetBounceX = (0.325f * xAmp * bounceIntensity) * (swingingArm == Arm.RIGHT ? -1f : 1f);
+				this.targetBounceX = (0.25f * xAmp * bounceIntensity) * (swingingArm == Arm.RIGHT ? -1f : 1f);
 			}
 
 			if(swingTickDelta < 0 && lastSwingTick != lastSwingDuration - 1) {

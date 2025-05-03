@@ -50,11 +50,14 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.equipment.EquipmentAsset;
 import net.minecraft.item.equipment.trim.ArmorTrim;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.ColorHelper;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
+import java.util.function.Function;
 
 @Environment(EnvType.CLIENT)
 public class GenderArmorLayer<S extends BipedEntityRenderState, M extends BipedEntityModel<S>> extends GenderLayer<S, M> {
@@ -66,11 +69,11 @@ public class GenderArmorLayer<S extends BipedEntityRenderState, M extends BipedE
 	private EntityConfig entityConfig;
 	private @NotNull IBreastArmorTexture textureData = BreastArmorTexture.DEFAULT;
 
-	private static boolean textureExists(Identifier id) {
+	private static final Function<Identifier, Boolean> TEXTURE_EXISTS = Util.memoize(id -> {
 		var texManager = MinecraftClient.getInstance().getTextureManager();
 		var resourceManager = ((TextureManagerAccessor) texManager).getResourceContainer();
 		return resourceManager.getResource(id).isPresent();
-	}
+	});
 
 	static {
 		// apply a very slight delta to fix z-fighting with the armor
@@ -90,8 +93,7 @@ public class GenderArmorLayer<S extends BipedEntityRenderState, M extends BipedE
 	public void render(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int light, S state, float limbAngle, float limbDistance) {
 		MinecraftClient client = MinecraftClient.getInstance();
 		if(client.player == null) {
-			// TODO is it possible to remove this check? does anything this invoke still check
-			//		the client player or world?
+			// we're currently in a menu, give up rendering before we crash the game
 			return;
 		}
 
@@ -101,11 +103,7 @@ public class GenderArmorLayer<S extends BipedEntityRenderState, M extends BipedE
 		final ItemStack chestplate = state.equippedChestStack;
 		// Check if the worn item in the chest slot is actually equippable in the chest slot, and has a model to render
 		var component = chestplate.get(DataComponentTypes.EQUIPPABLE);
-		if(component == null || component.slot() != EquipmentSlot.CHEST) return;
-		var asset = component.assetId().orElse(null);
-		if(asset == null) return;
-		var layers = equipmentModelLoader.get(asset).getLayers(EquipmentModel.LayerType.HUMANOID);
-		if(layers.isEmpty()) return;
+		if(component == null || component.slot() != EquipmentSlot.CHEST || component.assetId().isEmpty()) return;
 
 		try {
 			entityConfig = EntityConfig.getEntity(ent);
@@ -113,13 +111,18 @@ public class GenderArmorLayer<S extends BipedEntityRenderState, M extends BipedE
 			if(!setupRender(state, entityConfig)) return;
 			if(ent instanceof ArmorStandEntity && !genderArmor.armorStandsCopySettings()) return;
 
-			int color = DyedColorComponent.getColor(chestplate, 0);
+			int color = chestplate.isIn(ItemTags.DYEABLE) ? DyedColorComponent.getColor(chestplate, -1) : -1;
 			boolean glint = chestplate.hasGlint();
 
 			renderSides(state, getContextModel(), matrixStack, side -> {
+				var asset = component.assetId().orElseThrow();
 				// TODO is there still a need to allow for overriding the armor texture identifier?
-				layers.forEach(layer -> {
-					int layerColor = EquipmentRendererAccessor.invokeGetDyeColor(layer, color);
+				equipmentModelLoader.get(asset).getLayers(EquipmentModel.LayerType.HUMANOID).forEach(layer -> {
+					// mojang what the Optional hell is this
+					int layerColor = layer.dyeable().map(dye -> {
+						int defaultColor = dye.colorWhenUndyed().map(ColorHelper::fullAlpha).orElse(0);
+						return color != 0 ? color : defaultColor;
+					}).orElse(-1);
 					var texture = layer.getFullTextureId(EquipmentModel.LayerType.HUMANOID);
 					renderBreastArmor(texture, matrixStack, vertexConsumerProvider, light, side, layerColor, glint);
 				});
@@ -169,7 +172,7 @@ public class GenderArmorLayer<S extends BipedEntityRenderState, M extends BipedE
 	// TODO eventually expose some way for mods to override this, maybe through a default impl in IGenderArmor or similar
 	protected void renderBreastArmor(Identifier texture, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider,
 	                                 int light, BreastSide side, int color, boolean glint) {
-		if(!textureExists(texture)) {
+		if(!TEXTURE_EXISTS.apply(texture)) {
 			return;
 		}
 

@@ -42,8 +42,6 @@ public class GlobalConfig extends AbstractConfiguration {
 
     public static final BooleanConfigKey ARMOR_STAT = new BooleanConfigKey("armor_stat", true);
 
-    public static final BooleanConfigKey HIDE_OWN_CONTRIBUTOR_TAG = new BooleanConfigKey("hide_own_contributor_nametag", false);
-
     static {
         INSTANCE.setDefault(FIRST_TIME_LOAD);
         INSTANCE.setDefault(CLOUD_SYNC_ENABLED);
@@ -52,7 +50,6 @@ public class GlobalConfig extends AbstractConfiguration {
         INSTANCE.setDefault(SYNC_VERBOSITY);
         INSTANCE.setDefault(ALWAYS_SHOW_LIST);
         INSTANCE.setDefault(ARMOR_STAT);
-        INSTANCE.setDefault(HIDE_OWN_CONTRIBUTOR_TAG);
         if(!INSTANCE.exists()) {
             INSTANCE.save();
         }

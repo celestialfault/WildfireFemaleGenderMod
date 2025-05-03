@@ -37,7 +37,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 @SuppressWarnings("unused")
-public final class WildfireAPI {
+public class WildfireAPI {
 
     private static final Map<Item, IGenderArmor> GENDER_ARMORS = new HashMap<>();
 
@@ -60,10 +60,7 @@ public final class WildfireAPI {
     }
 
     /**
-     * Get the cached config for a {@link PlayerEntity}
-     *
-     * @apiNote This method will not load a player's config if they aren't already cached, and will only return
-     *          the config of players the mod has already loaded.
+     * Get the config for a {@link PlayerEntity}
      *
      * @param  uuid  the uuid of the target {@link PlayerEntity}
      * @see    PlayerConfig
@@ -91,16 +88,13 @@ public final class WildfireAPI {
      * request to the {@link com.wildfire.main.cloud.CloudSync cloud sync} server for it
      * (if cloud syncing is enabled).</p>
      *
-     * <p>Use of this method is <b>heavily</b> discouraged, as the mod will already perform this load process when
-     * first accessing a player's config; the exact return type of this method may also change between versions.</p>
-     *
-     * @deprecated This method may be removed in the future; if you depend on this for any reason,
-     *             please open an issue explaining your use case.
+     * <p>Use of this method is <b>heavily</b> discouraged, as the mod will already perform this load process upon
+     * first loading a player's config; the exact return type of this method may also change between versions.</p>
      *
      * @param  uuid  the uuid of the target {@link PlayerEntity}
      * @param  markForSync {@code true} if player data should be synced to the server upon being loaded; this only has an effect on the client player.
      */
-    @Deprecated(since = "4.3.3")
+    @ApiStatus.Obsolete // further discourage use of this
     @Environment(EnvType.CLIENT)
     public static CompletableFuture<@Nullable PlayerConfig> loadGenderInfo(UUID uuid, boolean markForSync) {
         return WildfireGenderClient.loadGenderInfo(uuid, markForSync, false);
