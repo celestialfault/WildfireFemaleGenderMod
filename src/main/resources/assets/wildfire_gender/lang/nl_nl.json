@@ -130,5 +130,5 @@
 	"wildfire_gender.pronoun.objective.they": "hun",
 	"wildfire_gender.pronoun.subjective.it": "het",
 	"wildfire_gender.pronoun.objective.it": "hets", "__comment": "Only logical one",
-	"wildfire_gender.pronoun.subjective.text": "Persoonlijke voornaamwoorden: %s"
+	"wildfire_gender.pronoun.subjective.text": "Voornaamwoorden: %s"
 }
