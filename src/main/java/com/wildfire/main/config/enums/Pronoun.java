@@ -80,14 +80,14 @@ public enum Pronoun {
 		};
 	}
 
-	public static MutableText localFormat(List<Pronoun> pronouns) {
+	public static @Nullable MutableText localFormat(List<Pronoun> pronouns) {
 		if (pronouns.isEmpty()) return  null;
 		Pronoun first = pronouns.getFirst();
 		Pronoun second = pronouns.size() == 2 ? pronouns.getLast() : null;
 		return switch (pronouns.size()) {
 			case 1 -> Text.translatable("wildfire_gender.pronoun.subjective." + first.subjective).append("/").append(Text.translatable("wildfire_gender.pronoun.objective." + first.subjective));
 			case 2 -> Text.translatable("wildfire_gender.pronoun.subjective." + first.subjective).append("/").append(Text.translatable("wildfire_gender.pronoun.subjective." + second.subjective));
-			default -> throw new UnsupportedOperationException();
+			default -> throw new MatchException("pronouns is not empty and has a size above 2, which is not allowed",null);
 		};
 	}
 
