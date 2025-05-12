@@ -111,7 +111,7 @@ public class GenderArmorLayer<S extends BipedEntityRenderState, M extends BipedE
 			if(!setupRender(state, entityConfig)) return;
 			if(ent instanceof ArmorStandEntity && !genderArmor.armorStandsCopySettings()) return;
 
-			int color = chestplate.isIn(ItemTags.DYEABLE) ? DyedColorComponent.getColor(chestplate, -1) : -1;
+			int color = chestplate.isIn(ItemTags.DYEABLE) ? DyedColorComponent.getColor(chestplate, 0) : -1;
 			boolean glint = chestplate.hasGlint();
 
 			renderSides(state, getContextModel(), matrixStack, side -> {
@@ -119,10 +119,7 @@ public class GenderArmorLayer<S extends BipedEntityRenderState, M extends BipedE
 				// TODO is there still a need to allow for overriding the armor texture identifier?
 				equipmentModelLoader.get(asset).getLayers(EquipmentModel.LayerType.HUMANOID).forEach(layer -> {
 					// mojang what the Optional hell is this
-					int layerColor = layer.dyeable().map(dye -> {
-						int defaultColor = dye.colorWhenUndyed().map(ColorHelper::fullAlpha).orElse(0);
-						return color != 0 ? color : defaultColor;
-					}).orElse(-1);
+					int layerColor = EquipmentRendererAccessor.invokeGetDyeColor(layer, color);
 					var texture = layer.getFullTextureId(EquipmentModel.LayerType.HUMANOID);
 					renderBreastArmor(texture, matrixStack, vertexConsumerProvider, light, side, layerColor, glint);
 				});
