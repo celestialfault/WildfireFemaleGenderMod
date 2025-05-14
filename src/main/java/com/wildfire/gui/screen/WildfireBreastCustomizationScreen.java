@@ -268,7 +268,7 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
         ));
 
         this.addDrawableChild(btnPronounSub = new WildfireButton(this.width / 2 - 36, tabOffsetY + 118, 140/*166*/, 20,
-                getTxtPronoun(false), button -> {
+                getTekstPronoun(false), button -> {
             SizedListConfigKey.LimitedArrayList<Pronoun> pronouns = plr.getConfig().get(Configuration.PRONOUNS);
             Pronoun pronoun;
             if (!pronouns.isEmpty()) pronoun = Pronoun.next(pronouns.getFirst());
@@ -279,13 +279,13 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
             if (plr.updatePronouns(pronouns)) {
                 PlayerConfig.saveGenderInfo(plr);
                 btnPronounObj.active = !plr.getConfig().get(Configuration.PRONOUNS).isEmpty();
-                button.setMessage(getTxtPronoun(false));
-                btnPronounObj.setMessage(getTxtPronoun(true));
+                button.setMessage(getTekstPronoun(false));
+                btnPronounObj.setMessage(getTekstPronoun(true));
             }
         }));
 
         this.addDrawableChild(btnPronounObj = new WildfireButton(this.width / 2 + 104, tabOffsetY + 118, 26, 20,
-                getTxtPronoun(true), button -> {
+                getTekstPronoun(true), button -> {
             SizedListConfigKey.LimitedArrayList<Pronoun> pronouns = plr.getConfig().get(Configuration.PRONOUNS);
             Pronoun pronoun;
             if (pronouns.size() > 1) pronoun = Pronoun.next(pronouns.getLast());
@@ -298,7 +298,7 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
             }
             if (plr.updatePronouns(pronouns)) {
                 PlayerConfig.saveGenderInfo(plr);
-                button.setMessage(getTxtPronoun(true));
+                button.setMessage(getTekstPronoun(true));
             }
         }));
         btnPronounObj.active = !plr.getConfig().get(Configuration.PRONOUNS).isEmpty();
@@ -444,15 +444,13 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
         return super.mouseReleased(mouseX, mouseY, state);
     }
 
-    private Text getTxtPronoun(boolean objective) { //Using txt as an abbreviation for text
+    private Text getTekstPronoun(boolean objective) {
         PlayerConfig plr = Objects.requireNonNull(getPlayer(), "getPlayer()");
-        if (objective) return !plr.getConfig().get(Configuration.PRONOUNS).isEmpty() ?
-                Pronoun.local(plr.getConfig().get(Configuration.PRONOUNS).getLast(),
-                        !(plr.getConfig().get(Configuration.PRONOUNS).size() == 1)) :
-                Text.translatable("wildfire_gender.label.none");
-        else return Text.translatable("wildfire_gender.pronoun.subjective.text",
-                !plr.getConfig().get(Configuration.PRONOUNS).isEmpty() ?
-                        Pronoun.local(plr.getConfig().get(Configuration.PRONOUNS).getFirst(), true) :
-                        Text.translatable("wildfire_gender.label.none"));
+        if (plr.getConfig().get(Configuration.PRONOUNS).isEmpty()) return Text.translatable("wildfire_gender.label.none");
+        final var pronouns = plr.getConfig().get(Configuration.PRONOUNS);
+        if (objective)
+            return Pronoun.local(pronouns.getLast(), !(pronouns.size() == 1));
+        else
+            return Text.translatable("wildfire_gender.pronoun.subjective.text", Pronoun.local(pronouns.getFirst(), true));
     }
 }
