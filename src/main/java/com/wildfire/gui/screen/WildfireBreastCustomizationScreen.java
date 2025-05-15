@@ -278,7 +278,7 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
             else pronouns.addFirst(pronoun);
             if (plr.updatePronouns(pronouns)) {
                 PlayerConfig.saveGenderInfo(plr);
-                btnPronounObj.active = !plr.getConfig().get(Configuration.PRONOUNS).isEmpty();
+                btnPronounObj.active = !pronouns.isEmpty();
                 button.setMessage(getTekstPronoun(false));
                 btnPronounObj.setMessage(getTekstPronoun(true));
             }
@@ -446,8 +446,8 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
 
     private Text getTekstPronoun(boolean objective) {
         PlayerConfig plr = Objects.requireNonNull(getPlayer(), "getPlayer()");
-        if (plr.getConfig().get(Configuration.PRONOUNS).isEmpty()) return Text.translatable("wildfire_gender.label.none");
         final var pronouns = plr.getConfig().get(Configuration.PRONOUNS);
+        if (pronouns.isEmpty()) return Text.translatable("wildfire_gender.label.none");
         if (objective)
             return Pronoun.local(pronouns.getLast(), !(pronouns.size() == 1));
         else

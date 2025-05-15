@@ -51,22 +51,21 @@ public enum Pronoun {
 		return subjective + "/" + objective;
 	}
 
-	public static Text local(Pronoun pronoun, Boolean subjective) {
+	public static Text local(Pronoun pronoun, boolean subjective) {
 		if (pronoun == null) return null;
 		Text text;
-		if (subjective) text = switch (pronoun) {
+		if (subjective) return switch (pronoun) {
 			case SHE -> Text.translatable("wildfire_gender.pronoun.subjective.she");
 			case HE -> Text.translatable("wildfire_gender.pronoun.subjective.he");
 			case THEY -> Text.translatable("wildfire_gender.pronoun.subjective.they");
 			case IT -> Text.translatable("wildfire_gender.pronoun.subjective.it");
 		};
-		else text = switch (pronoun) {
+		else return switch (pronoun) {
 			case SHE -> Text.translatable("wildfire_gender.pronoun.objective.she");
 			case HE -> Text.translatable("wildfire_gender.pronoun.objective.he");
 			case THEY -> Text.translatable("wildfire_gender.pronoun.objective.they");
 			case IT -> Text.translatable("wildfire_gender.pronoun.objective.it");
 		};
-		return text;
 	}
 
 	public static @Nullable String format(List<Pronoun> pronouns) {
@@ -81,13 +80,13 @@ public enum Pronoun {
 	}
 
 	public static @Nullable MutableText localFormat(List<Pronoun> pronouns) {
-		if (pronouns.isEmpty()) return  null;
+		if (pronouns.isEmpty()) return null;
 		Pronoun first = pronouns.getFirst();
 		Pronoun second = pronouns.size() == 2 ? pronouns.getLast() : null;
 		return switch (pronouns.size()) {
 			case 1 -> Text.translatable("wildfire_gender.pronoun.subjective." + first.subjective).append("/").append(Text.translatable("wildfire_gender.pronoun.objective." + first.subjective));
 			case 2 -> Text.translatable("wildfire_gender.pronoun.subjective." + first.subjective).append("/").append(Text.translatable("wildfire_gender.pronoun.subjective." + second.subjective));
-			default -> throw new MatchException("pronouns is not empty and has a size above 2, which is not allowed",null);
+			default -> throw new MatchException(null, null);
 		};
 	}
 

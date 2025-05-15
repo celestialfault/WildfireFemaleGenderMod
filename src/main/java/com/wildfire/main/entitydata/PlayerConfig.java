@@ -268,7 +268,7 @@ public class PlayerConfig extends EntityConfig {
 		config.set(Configuration.HURT_SOUNDS, plr.hasHurtSounds());
 		config.set(Configuration.VOICE_PITCH, plr.getVoicePitch());
 		config.set(Configuration.HOLIDAY_THEMES, plr.hasHolidayThemes());
-		config.set(Configuration.PRONOUNS,plr.getPronouns());
+		config.set(Configuration.PRONOUNS, plr.getPronouns());
 
 		//physics
 		config.set(Configuration.BREAST_PHYSICS, plr.hasBreastPhysics());
