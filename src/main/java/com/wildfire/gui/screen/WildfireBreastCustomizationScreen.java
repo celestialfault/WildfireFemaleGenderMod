@@ -268,7 +268,7 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
         ));
 
         this.addDrawableChild(btnPronounSub = new WildfireButton(this.width / 2 - 36, tabOffsetY + 118, 140/*166*/, 20,
-                getTextPronoun(false), button -> {
+                getPronounText(false), button -> {
             SizedListConfigKey.LimitedArrayList<Pronoun> pronouns = plr.getConfig().get(Configuration.PRONOUNS);
             Pronoun pronoun;
             if (!pronouns.isEmpty()) {
@@ -286,13 +286,13 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
             if (plr.updatePronouns(pronouns)) {
                 PlayerConfig.saveGenderInfo(plr);
                 btnPronounObj.active = !pronouns.isEmpty();
-                button.setMessage(getTextPronoun(false));
-                btnPronounObj.setMessage(getTextPronoun(true));
+                button.setMessage(getPronounText(false));
+                btnPronounObj.setMessage(getPronounText(true));
             }
         }));
 
         this.addDrawableChild(btnPronounObj = new WildfireButton(this.width / 2 + 104, tabOffsetY + 118, 26, 20,
-                getTextPronoun(true), button -> {
+                getPronounText(true), button -> {
             SizedListConfigKey.LimitedArrayList<Pronoun> pronouns = plr.getConfig().get(Configuration.PRONOUNS);
             Pronoun pronoun;
             if (pronouns.size() > 1) pronoun = Pronoun.next(pronouns.getLast());
@@ -305,7 +305,7 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
             }
             if (plr.updatePronouns(pronouns)) {
                 PlayerConfig.saveGenderInfo(plr);
-                button.setMessage(getTextPronoun(true));
+                button.setMessage(getPronounText(true));
             }
         }));
         btnPronounObj.active = !plr.getConfig().get(Configuration.PRONOUNS).isEmpty();
@@ -451,7 +451,7 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
         return super.mouseReleased(mouseX, mouseY, state);
     }
 
-    private Text getTextPronoun(boolean objective) {
+    private Text getPronounText(boolean objective) {
         PlayerConfig plr = Objects.requireNonNull(getPlayer(), "getPlayer()");
         final var pronouns = plr.getConfig().get(Configuration.PRONOUNS);
         if (pronouns.isEmpty()) return Text.translatable("wildfire_gender.label.none");
