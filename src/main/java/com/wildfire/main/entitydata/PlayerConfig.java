@@ -53,6 +53,7 @@ public class PlayerConfig extends EntityConfig {
 	protected boolean holidayThemes = Configuration.HOLIDAY_THEMES.getDefault();
 	protected boolean armorPhysOverride = Configuration.ARMOR_PHYSICS_OVERRIDE.getDefault();
 	protected boolean showBreastsInArmor = Configuration.SHOW_IN_ARMOR.getDefault();
+//	protected SizedListConfigKey.LimitedArrayList<Pronoun> pronouns = Configuration.PRONOUNS.getDefault(); // This breaks it for some reason, to lazy to figure it out -PinguinLars
 
 	/**
 	 * @deprecated Use {@link #updateGender(Gender)} instead

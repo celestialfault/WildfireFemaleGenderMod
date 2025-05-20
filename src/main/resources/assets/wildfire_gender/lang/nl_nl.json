@@ -122,13 +122,13 @@
 	"wildfire_gender.misc.holiday_themes": "Feestdagen Thema: %s",
 	"wildfire_gender.tooltip.holiday_themes.line1": "Wanneer aangezet, zal deze functie automatisch cosmetica weergeven zoals Kerst muts en andere feestdagen gerelateerde voorwerpen tijdens die feestdagen.",
 
-	"wildfire_gender.pronoun.subjective.she": "zij",
-	"wildfire_gender.pronoun.objective.she": "haar",
-	"wildfire_gender.pronoun.subjective.he": "hij",
-	"wildfire_gender.pronoun.objective.he": "zijn",
-	"wildfire_gender.pronoun.subjective.they": "hen", "__comment":"Could also be \"zij\"",
-	"wildfire_gender.pronoun.objective.they": "hun",
-	"wildfire_gender.pronoun.subjective.it": "het",
-	"wildfire_gender.pronoun.objective.it": "hets", "__comment": "Only logical one",
-	"wildfire_gender.pronoun.subjective.text": "Voornaamwoorden: %s"
+	"wildfire_gender.pronoun.she": "zij",
+	"wildfire_gender.pronoun.her": "haar",
+	"wildfire_gender.pronoun.he": "hij",
+	"wildfire_gender.pronoun.him": "zijn",
+	"wildfire_gender.pronoun.they": "hen",
+	"wildfire_gender.pronoun.them": "hun",
+	"wildfire_gender.pronoun.it": "hen",
+	"wildfire_gender.pronoun.its": "zij",
+	"wildfire_gender.pronoun.text": "Voornaamwoorden: %s"
 }

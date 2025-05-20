@@ -51,23 +51,6 @@ public enum Pronoun {
 		return subjective + "/" + objective;
 	}
 
-	public static Text local(Pronoun pronoun, boolean subjective) {
-		if (pronoun == null) return null;
-		Text text;
-		if (subjective) return switch (pronoun) {
-			case SHE -> Text.translatable("wildfire_gender.pronoun.subjective.she");
-			case HE -> Text.translatable("wildfire_gender.pronoun.subjective.he");
-			case THEY -> Text.translatable("wildfire_gender.pronoun.subjective.they");
-			case IT -> Text.translatable("wildfire_gender.pronoun.subjective.it");
-		};
-		else return switch (pronoun) {
-			case SHE -> Text.translatable("wildfire_gender.pronoun.objective.she");
-			case HE -> Text.translatable("wildfire_gender.pronoun.objective.he");
-			case THEY -> Text.translatable("wildfire_gender.pronoun.objective.they");
-			case IT -> Text.translatable("wildfire_gender.pronoun.objective.it");
-		};
-	}
-
 	public static @Nullable String format(List<Pronoun> pronouns) {
 		if(pronouns.isEmpty()) return null;
 		var first = pronouns.getFirst();
@@ -84,12 +67,18 @@ public enum Pronoun {
 		Pronoun first = pronouns.getFirst();
 		Pronoun second = pronouns.size() == 2 ? pronouns.getLast() : null;
 		return switch (pronouns.size()) {
-			case 1 -> Text.translatable("wildfire_gender.pronoun.subjective." + first.subjective).append("/").append(Text.translatable("wildfire_gender.pronoun.objective." + first.subjective));
-			case 2 -> Text.translatable("wildfire_gender.pronoun.subjective." + first.subjective).append("/").append(Text.translatable("wildfire_gender.pronoun.subjective." + second.subjective));
+			case 1 -> Text.translatable("wildfire_gender.pronoun." + first.subjective).append("/").append(Text.translatable("wildfire_gender.pronoun." + first.objective));
+			case 2 -> Text.translatable("wildfire_gender.pronoun." + first.subjective).append("/").append(Text.translatable("wildfire_gender.pronoun." + second.subjective));
 			default -> throw new MatchException(null, null);
 		};
 	}
 
+	/**
+	 * Returns the next pronoun in a sequential order.
+	 *
+	 * @param pronoun a <code>Pronoun</code> object or null
+	 * @return the next pronoun in the sequence, or null if <code>pronoun</code> is IT
+	 */
 	public static Pronoun next(Pronoun pronoun) {
 		return switch (pronoun) {
 			case SHE -> HE;
@@ -98,5 +87,25 @@ public enum Pronoun {
 			case IT -> null;
 			case null -> SHE;
 		};
+	}
+
+	public static Text subjectiveText(Pronoun pronoun) {
+		if (pronoun == null) return null;
+		return switch (pronoun) {
+			case SHE -> Text.translatable("wildfire_gender.pronoun.she");
+			case HE -> Text.translatable("wildfire_gender.pronoun.he");
+			case THEY -> Text.translatable("wildfire_gender.pronoun.they");
+			case IT -> Text.translatable("wildfire_gender.pronoun.it");
+		};
+	}
+
+	public static Text objectiveText(Pronoun pronoun) {
+		if (pronoun == null) return null;
+		return switch (pronoun) {
+            case SHE -> Text.translatable("wildfire_gender.pronoun.her");
+            case HE -> Text.translatable("wildfire_gender.pronoun.him");
+            case THEY -> Text.translatable("wildfire_gender.pronoun.them");
+            case IT -> Text.translatable("wildfire_gender.pronoun.its");
+        };
 	}
 }

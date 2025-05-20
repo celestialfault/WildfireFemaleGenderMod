@@ -295,13 +295,21 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
                 getPronounText(true), button -> {
             SizedListConfigKey.LimitedArrayList<Pronoun> pronouns = plr.getConfig().get(Configuration.PRONOUNS);
             Pronoun pronoun;
-            if (pronouns.size() > 1) pronoun = Pronoun.next(pronouns.getLast());
-            else pronoun = Pronoun.SHE;
+            if (pronouns.size() > 1) {
+                pronoun = Pronoun.next(pronouns.getLast());
+            } else {
+                pronoun = Pronoun.SHE;
+            }
             try {
-                if (pronoun != null) pronouns.set(1, pronoun);
-                else pronouns.remove(1);
+                if (pronoun != null) {
+                    pronouns.set(1, pronoun);
+                } else {
+                    pronouns.remove(1);
+                }
             } catch (IndexOutOfBoundsException e) {
-                if (pronoun != null) pronouns.add(1, pronoun);
+                if (pronoun != null) {
+                    pronouns.add(1, pronoun);
+                }
             }
             if (plr.updatePronouns(pronouns)) {
                 PlayerConfig.saveGenderInfo(plr);
@@ -454,11 +462,15 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
     private Text getPronounText(boolean objective) {
         PlayerConfig plr = Objects.requireNonNull(getPlayer(), "getPlayer()");
         final var pronouns = plr.getConfig().get(Configuration.PRONOUNS);
-        if (pronouns.isEmpty()) return Text.translatable("wildfire_gender.label.none");
+        if (pronouns.isEmpty()) return Text.translatable("wildfire_gender.pronoun.text", Text.translatable("wildfire_gender.label.none"));
         if (objective) {
-            return Pronoun.local(pronouns.getLast(), !(pronouns.size() == 1));
+            if (pronouns.size() ==1) {
+                return Pronoun.subjectiveText(pronouns.getLast());
+            } else {
+                return Pronoun.objectiveText(pronouns.getLast());
+            }
         } else {
-            return Text.translatable("wildfire_gender.pronoun.subjective.text", Pronoun.local(pronouns.getFirst(), true));
+            return Text.translatable("wildfire_gender.pronoun.text", Pronoun.subjectiveText(pronouns.getFirst()));
         }
     }
 }
