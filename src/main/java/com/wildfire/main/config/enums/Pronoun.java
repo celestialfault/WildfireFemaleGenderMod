@@ -51,6 +51,8 @@ public enum Pronoun {
 		return subjective + "/" + objective;
 	}
 
+	/// Old version of {@link Pronoun#format(List)}
+/*
 	public static @Nullable String format(List<Pronoun> pronouns) {
 		if(pronouns.isEmpty()) return null;
 		var first = pronouns.getFirst();
@@ -61,8 +63,9 @@ public enum Pronoun {
 			default -> throw new UnsupportedOperationException();
 		};
 	}
+*/
 
-	public static @Nullable MutableText localFormat(List<Pronoun> pronouns) {
+    public static @Nullable MutableText format(List<Pronoun> pronouns) {
 		if (pronouns.isEmpty()) return null;
 		Pronoun first = pronouns.getFirst();
 		Pronoun second = pronouns.size() == 2 ? pronouns.getLast() : null;
@@ -76,7 +79,7 @@ public enum Pronoun {
 	/**
 	 * Returns the next pronoun in a sequential order.
 	 *
-	 * @param pronoun a <code>Pronoun</code> object or null
+	 * @param pronoun a {@code pronoun} object or null
 	 * @return the next pronoun in the sequence, or null if <code>pronoun</code> is IT
 	 */
 	public static Pronoun next(Pronoun pronoun) {

@@ -175,7 +175,7 @@ public final class WildfireEventHandler {
 		var lines = new ArrayList<Text>();
 		var config = WildfireGender.getPlayerById(player.getUuid());
 
-		var pronouns = config != null ? Pronoun.localFormat(config.getConfig().get(Configuration.PRONOUNS)) : null;
+		var pronouns = config != null ? Pronoun.format(config.getConfig().get(Configuration.PRONOUNS)) : null;
 		if(pronouns != null) {
 			lines.add(pronouns.formatted(Formatting.GRAY));
 		}
