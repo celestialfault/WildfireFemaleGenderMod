@@ -167,7 +167,7 @@ public class PlayerConfig extends EntityConfig {
 		return updateValue(Configuration.FLOPPY_MULTIPLIER, value, v -> this.floppyMultiplier = v);
 	}
 
-    public boolean updatePronouns(SizedListConfigKey.LimitedArrayList<Pronoun> value) {
+	public boolean updatePronouns(SizedListConfigKey.LimitedArrayList<Pronoun> value) {
 		return updateValue(Configuration.PRONOUNS, value, v -> this.pronouns = v);
 	}
 

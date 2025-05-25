@@ -65,7 +65,7 @@ public enum Pronoun {
 	}
 */
 
-    public static @Nullable MutableText format(List<Pronoun> pronouns) {
+	public static @Nullable MutableText format(List<Pronoun> pronouns) {
 		if (pronouns.isEmpty()) return null;
 		Pronoun first = pronouns.getFirst();
 		Pronoun second = pronouns.size() == 2 ? pronouns.getLast() : null;
@@ -105,10 +105,10 @@ public enum Pronoun {
 	public static Text objectiveText(Pronoun pronoun) {
 		if (pronoun == null) return null;
 		return switch (pronoun) {
-            case SHE -> Text.translatable("wildfire_gender.pronoun.her");
-            case HE -> Text.translatable("wildfire_gender.pronoun.him");
-            case THEY -> Text.translatable("wildfire_gender.pronoun.them");
-            case IT -> Text.translatable("wildfire_gender.pronoun.its");
-        };
+			case SHE -> Text.translatable("wildfire_gender.pronoun.her");
+			case HE -> Text.translatable("wildfire_gender.pronoun.him");
+			case THEY -> Text.translatable("wildfire_gender.pronoun.them");
+			case IT -> Text.translatable("wildfire_gender.pronoun.its");
+		};
 	}
 }

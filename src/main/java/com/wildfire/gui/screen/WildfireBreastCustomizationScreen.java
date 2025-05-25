@@ -267,8 +267,7 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
                 .append(Text.translatable("wildfire_gender.tooltip.holiday_themes.line2")))*/
         ));
 
-        this.addDrawableChild(btnPronounSub = new WildfireButton(this.width / 2 - 36, tabOffsetY + 118, 140/*166*/, 20,
-                getPronounText(false), button -> {
+        this.addDrawableChild(btnPronounSub = new WildfireButton(this.width / 2 - 36, tabOffsetY + 118, 140, 20, getPronounText(false), button -> {
             SizedListConfigKey.LimitedArrayList<Pronoun> pronouns = plr.getConfig().get(Configuration.PRONOUNS);
             Pronoun pronoun;
             if (!pronouns.isEmpty()) {
@@ -291,8 +290,7 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
             }
         }));
 
-        this.addDrawableChild(btnPronounObj = new WildfireButton(this.width / 2 + 104, tabOffsetY + 118, 26, 20,
-                getPronounText(true), button -> {
+        this.addDrawableChild(btnPronounObj = new WildfireButton(this.width / 2 + 104, tabOffsetY + 118, 26, 20, getPronounText(true), button -> {
             SizedListConfigKey.LimitedArrayList<Pronoun> pronouns = plr.getConfig().get(Configuration.PRONOUNS);
             Pronoun pronoun;
             if (pronouns.size() > 1) {
