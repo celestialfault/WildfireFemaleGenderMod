@@ -465,9 +465,9 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
         if (pronouns.isEmpty()) return Text.translatable("wildfire_gender.pronoun.text", Text.translatable("wildfire_gender.label.none"));
         if (objective) {
             if (pronouns.size() ==1) {
-                return Pronoun.subjectiveText(pronouns.getLast());
-            } else {
                 return Pronoun.objectiveText(pronouns.getLast());
+            } else {
+                return Pronoun.subjectiveText(pronouns.getLast());
             }
         } else {
             return Text.translatable("wildfire_gender.pronoun.text", Pronoun.subjectiveText(pronouns.getFirst()));
