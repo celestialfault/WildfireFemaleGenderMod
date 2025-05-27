@@ -14,11 +14,12 @@
     "accessors.LivingEntityRendererAccessor",
     "accessors.TextureManagerAccessor",
     "accessors.TrimSpriteKeyConstructorAccessor",
+    "cape.PlayerListEntryMixin",
+    "cape.SkinTexturesMixin",
+    "cape.SkinTexturesWildfireImplMixin",
     "renderstate.LivingEntityRendererMixin",
     "renderstate.LivingEntityRenderStateMixin",
-    "cape.PlayerListEntryMixin",
-    "cape.SkinTexturesWildfireImplMixin",
-    "cape.SkinTexturesMixin"
+    "renderstate.PlayerEntityRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

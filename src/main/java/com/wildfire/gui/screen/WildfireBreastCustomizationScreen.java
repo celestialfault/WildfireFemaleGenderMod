@@ -68,7 +68,7 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
     private WildfireButton btnOverrideArmorPhys, btnBreastPhysics;
 
     //Miscellaneous Tab
-    private WildfireSlider voicePitchSlider;
+    private WildfireSlider voicePitchSlider, scaleSlider;
     private WildfireButton btnHurtSounds, btnHideInArmor, btnShowTooltips;
     private WildfireButton btnHolidayThemes;
 
@@ -238,6 +238,11 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
         voicePitchSlider.active = plr.hasHurtSounds();
         this.voicePitchSlider.setArrowKeyStep(0.01);
 
+        // TODO translation string
+        this.addDrawableChild(this.scaleSlider = new WildfireSlider(this.width / 2 - 36 + 166/2 + 2, tabOffsetY + 22, 166 / 2 - 2, 20, Configuration.SCALE, plr.getScale(),
+                plr::updateScale, value -> Text.translatable("wildfire_gender.slider.voice_pitch", Math.round(value * 100)), value -> PlayerConfig.saveGenderInfo(plr)));
+        this.scaleSlider.setArrowKeyStep(0.01);
+
         this.addDrawableChild(btnHideInArmor = new WildfireButton(this.width / 2 - 36, tabOffsetY + 46, 166, 20,
                 Text.translatable("wildfire_gender.char_settings.hide_in_armor", plr.showBreastsInArmor() ? DISABLED : ENABLED), button -> {
             boolean enableShowInArmor = !plr.showBreastsInArmor();
@@ -299,6 +304,7 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
         this.btnHideInArmor.visible = currentTab == 2;
         this.btnHurtSounds.visible = currentTab == 2;
         this.voicePitchSlider.visible = currentTab == 2;
+        this.scaleSlider.visible = currentTab == 2;
         this.btnShowTooltips.visible = currentTab == 2;
         this.btnHolidayThemes.visible = currentTab == 2;
     }
@@ -394,15 +400,11 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int state) {
-        //Ensure all sliders are saved
-        breastSlider.save();
-        xOffsetBoobSlider.save();
-        yOffsetBoobSlider.save();
-        zOffsetBoobSlider.save();
-        cleavageSlider.save();
-        floppySlider.save();
-        bounceSlider.save();
-        voicePitchSlider.save();
+        children().forEach(child -> {
+            if(child instanceof WildfireSlider slider) {
+                slider.save();
+            }
+        });
         return super.mouseReleased(mouseX, mouseY, state);
     }
 }

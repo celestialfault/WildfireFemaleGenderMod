@@ -43,6 +43,7 @@ public class Configuration extends AbstractConfiguration {
 	public static final FloatConfigKey FLOPPY_MULTIPLIER = new FloatConfigKey("floppy_multiplier", 0.75F, 0.25f, 1);
 
 	public static final FloatConfigKey VOICE_PITCH = new FloatConfigKey("voice_pitch", 1F, 0.8f, 1.2f);
+	public static final FloatConfigKey SCALE = new FloatConfigKey("scale", 1F, 0.9f, 1.1f);
 
 	//Render holiday themes on the player.
 	public static final BooleanConfigKey HOLIDAY_THEMES = new BooleanConfigKey("holiday_themes", true);

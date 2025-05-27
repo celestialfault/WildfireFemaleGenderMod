@@ -51,6 +51,7 @@ public class PlayerConfig extends EntityConfig {
 	protected boolean holidayThemes = Configuration.HOLIDAY_THEMES.getDefault();
 	protected boolean armorPhysOverride = Configuration.ARMOR_PHYSICS_OVERRIDE.getDefault();
 	protected boolean showBreastsInArmor = Configuration.SHOW_IN_ARMOR.getDefault();
+	protected float scale = Configuration.SCALE.getDefault();
 
 	/**
 	 * @deprecated Use {@link #updateGender(Gender)} instead
@@ -83,6 +84,7 @@ public class PlayerConfig extends EntityConfig {
 		this.cfg.setDefault(Configuration.VOICE_PITCH);
 
 		this.cfg.setDefault(Configuration.HOLIDAY_THEMES);
+		this.cfg.setDefault(Configuration.SCALE);
 
 		// Real players always have a UUID of version 4; if this isn't the case, then this is undeniably
 		// an NPC player entity.
@@ -163,6 +165,14 @@ public class PlayerConfig extends EntityConfig {
 		return updateValue(Configuration.FLOPPY_MULTIPLIER, value, v -> this.floppyMultiplier = v);
 	}
 
+	public float getScale() {
+		return scale;
+	}
+
+	public boolean updateScale(float value) {
+		return updateValue(Configuration.SCALE, value, v -> this.scale = v);
+	}
+
 	public SyncStatus getSyncStatus() {
 		return this.syncStatus;
 	}
@@ -215,6 +225,7 @@ public class PlayerConfig extends EntityConfig {
 		updateHurtSounds(cfg.get(Configuration.HURT_SOUNDS));
 		updateVoicePitch(cfg.get(Configuration.VOICE_PITCH));
 		updateHolidayThemes(cfg.get(Configuration.HOLIDAY_THEMES));
+		updateScale(cfg.get(Configuration.SCALE));
 
 		//physics
 		updateBreastPhysics(cfg.get(Configuration.BREAST_PHYSICS));
@@ -260,6 +271,7 @@ public class PlayerConfig extends EntityConfig {
 		config.set(Configuration.HURT_SOUNDS, plr.hasHurtSounds());
 		config.set(Configuration.VOICE_PITCH, plr.getVoicePitch());
 		config.set(Configuration.HOLIDAY_THEMES, plr.hasHolidayThemes());
+		config.set(Configuration.SCALE, plr.getScale());
 
 		//physics
 		config.set(Configuration.BREAST_PHYSICS, plr.hasBreastPhysics());
