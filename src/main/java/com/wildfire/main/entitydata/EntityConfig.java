@@ -29,18 +29,14 @@ import com.wildfire.main.Gender;
 import com.wildfire.physics.BreastPhysics;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
-import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -80,7 +76,6 @@ public class EntityConfig {
 	protected final BreastPhysics lBreastPhysics, rBreastPhysics;
 	protected final Breasts breasts;
 	protected boolean jacketLayer = true;
-	protected @Nullable BreastDataComponent fromComponent;
 
 	protected EntityConfig(UUID uuid) {
 		this.uuid = uuid;
@@ -90,23 +85,18 @@ public class EntityConfig {
 	}
 
 	/**
-	 * Copy gender settings included in the given {@link ItemStack item NBT} to the current entity
+	 * Copy gender settings included in the given {@link ItemStack#getNbt() item NBT} to the current entity
 	 *
 	 * @see BreastDataComponent
 	 */
 	public void readFromStack(@NotNull ItemStack chestplate) {
-		NbtComponent component = chestplate.get(DataComponentTypes.CUSTOM_DATA);
-		if(chestplate.isEmpty() || component == null) {
-			this.fromComponent = null;
+		if(chestplate.isEmpty()) {
 			this.gender = Gender.MALE;
-			return;
-		} else if(fromComponent != null && Objects.equals(component, fromComponent.nbtComponent())) {
-			// nothing's changed since the last time we checked, so there's no need to read from the
-			// underlying nbt tag again
 			return;
 		}
 
-		fromComponent = BreastDataComponent.fromComponent(component);
+		var nbt = chestplate.getSubNbt(BreastDataComponent.KEY);
+		var fromComponent = BreastDataComponent.fromNbt(nbt);
 		if(fromComponent == null) {
 			this.gender = Gender.MALE;
 			return;

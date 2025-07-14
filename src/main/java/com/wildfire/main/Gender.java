@@ -18,9 +18,6 @@
 
 package com.wildfire.main;
 
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -37,7 +34,6 @@ public enum Gender {
 	OTHER(Text.translatable("wildfire_gender.label.other").formatted(Formatting.GREEN), true, WildfireSounds.FEMALE_HURT);
 
 	public static final IntFunction<Gender> BY_ID = ValueLists.createIdToValueFunction(Gender::ordinal, values(), ValueLists.OutOfBoundsHandling.WRAP);
-	public static final PacketCodec<ByteBuf, Gender> CODEC = PacketCodecs.indexed(BY_ID, Gender::ordinal);
 
 	private final Text name;
 	private final boolean canHaveBreasts;

@@ -18,16 +18,15 @@
 
 package com.wildfire.gui.screen;
 
-import com.wildfire.gui.WildfireBreastPresetList;
 import com.wildfire.gui.WildfireButton;
 import com.wildfire.gui.WildfireSlider;
 import com.wildfire.main.Gender;
 import com.wildfire.main.WildfireGender;
+import com.wildfire.main.config.BreastPresetConfiguration;
+import com.wildfire.main.config.Configuration;
 import com.wildfire.main.config.GlobalConfig;
 import com.wildfire.main.entitydata.Breasts;
 import com.wildfire.main.entitydata.PlayerConfig;
-import com.wildfire.main.config.Configuration;
-import com.wildfire.main.config.BreastPresetConfiguration;
 import it.unimi.dsi.fastutil.floats.FloatConsumer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -71,7 +70,7 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
     //Presets Code
     //private WildfireButton btnAddPreset, btnDeletePreset;
 
-    private WildfireBreastPresetList PRESET_LIST;
+//    private WildfireBreastPresetList PRESET_LIST;
     private int currentTab = 0; // 0 = customization, 1 = presets
 
     public WildfireBreastCustomizationScreen(Screen parent, UUID uuid) {
@@ -264,11 +263,11 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
         ));
 
         //Preset Tab Below
-        PRESET_LIST = new WildfireBreastPresetList(this, 156, (j - 48));
+        /*PRESET_LIST = new WildfireBreastPresetList(this, 156, (j - 48));
         PRESET_LIST.setX(this.width / 2 + 30);
         PRESET_LIST.setHeight(125);
 
-        this.addSelectableChild(this.PRESET_LIST);
+        this.addSelectableChild(this.PRESET_LIST);*/
 
         updateTabs();
 
@@ -312,7 +311,7 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
         cfg.set(BreastPresetConfiguration.BREASTS_OFFSET_Z, plr.getBreasts().getZOffset());
         cfg.save();
 
-        PRESET_LIST.refreshList();
+//        PRESET_LIST.refreshList();
     }
 
     private void updatePresetTab() {
@@ -325,19 +324,19 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
         zOffsetBoobSlider.visible = canHaveBreasts && currentTab == 0;
         cleavageSlider.visible = canHaveBreasts && currentTab == 0;
         btnDualPhysics.visible = canHaveBreasts && currentTab == 0;
-        PRESET_LIST.visible = currentTab == 1;
+//        PRESET_LIST.visible = currentTab == 1;
     }
 
     @Override
-    public void renderBackground(DrawContext ctx, int mouseX, int mouseY, float delta) {
-        this.renderInGameBackground(ctx);
+    public void renderBackground(DrawContext ctx) {
+        super.renderBackground(ctx);
 
         PlayerConfig plr = getPlayer();
         if(plr == null) return;
         Identifier backgroundTexture = switch(plr.getGender()) {
-            case Gender.MALE -> null;
-            case Gender.FEMALE -> BACKGROUND_FEMALE;
-            case Gender.OTHER -> BACKGROUND_OTHER;
+            case MALE -> null;
+            case FEMALE -> BACKGROUND_FEMALE;
+            case OTHER -> BACKGROUND_OTHER;
         };
 
         if(backgroundTexture != null) {
@@ -357,15 +356,16 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
         //ctx.fill(x + 28, y - 64 - 21, x + 190, y + 68, 0x55000000);
         //ctx.fill(x + 29, y - 63 - 21, x + 189, y - 60, 0x55000000);
         ctx.drawText(textRenderer, getTitle(), x - textRenderer.getWidth(getTitle()) / 2, y - 82, 0xFFFFFF, false);
-
-        renderPlayerInFrame(ctx, this.width / 2 - 90, this.height / 2 + 44, mouseX, mouseY);
     }
 
     @Override
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
         if(client == null || client.player == null || client.world == null) return;
         //updatePresetTab();
+        renderBackground(ctx);
         super.render(ctx, mouseX, mouseY, delta);
+
+        renderPlayerInFrame(ctx, this.width / 2 - 90, this.height / 2 + 44, mouseX, mouseY);
 
         int x = this.width / 2;
         int y = this.height / 2;

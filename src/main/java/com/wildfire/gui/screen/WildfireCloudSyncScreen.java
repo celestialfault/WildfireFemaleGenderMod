@@ -34,6 +34,8 @@ import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+
+import java.util.ArrayList;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -123,14 +125,15 @@ public class WildfireCloudSyncScreen extends BaseWildfireScreen {
 	}
 
 	@Override
-	public void renderBackground(DrawContext ctx, int mouseX, int mouseY, float delta) {
-		this.renderInGameBackground(ctx);
+	public void renderBackground(DrawContext ctx) {
+		super.renderBackground(ctx);
 		ctx.drawTexture(BACKGROUND, (this.width - 172) / 2, (this.height - 124) / 2, 0, 0, 172, 144, 256, 256);
 	}
 
 	@Override
 	public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
 		if(client == null || client.world == null) return;
+		renderBackground(ctx);
 		super.render(ctx, mouseX, mouseY, delta);
 
 		int x = this.width / 2;
@@ -142,9 +145,10 @@ public class WildfireCloudSyncScreen extends BaseWildfireScreen {
 		GuiUtils.drawScrollableTextWithoutShadow(GuiUtils.Justify.LEFT, ctx, textRenderer, Text.translatable("wildfire_gender.cloud.status_log"),
 				x - 79, y + 47, x - 79 + 95, y + 48 + 10, 4473924);
 
+		var list = new ArrayList<>(SyncLog.SYNC_LOG);
 		for(int i = SyncLog.SYNC_LOG.size() - 1; i >= 0; i--) {
 			int reverseIndex = SyncLog.SYNC_LOG.size() - 1 - i;
-			var entry = SyncLog.SYNC_LOG.get(i);
+			var entry = list.get(i);
 
 			if(reverseIndex < 6) {
 				int ey = y + 110 - (reverseIndex * 10);

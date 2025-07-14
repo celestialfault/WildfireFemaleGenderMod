@@ -27,6 +27,8 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.minecraft.item.ArmorItem;
+import net.minecraft.item.ArmorMaterial;
+import net.minecraft.item.ArmorMaterials;
 import net.minecraft.item.ItemStack;
 import net.minecraft.resource.JsonDataLoader;
 import net.minecraft.resource.ResourceManager;
@@ -53,12 +55,20 @@ public final class GenderArmorResourceManager extends JsonDataLoader implements 
 		return INSTANCE.configs.get(model);
 	}
 
-	public static Optional<IGenderArmor> get(ItemStack item) {
+	public static Optional<IGenderArmor> get(ArmorMaterial item) {
 		return Optional.ofNullable(item)
-				.map(v -> v.getItem() instanceof ArmorItem armorItem ? armorItem : null)
-				.map(v -> v.getMaterial().getIdAsString())
-				.map(Identifier::of)
+				.map(ArmorMaterial::getName)
+				.map(v -> {
+					var splitAt = v.indexOf(':');
+					if(splitAt == -1) return Identifier.of("minecraft", v);
+					return Identifier.of(v.substring(0, splitAt), v.substring(splitAt + 1));
+				})
 				.map(GenderArmorResourceManager::get);
+	}
+
+	public static Optional<IGenderArmor> get(ItemStack stack) {
+		return Optional.ofNullable(stack.getItem() instanceof ArmorItem armorItem ? armorItem : null)
+				.flatMap(v -> GenderArmorResourceManager.get(v.getMaterial()));
 	}
 
 	@Override
@@ -71,7 +81,7 @@ public final class GenderArmorResourceManager extends JsonDataLoader implements 
 		var built = new HashMap<Identifier, IGenderArmor>();
 		//noinspection CodeBlock2Expr
 		prepared.forEach((k, v) -> {
-			built.put(k, IGenderArmor.CODEC.parse(JsonOps.INSTANCE, v).getOrThrow());
+			built.put(k, IGenderArmor.CODEC.parse(JsonOps.INSTANCE, v).getOrThrow(true, WildfireGender.LOGGER::error));
 		});
 		this.configs = Collections.unmodifiableMap(built);
 	}

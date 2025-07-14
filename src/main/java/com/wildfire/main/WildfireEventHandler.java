@@ -27,11 +27,9 @@ import com.wildfire.main.config.GlobalConfig;
 import com.wildfire.main.entitydata.BreastDataComponent;
 import com.wildfire.main.entitydata.EntityConfig;
 import com.wildfire.main.entitydata.PlayerConfig;
-import com.wildfire.main.networking.ServerboundSyncPacket;
 import com.wildfire.main.networking.WildfireSync;
 import com.wildfire.render.GenderArmorLayer;
 import com.wildfire.render.GenderLayer;
-import com.wildfire.render.HolidayFeaturesRenderer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
@@ -49,18 +47,12 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.ArmorStandEntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
 import net.minecraft.client.render.entity.PlayerEntityRenderer;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.component.type.AttributeModifiersComponent;
 import net.minecraft.entity.*;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.decoration.ArmorStandEntity;
@@ -71,6 +63,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvent;
+import net.minecraft.stat.StatFormatter;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Util;
@@ -89,10 +82,6 @@ public final class WildfireEventHandler {
 	private static final KeyBinding CONFIG_KEYBIND;
 	private static final KeyBinding TOGGLE_KEYBIND;
 	private static int timer = 0;
-
-	public static KeyBinding getConfigKeybind() {
-		return CONFIG_KEYBIND;
-	}
 
 	static {
 		if(FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
@@ -149,10 +138,10 @@ public final class WildfireEventHandler {
 
 		matrixStack.push();
 		float translationAmt = switch(player.getPose()) {
-			case EntityPose.CROUCHING -> 0.8f;
-			case EntityPose.SLEEPING -> 0.125f;
-			case EntityPose.SWIMMING, EntityPose.FALL_FLYING -> 0.3f;
-			case EntityPose.SITTING -> 0.275f; //not tested; sitting on a pig doesn't work apparently.
+			case CROUCHING -> 0.8f;
+			case SLEEPING -> 0.125f;
+			case SWIMMING, FALL_FLYING -> 0.3f;
+			case SITTING -> 0.275f; //not tested; sitting on a pig doesn't work apparently.
 			default -> 0.95f;
 		};
 		matrixStack.translate(0f, translationAmt, 0f);
@@ -173,12 +162,12 @@ public final class WildfireEventHandler {
 		var config = WildfireHelper.getArmorConfig(item);
 		// don't show a +0 tooltip on items that don't interact with physics (e.g. Elytra)
 		if(!config.coversBreasts() || config.physicsResistance() == 0f) return;
-		var formatted = AttributeModifiersComponent.DECIMAL_FORMAT.format(config.physicsResistance());
+		var formatted = StatFormatter.DECIMAL_FORMAT.format(config.physicsResistance());
 		tooltipAppender.accept(Text.translatable("wildfire_gender.armor.tooltip", formatted).formatted(Formatting.LIGHT_PURPLE));
 	}
 
 	@Environment(EnvType.CLIENT)
-	private static void renderHud(DrawContext context, RenderTickCounter tickCounter) {
+	private static void renderHud(DrawContext context, float tickDelta) {
 		var textRenderer = Objects.requireNonNull(MinecraftClient.getInstance().textRenderer, "textRenderer");
 		if(MinecraftClient.getInstance().currentScreen instanceof WardrobeBrowserScreen) {
 			return;
@@ -227,7 +216,7 @@ public final class WildfireEventHandler {
 		timer++;
 
 		// Only attempt to sync if the server will accept the packet, and only once every 5 ticks, or around 4 times a second
-		if(ServerboundSyncPacket.canSend() && timer % 5 == 0) {
+		if(WildfireSync.canSendToServer() && timer % 5 == 0) {
 			// sendToServer will only actually send a packet if any changes have been made that need to be synced,
 			// or if we haven't synced before.
 			if(clientConfig != null) WildfireSync.sendToServer(clientConfig);
@@ -341,7 +330,7 @@ public final class WildfireEventHandler {
 
 		BreastDataComponent component = BreastDataComponent.fromPlayer(player, playerConfig);
 		if(component != null) {
-			component.write(player.getWorld().getRegistryManager(), item);
+			component.write(item);
 		}
 	}
 }

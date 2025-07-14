@@ -19,7 +19,9 @@
 package com.wildfire.api.impl;
 
 import com.wildfire.api.IBreastArmorTexture;
+import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2ic;
 
 /**
@@ -31,7 +33,8 @@ public record BreastArmorTexture(
 		@NotNull Vector2ic textureSize,
 		@NotNull Vector2ic leftUv,
 		@NotNull Vector2ic rightUv,
-		@NotNull Vector2ic dimensions
+		@NotNull Vector2ic dimensions,
+		@Nullable Identifier texture
 ) implements IBreastArmorTexture {
 	/**
 	 * @deprecated Use {@link IBreastArmorTexture#DEFAULT} instead

@@ -29,6 +29,7 @@ import com.wildfire.main.config.GlobalConfig;
 import com.wildfire.main.entitydata.PlayerConfig;
 import com.wildfire.main.networking.WildfireSync;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -79,7 +80,7 @@ public class WildfireGender implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		WildfireSync.register();
+		ServerPlayNetworking.registerGlobalReceiver(WildfireSync.SEND_GENDER_IDENTIFIER, WildfireSync::handle);
 		WildfireEventHandler.registerCommonEvents();
 		GlobalConfig.INSTANCE.load();
 	}

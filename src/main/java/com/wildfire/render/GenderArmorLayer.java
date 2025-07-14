@@ -19,15 +19,18 @@
 package com.wildfire.render;
 
 import com.wildfire.api.IBreastArmorTexture;
+import com.wildfire.api.IGenderArmor;
 import com.wildfire.main.WildfireGender;
 import com.wildfire.main.entitydata.EntityConfig;
 import com.wildfire.render.WildfireModelRenderer.BreastModelBox;
+import com.wildfire.resources.GenderArmorResourceManager;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.impl.client.rendering.ArmorRendererRegistryImpl;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.*;
+import net.minecraft.client.render.entity.PlayerModelPart;
 import net.minecraft.client.render.entity.feature.FeatureRendererContext;
 import net.minecraft.client.render.entity.model.BipedEntityModel;
 import net.minecraft.client.render.item.ItemRenderer;
@@ -36,23 +39,21 @@ import net.minecraft.client.texture.MissingSprite;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.DyedColorComponent;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
-import net.minecraft.entity.player.PlayerModelPart;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ArmorMaterial;
+import net.minecraft.item.DyeableArmorItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.trim.ArmorTrim;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.ColorHelper;
+import net.minecraft.util.Nullables;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Environment(EnvType.CLIENT)
 public class GenderArmorLayer<T extends LivingEntity, M extends BipedEntityModel<T>> extends GenderLayer<T, M> {
@@ -74,6 +75,25 @@ public class GenderArmorLayer<T extends LivingEntity, M extends BipedEntityModel
 		armorTrimsAtlas = bakery.getAtlas(TexturedRenderLayers.ARMOR_TRIMS_ATLAS_TEXTURE);
 		lBoobArmor = new BreastModelBox(64, 32, 16, 17, -4F, 0.0F, 0F, 4, 5, 3, 0.0F, false);
 		rBoobArmor = new BreastModelBox(64, 32, 20, 17, 0, 0.0F, 0F, 4, 5, 3, 0.0F, false);
+	}
+
+	public @NotNull Identifier getArmorResource(@NotNull ArmorItem item) {
+		return GenderArmorResourceManager.get(item.getMaterial())
+				.map(IGenderArmor::texture)
+				.map(IBreastArmorTexture::texture)
+				.orElseGet(() -> takeAGuessAtTheIdentifier(item));
+	}
+
+	// I was hoping I'd never need to do this again :(
+	private Identifier takeAGuessAtTheIdentifier(@NotNull ArmorItem item) {
+		String material = item.getMaterial().getName();
+		String namespace = "minecraft";
+		int namespaceDelim = material.indexOf(':');
+		if(namespaceDelim >= 0) {
+			namespace = material.substring(0, namespaceDelim);
+			material = material.substring(namespaceDelim + 1);
+		}
+		return new Identifier(namespace, "textures/models/armor/" + material + "_layer_1.png");
 	}
 
 	@Override
@@ -103,20 +123,26 @@ public class GenderArmorLayer<T extends LivingEntity, M extends BipedEntityModel
 			if(!setupRender(ent, entityConfig, partialTicks)) return;
 			if(ent instanceof ArmorStandEntity && !genderArmor.armorStandsCopySettings()) return;
 
-			final RegistryEntry<ArmorMaterial> material = ((ArmorItem) chestplate.getItem()).getMaterial();
-			final int color = chestplate.isIn(ItemTags.DYEABLE) ? ColorHelper.Argb.fullAlpha(DyedColorComponent.getColor(chestplate, -6265536)) : -1;
+			final var armorItem = (ArmorItem) chestplate.getItem();
+			final var material = armorItem.getMaterial();
 			final boolean glint = chestplate.hasGlint();
 
-			renderSides(ent, getContextModel(), matrixStack, side -> {
-				material.value().layers().forEach(layer -> {
-					int layerColor = layer.isDyeable() ? color : -1;
-					renderBreastArmor(layer.getTexture(false), matrixStack, vertexConsumerProvider, light, side, layerColor, glint);
-				});
+			// I did not miss having to do this kind of nonsense :(
+			final AtomicInteger r = new AtomicInteger(255),
+					g = new AtomicInteger(255),
+					b = new AtomicInteger(255);
+			if(armorItem instanceof DyeableArmorItem dyeableItem) {
+				int color = dyeableItem.getColor(armorStack);
+				r.set(color >> 16 & 255);
+				g.set(color >> 8 & 255);
+				b.set(color & 255);
+			}
 
-				ArmorTrim trim = armorStack.get(DataComponentTypes.TRIM);
-				if(trim != null) {
+			renderSides(ent, getContextModel(), matrixStack, side -> {
+				renderBreastArmor(getArmorResource(armorItem), matrixStack, vertexConsumerProvider, light, side, r.get() / 255f, g.get() / 255f, b.get() / 255f, glint);
+				ArmorTrim.getTrim(ent.getWorld().getRegistryManager(), chestplate).ifPresent(trim -> {
 					renderArmorTrim(material, matrixStack, vertexConsumerProvider, light, trim, glint, side);
-				}
+				});
 			});
 		} catch(Exception e) {
 			WildfireGender.LOGGER.error("Failed to render breast armor", e);
@@ -152,32 +178,31 @@ public class GenderArmorLayer<T extends LivingEntity, M extends BipedEntityModel
 
 	// TODO eventually expose some way for mods to override this, maybe through a default impl in IGenderArmor or similar
 	protected void renderBreastArmor(Identifier texture, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider,
-	                                 int light, BreastSide side, int color, boolean glint) {
+	                                 int light, BreastSide side, float r, float g, float b, boolean glint) {
 		if(MinecraftClient.getInstance().getTextureManager().getTexture(texture) == MissingSprite.getMissingSpriteTexture()) {
 			return;
 		}
 
 		BreastModelBox armor = side.isLeft ? lBoobArmor : rBoobArmor;
 		RenderLayer armorType = RenderLayer.getArmorCutoutNoCull(texture);
-		VertexConsumer armorVertexConsumer = ItemRenderer.getArmorGlintConsumer(vertexConsumerProvider, armorType, glint);
-		renderBox(armor, matrixStack, armorVertexConsumer, light, OverlayTexture.DEFAULT_UV, ColorHelper.Argb.fullAlpha(color));
+		VertexConsumer armorVertexConsumer = ItemRenderer.getArmorGlintConsumer(vertexConsumerProvider, armorType, false, glint);
+		renderBox(armor, matrixStack, armorVertexConsumer, light, OverlayTexture.DEFAULT_UV, r, g, b, 1f);
 	}
 
-	protected void renderArmorTrim(RegistryEntry<ArmorMaterial> material, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider,
+	protected void renderArmorTrim(ArmorMaterial material, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider,
 	                               int packedLightIn, ArmorTrim trim, boolean hasGlint, BreastSide side) {
 		BreastModelBox trimModelBox = side.isLeft ? lTrim : rTrim;
 		Sprite sprite = this.armorTrimsAtlas.getSprite(trim.getGenericModelId(material));
-		VertexConsumer vertexConsumer = sprite.getTextureSpecificVertexConsumer(
-				vertexConsumerProvider.getBuffer(TexturedRenderLayers.getArmorTrims(trim.getPattern().value().decal())));
+		VertexConsumer vertexConsumer = sprite.getTextureSpecificVertexConsumer(vertexConsumerProvider.getBuffer(TexturedRenderLayers.getArmorTrims()));
 		// Render the armor trim itself
-		renderBox(trimModelBox, matrixStack, vertexConsumer, packedLightIn, OverlayTexture.DEFAULT_UV, -1);
+		renderBox(trimModelBox, matrixStack, vertexConsumer, packedLightIn, OverlayTexture.DEFAULT_UV, 1f, 1f, 1f, 1f);
 		// The enchantment glint however requires special handling; due to how Minecraft's enchant glint rendering works, rendering
 		// it at the same time as the trim itself results in the glint not rendering in sync with the rest of the armor.
 		// We *also* can't simply render the glint for both the trim and armor at the same time, due to the slight delta we apply
 		// to fix z-fighting between the trim and armor - and as such - a glint has to be rendered for each respective layer.
 		if(hasGlint) {
 			renderBox(trimModelBox, matrixStack, vertexConsumerProvider.getBuffer(RenderLayer.getArmorEntityGlint()),
-					packedLightIn, OverlayTexture.DEFAULT_UV, -1);
+					packedLightIn, OverlayTexture.DEFAULT_UV, 1f, 1f, 1f, 1f);
 		}
 	}
 }

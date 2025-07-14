@@ -2,7 +2,7 @@
   "required": true,
   "minVersion": "0.8",
   "package": "com.wildfire.mixins",
-  "compatibilityLevel": "JAVA_21",
+  "compatibilityLevel": "JAVA_17",
   "mixins": [
     "ArmorStandEntityMixin"
   ],
@@ -11,10 +11,7 @@
     "LivingEntityMixin",
     "PlayerEntityRendererMixin",
     "accessors.AnimalModelAccessor",
-    "accessors.RenderLayerAccessor",
-    "cape.PlayerListEntryMixin",
-    "cape.SkinTexturesWildfireImplMixin",
-    "cape.SkinTexturesMixin"
+    "accessors.RenderLayerAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

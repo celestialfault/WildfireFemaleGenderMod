@@ -18,11 +18,14 @@
 
 package com.wildfire.mixins;
 
-import com.llamalad7.mixinextras.sugar.Local;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.sugar.Share;
+import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import com.wildfire.events.ArmorStatsTooltipEvent;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.component.type.AttributeModifiersComponent;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.Item;
@@ -33,23 +36,50 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.function.Consumer;
+import java.util.ArrayList;
+import java.util.List;
 
 @Mixin(ItemStack.class)
 @Environment(EnvType.CLIENT)
 abstract class ItemStackMixin {
 	@Shadow public abstract Item getItem();
 
-	@Inject(
-			method = "appendAttributeModifiersTooltip",
-			at = @At("TAIL")
+	@Shadow
+	private static boolean isSectionVisible(int flags, ItemStack.TooltipSection tooltipSection) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Shadow protected abstract int getHideFlags();
+
+	// @Local isn't playing nice, so instead do this ourselves with a @Share
+	@WrapOperation(
+			method = "getTooltip",
+			at = @At(value = "INVOKE", target = "Lcom/google/common/collect/Lists;newArrayList()Ljava/util/ArrayList;", remap = false)
 	)
-	public void wildfiregender$armorStats(Consumer<Text> textConsumer, @Nullable PlayerEntity player, CallbackInfo ci, @Local AttributeModifiersComponent attributeModifiersComponent) {
-		if(!attributeModifiersComponent.showInTooltip() || attributeModifiersComponent.modifiers().isEmpty()) return;
+	public <E> ArrayList<E> wildfiregender$grabList(
+			Operation<ArrayList<E>> original,
+			@Share(namespace = "wildfiregender", value = "lineList") LocalRef<ArrayList<E>> ref
+	) {
+		var list = original.call();
+		ref.set(list);
+		return list;
+	}
+
+	@Inject(
+			method = "getTooltip",
+			at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;hasNbt()Z", ordinal = 1)
+	)
+	public void wildfiregender$armorStats(
+			@Nullable PlayerEntity player,
+			TooltipContext context,
+			CallbackInfoReturnable<List<Text>> cir,
+			@Share(namespace = "wildfiregender", value = "lineList") LocalRef<ArrayList<Text>> ref
+	) {
+		if(!isSectionVisible(getHideFlags(), ItemStack.TooltipSection.MODIFIERS)) return;
 		if(this.getItem() instanceof ArmorItem) {
-			ArmorStatsTooltipEvent.EVENT.invoker().appendTooltips((ItemStack)(Object)this, textConsumer, player);
+			ArmorStatsTooltipEvent.EVENT.invoker().appendTooltips((ItemStack)(Object)this, ref.get()::add, player);
 		}
 	}
 }

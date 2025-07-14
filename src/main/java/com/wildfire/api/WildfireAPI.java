@@ -19,7 +19,6 @@
 package com.wildfire.api;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.wildfire.main.WildfireGenderClient;
 import com.wildfire.main.config.Configuration;
 import com.wildfire.main.entitydata.PlayerConfig;
@@ -46,15 +45,10 @@ public final class WildfireAPI {
 
     private static final Map<Item, IGenderArmor> GENDER_ARMORS = new HashMap<>();
 
-    private static final Codec<Vector2ic> VEC2I_LEGACY_CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codec.INT.fieldOf("x").forGetter(Vector2ic::x),
-            Codec.INT.fieldOf("y").forGetter(Vector2ic::y)
-    ).apply(instance, Vector2i::new));
-
-    /* package-private */ static final Codec<Vector2ic> VECTOR_2I_CODEC = Codec.withAlternative(Codec.INT_STREAM.comapFlatMap(
+    /* package-private */ static final Codec<Vector2ic> VECTOR_2I_CODEC = Codec.INT_STREAM.comapFlatMap(
             stream -> Util.decodeFixedLengthArray(stream, 2).map(Vector2i::new),
             vec2i -> IntStream.of(vec2i.x(), vec2i.y())
-    ), VEC2I_LEGACY_CODEC);
+    );
 
     /**
      * Add custom physics resistance attributes to a chestplate

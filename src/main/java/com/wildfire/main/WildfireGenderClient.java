@@ -28,6 +28,7 @@ import com.wildfire.resources.GenderArmorResourceManager;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.resource.ResourceType;
@@ -51,7 +52,7 @@ public class WildfireGenderClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		WildfireSounds.register();
-		WildfireSync.registerClient();
+		ClientPlayNetworking.registerGlobalReceiver(WildfireSync.SYNC_IDENTIFIER, WildfireSync::handle);
 		WildfireEventHandler.registerClientEvents();
 		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(GenderArmorResourceManager.INSTANCE);
 	}

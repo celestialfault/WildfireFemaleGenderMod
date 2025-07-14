@@ -28,6 +28,7 @@ import net.minecraft.client.render.entity.LivingEntityRenderer;
 import net.minecraft.client.render.entity.PlayerEntityRenderer;
 import net.minecraft.client.render.entity.model.BipedEntityModel;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
@@ -43,10 +44,10 @@ abstract class PlayerEntityRendererMixin extends LivingEntityRenderer<PlayerEnti
 	}
 
 	@Inject(
-		method = "renderLabelIfPresent(Lnet/minecraft/client/network/AbstractClientPlayerEntity;Lnet/minecraft/text/Text;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IF)V",
+		method = "renderLabelIfPresent(Lnet/minecraft/client/network/AbstractClientPlayerEntity;Lnet/minecraft/text/Text;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V",
 		at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/math/MatrixStack;push()V", shift = At.Shift.AFTER)
 	)
-	public void wildfiregender$renderNametag(AbstractClientPlayerEntity player, Text originalText, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int light, float delta, CallbackInfo ci) {
-		PlayerNametagRenderEvent.EVENT.invoker().onRenderNameTag(player, matrixStack, vertexConsumerProvider, (text) -> super.renderLabelIfPresent(player, text, matrixStack, vertexConsumerProvider, light, delta));
+	public void wildfiregender$renderNametag(AbstractClientPlayerEntity player, Text originalText, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo ci) {
+		PlayerNametagRenderEvent.EVENT.invoker().onRenderNameTag(player, matrixStack, vertexConsumerProvider, (text) -> super.renderLabelIfPresent(player, text, matrixStack, vertexConsumerProvider, i));
 	}
 }

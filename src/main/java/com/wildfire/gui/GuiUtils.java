@@ -29,10 +29,7 @@ import net.minecraft.text.OrderedText;
 import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
-import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
 
 import java.util.Objects;
 
@@ -73,9 +70,13 @@ public final class GuiUtils {
 
 	}
 
+	public static int fullAlpha(int argb) {
+		return argb | -16777216;
+	}
+
 	// Reimplementation of ClickableWidget#drawScrollableText but with the text shadow removed
 	public static void drawScrollableTextWithoutShadow(Justify justify, DrawContext context, TextRenderer textRenderer, Text text, int left, int top, int right, int bottom, int color) {
-		color = ColorHelper.Argb.fullAlpha(color);
+		color = fullAlpha(color);
 		int i = textRenderer.getWidth(text);
 		int j = (top + bottom - 9) / 2 + 1;
 		int k = right - left;
@@ -100,33 +101,6 @@ public final class GuiUtils {
 	// Reimplementation of InventoryScreen#drawEntity, intended to allow for applying our own scissor calls, and
 	// accepting an origin point instead of X/Y bounds
 	public static void drawEntityOnScreen(DrawContext ctx, int x, int y, int size, float mouseX, float mouseY, LivingEntity entity) {
-		float i = (float) Math.atan(mouseX / 40.0F);
-		float j = (float) Math.atan(mouseY / 40.0F);
-		Quaternionf quaternionf = new Quaternionf().rotateZ((float) Math.PI);
-		Quaternionf quaternionf2 = new Quaternionf().rotateX(j * 20.0F * (float) (Math.PI / 180.0));
-		quaternionf.mul(quaternionf2);
-		float k = entity.bodyYaw;
-		float l = entity.getYaw();
-		float m = entity.getPitch();
-		float n = entity.prevHeadYaw;
-		float o = entity.headYaw;
-
-		ctx.getMatrices().push();
-		ctx.getMatrices().translate(0, 0, 50.0); //prevent rear model clipping
-
-		entity.bodyYaw = 180.0F + i * 20.0F;
-		entity.setYaw(180.0F + i * 40.0F);
-		entity.setPitch(-j * 20.0F);
-		entity.headYaw = entity.getYaw();
-		entity.prevHeadYaw = entity.getYaw();
-		// divide by entity scale to ensure that we always draw the entity at a consistent size
-		float renderSize = size / entity.getScale();
-		InventoryScreen.drawEntity(ctx, x, y, renderSize, new Vector3f(), quaternionf, quaternionf2, entity);
-		entity.bodyYaw = k;
-		entity.setYaw(l);
-		entity.setPitch(m);
-		entity.prevHeadYaw = n;
-		entity.headYaw = o;
-		ctx.getMatrices().pop();
+		InventoryScreen.drawEntity(ctx, x, y, size, mouseX, mouseY, entity);
 	}
 }

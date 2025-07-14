@@ -39,7 +39,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.session.Session;
+import net.minecraft.client.util.Session;
 import net.minecraft.util.Util;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.ApiStatus;
@@ -226,7 +226,7 @@ public final class CloudSync {
 				var session = client.getSession();
 
 				try {
-					client.getSessionService().joinServer(Objects.requireNonNull(session.getUuidOrNull()), session.getAccessToken(), serverId);
+					client.getSessionService().joinServer(session.getProfile(), session.getAccessToken(), serverId);
 				} catch(AuthenticationException e) {
 					throw new RuntimeException(e);
 				}

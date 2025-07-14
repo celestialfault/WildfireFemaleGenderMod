@@ -21,8 +21,10 @@ package com.wildfire.api;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.wildfire.api.impl.BreastArmorTexture;
+import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
 import org.joml.Vector2ic;
 
@@ -54,13 +56,16 @@ public interface IBreastArmorTexture {
 					.forGetter(IBreastArmorTexture::rightUv),
 			WildfireAPI.VECTOR_2I_CODEC
 					.optionalFieldOf("dimensions", DEFAULT_DIMENSIONS)
-					.forGetter(IBreastArmorTexture::dimensions)
-	).apply(instance, (size, leftUv, rightUv, dimensions) -> {
+					.forGetter(IBreastArmorTexture::dimensions),
+			Identifier.CODEC
+					.optionalFieldOf("texture", null)
+					.forGetter(IBreastArmorTexture::texture)
+	).apply(instance, (size, leftUv, rightUv, dimensions, texture) -> {
 		var right = rightUv;
 		if(right.x() == -1 && right.y() == -1) {
 			right = leftUv.add(dimensions.x(), 0, new Vector2i());
 		}
-		return new BreastArmorTexture(size, leftUv, right, dimensions);
+		return new BreastArmorTexture(size, leftUv, right, dimensions, texture);
 	}));
 
 	/**
@@ -109,5 +114,12 @@ public interface IBreastArmorTexture {
 	 */
 	default @NotNull Vector2ic rightUv() {
 		return DEFAULT_RIGHT_UV;
+	}
+
+	/**
+	 * Optional texture override to use instead of the default guess.
+	 */
+	default @Nullable Identifier texture() {
+		return null;
 	}
 }

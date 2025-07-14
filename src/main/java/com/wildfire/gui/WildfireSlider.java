@@ -124,7 +124,7 @@ public class WildfireSlider extends ClickableWidget {
 	}
 
 	@Override
-	protected void renderWidget(DrawContext ctx, int mouseX, int mouseY, float delta) {
+	protected void renderButton(DrawContext ctx, int mouseX, int mouseY, float delta) {
 		if (this.visible) {
 			int xP = getX() + 2;
 			ctx.fill(xP - 2, getY(), getX() + this.width, getY() + this.height, 0x222222 + (128 << 24));

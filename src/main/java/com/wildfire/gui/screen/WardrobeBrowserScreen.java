@@ -34,14 +34,11 @@ import com.wildfire.main.entitydata.PlayerConfig;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.ScreenRect;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.Tooltip;
-import net.minecraft.client.gui.tooltip.TooltipState;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.text.Text;
-import net.minecraft.text.Texts;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 
@@ -56,7 +53,7 @@ public class WardrobeBrowserScreen extends BaseWildfireScreen {
 
 	private static final boolean isBreastCancerAwarenessMonth = Calendar.getInstance().get(Calendar.MONTH) == Calendar.OCTOBER;
 
-	private final TooltipState contribTooltip = new TooltipState();
+//	private final TooltipState contribTooltip = new TooltipState();
 
 	public WardrobeBrowserScreen(Screen parent, UUID uuid) {
 		super(Text.translatable("wildfire_gender.wardrobe.title"), parent, uuid);
@@ -130,25 +127,27 @@ public class WardrobeBrowserScreen extends BaseWildfireScreen {
 	}
 
 	@Override
-	public void renderBackground(DrawContext ctx, int mouseX, int mouseY, float delta) {
-		this.renderInGameBackground(ctx);
+	public void renderBackground(DrawContext ctx) {
+		super.renderBackground(ctx);
 
 		PlayerConfig plr = getPlayer();
 		if(plr == null) return;
 		Identifier backgroundTexture = switch(plr.getGender()) {
-			case Gender.MALE -> BACKGROUND_MALE;
-			case Gender.FEMALE -> BACKGROUND_FEMALE;
-			case Gender.OTHER -> BACKGROUND_OTHER;
+			case MALE -> BACKGROUND_MALE;
+			case FEMALE -> BACKGROUND_FEMALE;
+			case OTHER -> BACKGROUND_OTHER;
 		};
 
 		ctx.drawTexture(backgroundTexture, (this.width - 272) / 2, (this.height - 138) / 2, 0, 0, 268, 124, 512, 512);
-
-		renderPlayerInFrame(ctx, this.width / 2 - 90, this.height / 2 + 18, mouseX, mouseY);
 	}
 
 	@Override
 	public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
+		renderBackground(ctx);
 		super.render(ctx, mouseX, mouseY, delta);
+
+		renderPlayerInFrame(ctx, this.width / 2 - 90, this.height / 2 + 18, mouseX, mouseY);
+
 		int x = this.width / 2;
 		int y = this.height / 2;
 		ctx.drawText(textRenderer, getTitle(), x - textRenderer.getWidth(getTitle()) / 2, y - 82, 0xFFFFFF, false);
@@ -179,7 +178,7 @@ public class WardrobeBrowserScreen extends BaseWildfireScreen {
 		}
 
 		final Text text;
-		final var toList = new ArrayList<>(foundContributors);
+		final var toList = new ArrayDeque<>(foundContributors);
 		if(withCreator && !foundContributors.isEmpty()) {
 			text = Text.translatable("wildfire_gender.label.with_both");
 			toList.addFirst(entries.get(WildfireGender.CREATOR_UUID));
@@ -201,8 +200,8 @@ public class WardrobeBrowserScreen extends BaseWildfireScreen {
 					.map(entry -> Team.decorateName(entry.getScoreboardTeam(), Text.of(entry.getProfile().getName())))
 					.toList();
 
-			contribTooltip.setTooltip(Tooltip.of(Texts.join(contributorNames, Text.literal("\n"))));
-			contribTooltip.render(true, true, ScreenRect.empty());
+//			contribTooltip.setTooltip(Tooltip.of(Texts.join(contributorNames, Text.literal("\n"))));
+//			contribTooltip.render(true, true, ScreenRect.empty());
 		}
 	}
 }

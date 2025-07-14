@@ -57,7 +57,7 @@ public final class SyncedPlayerList {
 		int yPos = 18;
 		for(var entry : syncedPlayers) {
 			var text = Text.empty()
-					.append(Text.literal(entry.name()).withColor(entry.color()))
+					.append(Text.literal(entry.name()).styled(style -> style.withColor(entry.color())))
 					.append(" - ")
 					.append(entry.gender().getDisplayName());
 			context.drawText(textRenderer, text, 10, yPos, 0xFFFFFFFF, false);

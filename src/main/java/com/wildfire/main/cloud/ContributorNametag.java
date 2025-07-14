@@ -40,7 +40,7 @@ public record ContributorNametag(String text, @Nullable Integer color) {
 	}
 
 	public Text asText() {
-		return Text.literal(this.text).withColor(getColor());
+		return Text.literal(this.text).styled(style -> style.withColor(getColor()));
 	}
 
 	public static @Nullable Integer getContributorColor(UUID uuid) {

@@ -25,11 +25,13 @@ import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
 
 import java.time.Instant;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 
 public final class SyncLog {
-	public static final List<Entry> SYNC_LOG = new ArrayList<>();
+	public static final Deque<Entry> SYNC_LOG = new ArrayDeque<>();
 
 	public static int verbosity() {
 		return GlobalConfig.INSTANCE.get(GlobalConfig.SYNC_VERBOSITY).ordinal();
