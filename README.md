@@ -1,14 +1,26 @@
-![Mod Banner](https://i.imgur.com/WLCTnCK.png)
-# Wildfire's Female Gender Mod
+<div align="center">
 
-### Description
-The primary goal of this mod is to enhance your Minecraft player's appearance by adding breasts to your player model, providing a distinctive look compared to the standard model.
-It works on client-side without issues but if you wish to add syncing support then this mod must be present on the server aswell.
+![Mod Banner](https://i.imgur.com/WLCTnCK.png)
+
+# Female Gender Mod
+
+![Cloud sync player count badge](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fwfgm.celestialfault.dev%2Fstats&query=synced_users&label=Cloud%20synced%20players)
+
+</div>
+
+This mod adds extra customization options to the player model by adding breasts for a more feminine appearance.
+
+This mod is primarily client-sided, but your settings will also be automatically synced with other connected players
+if the mod is also installed on the server.
+
+The mod also features cloud sync support (as of 4.0 on 1.21.2+) to allow for syncing your customization settings
+to other players on servers that don't have the mod installed.
 
 ## Default Controls
 
-G - Open Wildfire's Gender Menu
+G - Open Customization Settings
 
 ## License
 
-Wildfire's Female Gender Mod is licensed under GNU LGPLv3, a free and open-source license. For more information, please see the [license file](https://github.com/WildfireRomeo/WildfireFemaleGenderMod/blob/fabric-1.20.2/LICENSE).
+The Female Gender Mod is licensed under the GNU LGPLv3, a free and open-source license. For more information,
+please see the [license file](./LICENSE).

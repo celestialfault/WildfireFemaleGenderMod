@@ -22,22 +22,16 @@ import com.wildfire.gui.GuiUtils;
 import com.wildfire.gui.WildfireButton;
 import com.wildfire.main.WildfireGender;
 import com.wildfire.main.WildfireGenderClient;
-import com.wildfire.main.WildfireHelper;
 import com.wildfire.main.config.GlobalConfig;
 import com.wildfire.main.entitydata.PlayerConfig;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.MathHelper;
-import org.joml.Quaternionf;
 
-import java.text.Normalizer;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -140,7 +134,7 @@ public class WildfireFirstTimeSetupScreen extends BaseWildfireScreen {
 		if(client == null || client.world == null) return;
 		super.render(ctx, mouseX, mouseY, delta);
 
-		MatrixStack mStack = ctx.getMatrices();
+		var mStack = ctx.getMatrices();
 
 		int x = this.width / 2;
 		int y = this.height / 2;
@@ -154,9 +148,9 @@ public class WildfireFirstTimeSetupScreen extends BaseWildfireScreen {
 
 
 		mStack.push();
-			mStack.translate(x, y + 47, 0);
-			mStack.scale(0.8f, 0.8f, 1);
-			mStack.translate(-x, -y - 47, 0);
+		mStack.translate(x, y + 47, 0);
+		mStack.scale(0.8f, 0.8f, 1);
+		mStack.translate(-x, -y - 47, 0);
 		GuiUtils.drawCenteredTextWrapped(ctx, textRenderer, NOTICE, x, y + 68, (int) ((256-10) * 1.2f), 4210752);
 		mStack.pop();
 
@@ -170,7 +164,7 @@ public class WildfireFirstTimeSetupScreen extends BaseWildfireScreen {
 		/*mStack.push();
 			mStack.translate(keiraX + (keiraW / 2), keiraY + (keiraH / 2), 0);
 			mStack.multiply(new Quaternionf().rotateZ(-25 * MathHelper.RADIANS_PER_DEGREE));
-			ctx.drawTexture(RenderLayer::getGuiTextured, KEIRA_LOOK, -keiraW / 2, -keiraH / 2, 0, 0, keiraW, keiraH, KEIRA_WIDTH, KEIRA_HEIGHT, KEIRA_WIDTH, KEIRA_HEIGHT);
+			ctx.drawTexture(KEIRA_LOOK, -keiraW / 2, -keiraH / 2, 0, 0, keiraW, keiraH, KEIRA_WIDTH, KEIRA_HEIGHT, KEIRA_WIDTH, KEIRA_HEIGHT);
 		mStack.pop();*/
 	}
 

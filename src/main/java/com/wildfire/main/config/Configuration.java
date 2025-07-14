@@ -44,6 +44,9 @@ public class Configuration extends AbstractConfiguration {
 
 	public static final FloatConfigKey VOICE_PITCH = new FloatConfigKey("voice_pitch", 1F, 0.8f, 1.2f);
 
+	//Render holiday themes on the player.
+	public static final BooleanConfigKey HOLIDAY_THEMES = new BooleanConfigKey("holiday_themes", true);
+
 	public Configuration(String cfgName) {
 		super(CONFIG_DIR, cfgName);
 	}

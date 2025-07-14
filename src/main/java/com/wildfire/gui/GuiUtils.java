@@ -18,26 +18,22 @@
 
 package com.wildfire.gui;
 
-import com.wildfire.main.WildfireGender;
-import com.wildfire.main.entitydata.PlayerConfig;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
-import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.Util;
+import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
-import java.util.List;
 import java.util.Objects;
 
 @Environment(EnvType.CLIENT)
@@ -45,6 +41,9 @@ public final class GuiUtils {
 	public enum Justify {
 		LEFT, CENTER
 	}
+
+	private static final double HALF_PI = Math.PI / 2;
+	private static final double DOUBLE_PI = Math.PI * 2;
 
 	private GuiUtils() {
 		throw new UnsupportedOperationException();
@@ -59,7 +58,6 @@ public final class GuiUtils {
 		int centeredX = x - textRenderer.getWidth(text) / 2;
 		ctx.drawText(textRenderer, text, centeredX, y, color, false);
 	}
-
 
 	public static void drawCenteredText(DrawContext ctx, TextRenderer textRenderer, OrderedText text, int x, int y, int color) {
 		int centeredX = x - textRenderer.getWidth(text) / 2;
@@ -77,16 +75,15 @@ public final class GuiUtils {
 
 	// Reimplementation of ClickableWidget#drawScrollableText but with the text shadow removed
 	public static void drawScrollableTextWithoutShadow(Justify justify, DrawContext context, TextRenderer textRenderer, Text text, int left, int top, int right, int bottom, int color) {
+		color = ColorHelper.Argb.fullAlpha(color);
 		int i = textRenderer.getWidth(text);
-		int var10000 = top + bottom;
-		Objects.requireNonNull(textRenderer);
-		int j = (var10000 - 9) / 2 + 1;
+		int j = (top + bottom - 9) / 2 + 1;
 		int k = right - left;
 		if (i > k) {
 			int l = i - k;
-			double d = (double) Util.getMeasuringTimeMs() / 1000.0;
-			double e = Math.max((double)l * 0.5, 3.0);
-			double f = Math.sin(1.5707963267948966 * Math.cos(6.283185307179586 * d / e)) / 2.0 + 0.5;
+			double d = Util.getMeasuringTimeMs() / 1000.0;
+			double e = Math.max(l * 0.5, 3.0);
+			double f = Math.sin(HALF_PI * Math.cos(DOUBLE_PI * d / e)) / 2.0 + 0.5;
 			double g = MathHelper.lerp(f, 0.0, l);
 			context.enableScissor(left, top, right, bottom);
 			context.drawText(textRenderer, text, left - (int)g, j, color, false);
@@ -115,7 +112,6 @@ public final class GuiUtils {
 		float o = entity.headYaw;
 
 		ctx.getMatrices().push();
-
 		ctx.getMatrices().translate(0, 0, 50.0); //prevent rear model clipping
 
 		entity.bodyYaw = 180.0F + i * 20.0F;
@@ -132,20 +128,5 @@ public final class GuiUtils {
 		entity.prevHeadYaw = n;
 		entity.headYaw = o;
 		ctx.getMatrices().pop();
-	}
-
-	public static void drawSyncedPlayers(DrawContext context, TextRenderer textRenderer, List<PlayerListEntry> syncedPlayers) {
-		if(syncedPlayers.isEmpty()) return;
-		var header = Text.translatable("wildfire_gender.wardrobe.players_using_mod").formatted(Formatting.AQUA);
-		context.drawText(textRenderer, header, 5, 5, 0xFFFFFF, true);
-
-		int yPos = 18;
-		for(PlayerListEntry entry : syncedPlayers) {
-			PlayerConfig cfg = WildfireGender.getPlayerById(entry.getProfile().getId());
-			if(cfg == null) continue;
-			var text = Text.literal(entry.getProfile().getName()).append(" - ").append(cfg.getGender().getDisplayName());
-			context.drawText(textRenderer, text, 10, yPos, 0xFFFFFF, false);
-			yPos += 10;
-		}
 	}
 }

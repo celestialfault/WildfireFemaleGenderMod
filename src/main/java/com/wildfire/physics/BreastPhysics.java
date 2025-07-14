@@ -59,10 +59,10 @@ public class BreastPhysics {
 	}
 
 	private static boolean vehicleSuppressesRotation(Entity vehicle) {
-		return
+		return (
 				// while you aren't able to normally ride chickens in vanilla, it is still possible through
 				// means like /ride, and as chickens attempt to force the rider's body yaw to the same yaw
-				// as the chicken (which is likely intended only for baby zombies), this results in unintended
+				// as the chicken (which is likely intended only for baby zombies), which results in unintended
 				// behavior with what we're doing
 				vehicle instanceof ChickenEntity
 				// unsaddled horses (and llamas, which also extend AbstractDonkeyEntity?) also break rotation
@@ -70,30 +70,30 @@ public class BreastPhysics {
 				// (somewhat) freely move around
 				|| vehicle instanceof AbstractHorseEntity horseLike && !horseLike.isSaddled()
 				// camels also suffer from largely the same issue as unsaddled horses when sitting or standing up
-				|| vehicle instanceof CamelEntity camel && camel.isStationary();
+				|| vehicle instanceof CamelEntity camel && camel.isStationary()
+		);
 	}
 
 	private static boolean shouldUseVehicleYaw(LivingEntity rider, Entity vehicle) {
-		return vehicle.hasControllingPassenger()
+		return (
+				vehicle.hasControllingPassenger()
 				// boats will typically be caught by the above #hasControllingPassenger() check, but still
 				// special case these to catch any weird modded cases that might arise
 				|| vehicle instanceof BoatEntity
 				// general catch-all for other entities that force the rider's body yaw to match theirs,
 				// such as horses
-				|| vehicle.getBodyYaw() == rider.getBodyYaw();
+				|| vehicle.getBodyYaw() == rider.getBodyYaw()
+		);
 	}
 
-	private static float calcRotation(LivingEntity entity, float bounceIntensity) {
+	private float calcRotation(LivingEntity entity, float bounceIntensity) {
 		Entity vehicle = entity.getVehicle();
 		if(vehicle != null) {
 			if(vehicleSuppressesRotation(vehicle)) {
 				return 0f;
 			} else if(shouldUseVehicleYaw(entity, vehicle)) {
-				if(vehicle instanceof LivingEntity livingVehicle) {
-					return -((livingVehicle.bodyYaw - livingVehicle.prevBodyYaw) / 15f) * bounceIntensity;
-				} else {
-					return -((vehicle.getYaw() - vehicle.prevYaw) / 15f) * bounceIntensity;
-				}
+				float previous = vehicle instanceof LivingEntity living ? living.prevBodyYaw : vehicle.prevYaw;
+				return -((vehicle.getBodyYaw() - previous) / 15f) * bounceIntensity;
 			}
 		}
 
@@ -102,6 +102,8 @@ public class BreastPhysics {
 
 	// this class cannot be blanket marked as client-side only, as this is referenced in the constructor for EntityConfig;
 	// as such, the best we can get here is marking this method as such.
+	// TODO there's a lot of unused code here; this function should also ideally be broken up to make reading
+	// 		through it not as much of a chore (especially the vehicle physics)
 	@Environment(EnvType.CLIENT)
 	public void update(LivingEntity entity, IGenderArmor armor) {
 		// always suppress the full physics calculations on armor stands
@@ -205,7 +207,7 @@ public class BreastPhysics {
 
 		this.targetBounceY = (float) motion.y * bounceIntensity;
 		this.targetBounceY += breastWeight;
-		float horizVel = (float) Math.sqrt(Math.pow(motion.x, 2) + Math.pow(motion.z, 2)) * (bounceIntensity);
+//		float horizVel = (float) Math.sqrt(Math.pow(motion.x, 2) + Math.pow(motion.z, 2)) * (bounceIntensity);
 
 		this.targetRotVel = calcRotation(entity, bounceIntensity);
 		this.targetRotVel += (float) motion.y * bounceIntensity * randomB;
@@ -228,8 +230,8 @@ public class BreastPhysics {
 		}
 
 		//button option for extra entities
-		if(entity.getVehicle() != null) {
-			if(entity.getVehicle() instanceof BoatEntity boat) {
+		switch(entity.getVehicle()) {
+			case BoatEntity boat -> {
 				int rowTime = (int) boat.interpolatePaddlePhase(0, entity.limbAnimator.getPos());
 				int rowTime2 = (int) boat.interpolatePaddlePhase(1, entity.limbAnimator.getPos());
 
@@ -238,30 +240,35 @@ public class BreastPhysics {
 				if(rotationL < -1 || rotationR < -0.6f) {
 					this.targetBounceY = bounceIntensity / 3.25f;
 				}
-			} else if(entity.getVehicle() instanceof MinecartEntity cart) {
+			}
+			case MinecartEntity cart -> {
 				float speed = (float) cart.getVelocity().lengthSquared();
 				if(Math.random() * speed < 0.5f && speed > 0.2f) {
 					this.targetBounceY = (Math.random() > 0.5 ? -bounceIntensity : bounceIntensity) / 6f;
 					this.targetBounceY += breastWeight;
 				}
-			} else if(entity.getVehicle() instanceof AbstractHorseEntity horse) {
+			}
+			case AbstractHorseEntity horse -> {
 				float movement = (float) horse.getVelocity().lengthSquared();
 				if(horse.age % clampMovement(movement) == 5 && movement > 0.05f) {
 					this.targetBounceY = bounceIntensity / 4f;
 					this.targetBounceY += breastWeight;
 				}
-			} else if(entity.getVehicle() instanceof PigEntity pig) {
+			}
+			case PigEntity pig -> {
 				float movement = (float) pig.getVelocity().lengthSquared();
 				if(pig.age % clampMovement(movement) == 5 && movement > 0.002f) {
 					this.targetBounceY = (bounceIntensity * MathHelper.clamp(movement * 75, 0.1f, 1f)) / 4f;
 					this.targetBounceY += breastWeight;
 				}
-			} else if(entity.getVehicle() instanceof StriderEntity strider) {
+			}
+			case StriderEntity strider -> {
 				double heightOffset = (double)strider.getHeight() - 0.19
 						+ (double)(0.12F * MathHelper.cos(strider.limbAnimator.getPos() * 1.5f)
 						* 2F * Math.min(0.25F, strider.limbAnimator.getSpeed()));
 				this.targetBounceY += ((float) (heightOffset * 3f) - 4.5f) * bounceIntensity;
 			}
+			case null, default -> {}
 		}
 
 		int swingDuration = entity.getHandSwingDuration();
@@ -269,25 +276,31 @@ public class BreastPhysics {
 		// as any faster and the arm effectively doesn't swing at all; we check the previous tick's swing duration for
 		// reasons explained later on in this block
 		if((swingDuration > 1 || lastSwingDuration > 1) && pose != EntityPose.SLEEPING) {
-			float amplifier = 0f;
+			float rawAmplifier = 0f;
 			if(swingDuration < 6) {
-				amplifier = 0.15f * (6 - swingDuration);
+				rawAmplifier = 0.15f * (6 - swingDuration);
 			} else if(swingDuration > 6) {
-				amplifier = -0.067f * (swingDuration - 6);
+				rawAmplifier = -0.055f * (swingDuration - 6);
 			}
-			// Cap our amplifier at the swing durations of Mining Fatigue III/Haste II
-			amplifier = MathHelper.clamp(1 + amplifier, 0.6f, 1.3f);
+			// Cap our amplifier at the swing durations of Mining Fatigue IV/Haste II
+			float amplifier = MathHelper.clamp(1 + rawAmplifier, 0.6f, 1.3f);
+
+			Arm swingingArm = entity.preferredHand == Hand.MAIN_HAND ? entity.getMainArm() : entity.getMainArm().getOpposite();
+			int swingTickDelta = entity.handSwingTicks - lastSwingTick;
+			float swingProgress = distanceFromMedian(0, lastSwingDuration, MathHelper.clamp(lastSwingTick, 0, lastSwingDuration));
+			Arm swingingToward = swingProgress > -0.2f ? swingingArm.getOpposite() : swingingArm;
 
 			// consistently apply even with short swing durations, such as with haste
 			int everyNthTick = MathHelper.clamp(swingDuration - 1, 1, 5);
 			if(entity.handSwinging && entity.age % everyNthTick == 0) {
-				float hasteMult = MathHelper.clamp(everyNthTick / 5f, 0.4f, 1f);
-				this.targetBounceY += (Math.random() > 0.5 ? -0.25f : 0.25f) * amplifier * bounceIntensity * hasteMult;
+				this.targetBounceY += (Math.random() > 0.5 ? -0.25f : 0.25f) * amplifier * bounceIntensity;
+				// The regular amplifier here makes this look relatively unnatural at high levels of mining fatigue,
+				// so instead we're increasing the potency of negative amplifiers (and decreasing positive amplifiers),
+				// and clamping this at a lower range than normal.
+				// The effective range of these numbers is around the swing durations of Mining Fatigue V to Haste II.
+				var xAmp = MathHelper.clamp(1 + (rawAmplifier * (rawAmplifier < 0 ? 1.625f : 0.8f)), 0.25f, 1.225f);
+				this.targetBounceX = (0.325f * xAmp * bounceIntensity) * (swingingArm == Arm.RIGHT ? -1f : 1f);
 			}
-
-			int swingTickDelta = entity.handSwingTicks - lastSwingTick;
-			float swingProgress = distanceFromMedian(0, lastSwingDuration, MathHelper.clamp(lastSwingTick, 0, lastSwingDuration));
-			Arm swingingArm = entity.preferredHand == Hand.MAIN_HAND ? entity.getMainArm() : entity.getMainArm().getOpposite();
 
 			if(swingTickDelta < 0 && lastSwingTick != lastSwingDuration - 1) {
 				// Add a bit of counter-rotation back toward the currently swinging arm if the previous arm swing
@@ -295,11 +308,10 @@ public class BreastPhysics {
 				// Note that we don't check if the player's arm is currently swinging here to account for cases like
 				// haste being used to reset a player's swing; one notable example of this is Wynncraft's spell casting,
 				// which applies haste to the player when a spell is successfully cast.
-				this.targetRotVel += (swingingArm == Arm.RIGHT ? -2.5f : 2.5f) * Math.abs(swingProgress) * bounceIntensity;
+				this.targetRotVel += (swingingArm == Arm.RIGHT ? -4f : 4f) * Math.abs(swingProgress) * bounceIntensity;
 			} else if(entity.handSwinging && swingDuration > 1) {
 				// Otherwise if the swing animation isn't interrupted, attempt to rotate slightly counter to the
 				// direction that the body is currently moving
-				Arm swingingToward = swingProgress > 0f ? swingingArm.getOpposite() : swingingArm;
 				this.targetRotVel += (swingingToward == Arm.RIGHT ? -0.2f : 0.2f) * amplifier * bounceIntensity;
 			}
 			lastSwingTick = entity.handSwingTicks;
@@ -388,8 +400,8 @@ public class BreastPhysics {
 	/**
 	 * Return the distance from the median of the two provided boundary points from a given point
 	 *
-	 * @param p1    Lower boundary point
-	 * @param p2    Upper boundary point
+	 * @param p1    Lower boundary point (inclusive)
+	 * @param p2    Upper boundary point (inclusive)
 	 * @param point The target point within the range of {@code p1} and {@code p2} to get the distance from the median of
 	 *
 	 * @return A {@code float} indicating how far the provided {@code point} is from the median of the two boundary

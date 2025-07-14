@@ -19,7 +19,7 @@
 package com.wildfire.main;
 
 import com.wildfire.events.*;
-import com.wildfire.gui.GuiUtils;
+import com.wildfire.gui.SyncedPlayerList;
 import com.wildfire.gui.screen.WardrobeBrowserScreen;
 import com.wildfire.gui.screen.WildfireFirstTimeSetupScreen;
 import com.wildfire.main.cloud.CloudSync;
@@ -31,6 +31,7 @@ import com.wildfire.main.networking.ServerboundSyncPacket;
 import com.wildfire.main.networking.WildfireSync;
 import com.wildfire.render.GenderArmorLayer;
 import com.wildfire.render.GenderLayer;
+import com.wildfire.render.HolidayFeaturesRenderer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
@@ -47,8 +48,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -61,6 +60,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.component.type.AttributeModifiersComponent;
 import net.minecraft.entity.*;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.decoration.ArmorStandEntity;
@@ -78,8 +78,6 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -101,6 +99,7 @@ public final class WildfireEventHandler {
 			// this has to be wrapped in a lambda to ensure that a dedicated server won't crash during startup
 			// while executing this static block
 			CONFIG_KEYBIND = Util.make(() -> {
+				// FIXME this now conflicts with the Quick Actions key from vanilla as of 1.21.6-pre1
 				KeyBinding keybind = new KeyBinding("key.wildfire_gender.gender_menu", GLFW.GLFW_KEY_G, "category.wildfire_gender.generic");
 				KeyBindingHelper.registerKeyBinding(keybind);
 				return keybind;
@@ -152,11 +151,10 @@ public final class WildfireEventHandler {
 		float translationAmt = switch(player.getPose()) {
 			case EntityPose.CROUCHING -> 0.8f;
 			case EntityPose.SLEEPING -> 0.125f;
-			case EntityPose.SWIMMING -> 0.3f;
-			case EntityPose.FALL_FLYING -> 0.3f;
+			case EntityPose.SWIMMING, EntityPose.FALL_FLYING -> 0.3f;
 			case EntityPose.SITTING -> 0.275f; //not tested; sitting on a pig doesn't work apparently.
-            default -> 0.95f;
-        };
+			default -> 0.95f;
+		};
 		matrixStack.translate(0f, translationAmt, 0f);
 		matrixStack.scale(0.5f, 0.5f, 0.5f);
 		renderHelper.accept(nametag);
@@ -172,8 +170,11 @@ public final class WildfireEventHandler {
 		if(playerConfig == null || !playerConfig.getGender().canHaveBreasts()) return;
 
 		if(!(item.getItem() instanceof ArmorItem armorItem) || armorItem.getSlotType() != EquipmentSlot.CHEST) return;
-		float physResistance = (WildfireHelper.getArmorConfig(item).physicsResistance());
-		tooltipAppender.accept(Text.translatable("wildfire_gender.armor.tooltip", Math.floor(physResistance * 100f) / 100f).formatted(Formatting.LIGHT_PURPLE));
+		var config = WildfireHelper.getArmorConfig(item);
+		// don't show a +0 tooltip on items that don't interact with physics (e.g. Elytra)
+		if(!config.coversBreasts() || config.physicsResistance() == 0f) return;
+		var formatted = AttributeModifiersComponent.DECIMAL_FORMAT.format(config.physicsResistance());
+		tooltipAppender.accept(Text.translatable("wildfire_gender.armor.tooltip", formatted).formatted(Formatting.LIGHT_PURPLE));
 	}
 
 	@Environment(EnvType.CLIENT)
@@ -183,22 +184,9 @@ public final class WildfireEventHandler {
 			return;
 		}
 
-		/*if(MinecraftClient.getInstance().player != null) {
-			PlayerConfig pCfg = WildfireGender.getPlayerById(MinecraftClient.getInstance().player.getUuid());
-			if(pCfg != null) {
-				context.drawText(textRenderer, "Physics Debug", 5, 5, 0xFFFFFF, true);
-				context.drawText(textRenderer, "Position: " + pCfg.getLeftBreastPhysics().getPositionX() + "," + pCfg.getLeftBreastPhysics().getPositionY(), 5, 15, 0xFFFFFF, true);
-				context.drawText(textRenderer, "Breast Size: " + pCfg.getLeftBreastPhysics().getBreastSize(tickCounter.getTickDelta(false)), 5, 35, 0xFFFFFF, true);
-			}
-		}*/
-		boolean shouldShow = switch(GlobalConfig.INSTANCE.get(GlobalConfig.ALWAYS_SHOW_LIST)) {
-			case MOD_UI_ONLY -> false;
-			case TAB_LIST_OPEN -> MinecraftClient.getInstance().options.playerListKey.isPressed();
-			case ALWAYS -> true;
-		};
-		if(!shouldShow) return;
-
-		GuiUtils.drawSyncedPlayers(context, textRenderer, collectPlayerEntries());
+		if(GlobalConfig.INSTANCE.get(GlobalConfig.ALWAYS_SHOW_LIST).isVisible()) {
+			SyncedPlayerList.drawSyncedPlayers(context, textRenderer);
+		}
 	}
 
 	/**
@@ -211,6 +199,7 @@ public final class WildfireEventHandler {
 		if(entityRenderer instanceof PlayerEntityRenderer playerRenderer) {
 			registrationHelper.register(new GenderLayer<>(playerRenderer));
 			registrationHelper.register(new GenderArmorLayer<>(playerRenderer, context.getModelManager()));
+//			registrationHelper.register(new HolidayFeaturesRenderer(playerRenderer)); // TODO figure out why java is screaming at me
 		} else if(entityRenderer instanceof ArmorStandEntityRenderer armorStandRenderer) {
 			registrationHelper.register(new GenderArmorLayer<>(armorStandRenderer, context.getModelManager()));
 		}
@@ -354,19 +343,5 @@ public final class WildfireEventHandler {
 		if(component != null) {
 			component.write(player.getWorld().getRegistryManager(), item);
 		}
-	}
-
-
-	public static List<PlayerListEntry> collectPlayerEntries() {
-		if(MinecraftClient.getInstance().player == null) return new ArrayList<>();
-		ClientPlayerEntity player = MinecraftClient.getInstance().player;
-		return player.networkHandler.getListedPlayerListEntries().stream()
-				.filter(entry -> !entry.getProfile().getId().equals(player.getUuid()))
-				.filter(entry -> {
-					var cfg = WildfireGender.getPlayerById(entry.getProfile().getId());
-					return cfg != null && cfg.getSyncStatus() != PlayerConfig.SyncStatus.UNKNOWN;
-				})
-				.limit(40L)
-				.toList();
 	}
 }

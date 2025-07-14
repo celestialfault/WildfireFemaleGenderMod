@@ -2,13 +2,13 @@
   "schemaVersion": 1,
   "id": "wildfire_gender",
   "version": "${version}+${minecraft_version}",
-  "name": "Wildfire's Female Gender Mod",
-  "description": "Allows players to choose what gender they want to be.",
+  "name": "Female Gender Mod",
+  "description": "Adds extra customization options to the player model by adding breasts for a more feminine appearance",
   "authors": [
     "WildfireRomeo"
   ],
   "contributors": [
-    "Archl",
+    "A2 76",
     "Arcti_cc",
     "BluelightAmelia",
     "celeste",

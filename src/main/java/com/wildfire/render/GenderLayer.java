@@ -19,7 +19,6 @@
 package com.wildfire.render;
 
 import com.wildfire.api.IGenderArmor;
-import com.wildfire.main.WildfireEventHandler;
 import com.wildfire.main.config.GlobalConfig;
 import com.wildfire.main.entitydata.Breasts;
 import com.wildfire.main.WildfireGender;
@@ -30,7 +29,6 @@ import com.wildfire.mixins.accessors.RenderLayerAccessor;
 import com.wildfire.physics.BreastPhysics;
 import com.wildfire.render.WildfireModelRenderer.BreastModelBox;
 import com.wildfire.render.WildfireModelRenderer.OverlayModelBox;
-import com.wildfire.render.WildfireModelRenderer.PositionTextureVertex;
 
 import java.lang.Math;
 import java.util.function.Consumer;
@@ -101,7 +99,8 @@ public class GenderLayer<T extends LivingEntity, M extends BipedEntityModel<T>> 
 					   float limbDistance, float partialTicks, float animationProgress, float headYaw, float headPitch) {
 		MinecraftClient client = MinecraftClient.getInstance();
 		if(client.player == null) {
-			// we're currently in a menu; we won't have any data loaded to begin with, so just give up early
+			// TODO is it possible to remove this check? does anything this invoke still check
+			//		the client player or world?
 			return;
 		}
 
@@ -210,14 +209,8 @@ public class GenderLayer<T extends LivingEntity, M extends BipedEntityModel<T>> 
 
 		ModelPart body = model.body;
 		matrixStack.translate(body.pivotX * 0.0625f, body.pivotY * 0.0625f, body.pivotZ * 0.0625f);
-		if(body.roll != 0.0F) {
-			matrixStack.multiply(new Quaternionf().rotationXYZ(0f, 0f, body.roll));
-		}
-		if(body.yaw != 0.0F) {
-			matrixStack.multiply(new Quaternionf().rotationXYZ(0f, body.yaw, 0f));
-		}
-		if(body.pitch != 0.0F) {
-			matrixStack.multiply(new Quaternionf().rotationXYZ(body.pitch, 0f, 0f));
+		if(body.roll != 0.0F || body.yaw != 0.0F || body.pitch != 0.0F) {
+			matrixStack.multiply(new Quaternionf().rotationZYX(body.roll, body.yaw, body.pitch));
 		}
 
 		if(bounceEnabled) {
@@ -303,12 +296,12 @@ public class GenderLayer<T extends LivingEntity, M extends BipedEntityModel<T>> 
 									int light, int overlay, int color) {
 		Matrix4f matrix4f = matrixStack.peek().getPositionMatrix();
 		Matrix3f matrix3f = matrixStack.peek().getNormalMatrix();
-		for(WildfireModelRenderer.TexturedQuad quad : model.quads) {
+		for(var quad : model.quads) {
 			Vector3f vector3f = new Vector3f(quad.normal.x, quad.normal.y, quad.normal.z).mul(matrix3f);
 			float normalX = vector3f.x;
 			float normalY = vector3f.y;
 			float normalZ = vector3f.z;
-			for(PositionTextureVertex vertex : quad.vertexPositions) {
+			for(var vertex : quad.vertexPositions) {
 				float j = vertex.x() / 16.0F;
 				float k = vertex.y() / 16.0F;
 				float l = vertex.z() / 16.0F;

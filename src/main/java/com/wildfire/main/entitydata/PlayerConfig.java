@@ -48,6 +48,7 @@ public class PlayerConfig extends EntityConfig {
 
 	private final Configuration cfg;
 	protected boolean hurtSounds = Configuration.HURT_SOUNDS.getDefault();
+	protected boolean holidayThemes = Configuration.HOLIDAY_THEMES.getDefault();
 	protected boolean armorPhysOverride = Configuration.ARMOR_PHYSICS_OVERRIDE.getDefault();
 	protected boolean showBreastsInArmor = Configuration.SHOW_IN_ARMOR.getDefault();
 
@@ -80,6 +81,12 @@ public class PlayerConfig extends EntityConfig {
 		this.cfg.setDefault(Configuration.BOUNCE_MULTIPLIER);
 		this.cfg.setDefault(Configuration.FLOPPY_MULTIPLIER);
 		this.cfg.setDefault(Configuration.VOICE_PITCH);
+
+		this.cfg.setDefault(Configuration.HOLIDAY_THEMES);
+
+		// Real players always have a UUID of version 4; if this isn't the case, then this is undeniably
+		// an NPC player entity.
+		if(uuid.version() != 4) this.holidayThemes = false;
 	}
 
 	// this shouldn't ever be called on players, but just to be safe, override with a noop.
@@ -105,6 +112,16 @@ public class PlayerConfig extends EntityConfig {
 	public boolean updateBustSize(float value) {
 		return updateValue(Configuration.BUST_SIZE, value, v -> this.pBustSize = v);
 	}
+
+
+	public boolean hasHolidayThemes() {
+		return holidayThemes;
+	}
+
+	public boolean updateHolidayThemes(boolean value) {
+		return updateValue(Configuration.HOLIDAY_THEMES, value, v -> this.holidayThemes = v);
+	}
+
 
 	public boolean hasHurtSounds() {
 		return hurtSounds;
@@ -197,6 +214,7 @@ public class PlayerConfig extends EntityConfig {
 		updateBustSize(cfg.get(Configuration.BUST_SIZE));
 		updateHurtSounds(cfg.get(Configuration.HURT_SOUNDS));
 		updateVoicePitch(cfg.get(Configuration.VOICE_PITCH));
+		updateHolidayThemes(cfg.get(Configuration.HOLIDAY_THEMES));
 
 		//physics
 		updateBreastPhysics(cfg.get(Configuration.BREAST_PHYSICS));
@@ -241,6 +259,7 @@ public class PlayerConfig extends EntityConfig {
 		config.set(Configuration.BUST_SIZE, plr.getBustSize());
 		config.set(Configuration.HURT_SOUNDS, plr.hasHurtSounds());
 		config.set(Configuration.VOICE_PITCH, plr.getVoicePitch());
+		config.set(Configuration.HOLIDAY_THEMES, plr.hasHolidayThemes());
 
 		//physics
 		config.set(Configuration.BREAST_PHYSICS, plr.hasBreastPhysics());

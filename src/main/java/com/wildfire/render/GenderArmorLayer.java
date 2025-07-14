@@ -19,7 +19,6 @@
 package com.wildfire.render;
 
 import com.wildfire.api.IBreastArmorTexture;
-import com.wildfire.api.impl.BreastArmorTexture;
 import com.wildfire.main.WildfireGender;
 import com.wildfire.main.entitydata.EntityConfig;
 import com.wildfire.render.WildfireModelRenderer.BreastModelBox;
@@ -62,7 +61,7 @@ public class GenderArmorLayer<T extends LivingEntity, M extends BipedEntityModel
 	protected BreastModelBox lBoobArmor, rBoobArmor;
 	protected static final BreastModelBox lTrim, rTrim;
 	private EntityConfig entityConfig;
-	private @NotNull IBreastArmorTexture textureData = BreastArmorTexture.DEFAULT;
+	private @NotNull IBreastArmorTexture textureData = IBreastArmorTexture.DEFAULT;
 
 	static {
 		// apply a very slight delta to fix z-fighting with the armor
@@ -82,7 +81,8 @@ public class GenderArmorLayer<T extends LivingEntity, M extends BipedEntityModel
 	                   float limbDistance, float partialTicks, float animationProgress, float headYaw, float headPitch) {
 		MinecraftClient client = MinecraftClient.getInstance();
 		if(client.player == null) {
-			// we're currently in a menu, give up rendering before we crash the game
+			// TODO is it possible to remove this check? does anything this invoke still check
+			//		the client player or world?
 			return;
 		}
 

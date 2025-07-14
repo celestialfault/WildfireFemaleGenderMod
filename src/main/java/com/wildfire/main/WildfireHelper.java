@@ -29,7 +29,6 @@ import net.fabricmc.fabric.api.util.TriState;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ItemStack;
-import com.wildfire.api.impl.GenderArmor;
 import com.wildfire.resources.GenderArmorResourceManager;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -72,14 +71,15 @@ public final class WildfireHelper {
         return (float) ThreadLocalRandom.current().nextDouble(min, (double) max + 1);
     }
 
+    @SuppressWarnings("removal")
     @Environment(EnvType.CLIENT)
     public static IGenderArmor getArmorConfig(ItemStack stack) {
         if(stack.isEmpty()) {
-            return GenderArmor.EMPTY;
+            return IGenderArmor.EMPTY;
         }
 
         return GenderArmorResourceManager.get(stack).orElseGet(() -> {
-            var fallback = stack.getItem() instanceof ArmorItem ? GenderArmor.DEFAULT : GenderArmor.EMPTY;
+            var fallback = stack.getItem() instanceof ArmorItem ? IGenderArmor.DEFAULT : IGenderArmor.EMPTY;
             return WildfireAPI.getGenderArmors().getOrDefault(stack.getItem(), fallback);
         });
     }

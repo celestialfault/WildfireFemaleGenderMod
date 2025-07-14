@@ -18,7 +18,6 @@
 
 package com.wildfire.gui.screen;
 
-import com.wildfire.gui.GuiUtils;
 import com.wildfire.gui.WildfireBreastPresetList;
 import com.wildfire.gui.WildfireButton;
 import com.wildfire.gui.WildfireSlider;
@@ -32,12 +31,9 @@ import com.wildfire.main.config.BreastPresetConfiguration;
 import it.unimi.dsi.fastutil.floats.FloatConsumer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.Tooltip;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -65,11 +61,12 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
 
     //Breast Physics Tab
     private WildfireSlider bounceSlider, floppySlider;
-    private WildfireButton btnHideInArmor, btnOverrideArmorPhys, btnBreastPhysics, btnShowTooltips;
+    private WildfireButton btnOverrideArmorPhys, btnBreastPhysics;
 
     //Miscellaneous Tab
     private WildfireSlider voicePitchSlider;
-    private WildfireButton btnHurtSounds;
+    private WildfireButton btnHurtSounds, btnHideInArmor, btnShowTooltips;
+    private WildfireButton btnHolidayThemes;
 
     //Presets Code
     //private WildfireButton btnAddPreset, btnDeletePreset;
@@ -255,6 +252,17 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
             button.setMessage(Text.translatable("wildfire_gender.char_settings.show_armor_stat", config.get(GlobalConfig.ARMOR_STAT) ? ENABLED : DISABLED));
         }));
 
+        this.addDrawableChild(btnHolidayThemes = new WildfireButton(this.width / 2 - 36, tabOffsetY + 94, 166, 20,
+                Text.translatable("wildfire_gender.misc.holiday_themes", plr.hasHolidayThemes() ? ENABLED : DISABLED), button -> {
+            boolean enableHolidayThemes = !plr.hasHolidayThemes();
+            if(plr.updateHolidayThemes(enableHolidayThemes)) {
+                button.setMessage(Text.translatable("wildfire_gender.misc.holiday_themes", plr.hasHolidayThemes() ? ENABLED : DISABLED));
+            }
+        }, Tooltip.of(Text.translatable("wildfire_gender.tooltip.holiday_themes.line1"))
+                /*.append("\n\n")
+                .append(Text.translatable("wildfire_gender.tooltip.holiday_themes.line2")))*/
+        ));
+
         //Preset Tab Below
         PRESET_LIST = new WildfireBreastPresetList(this, 156, (j - 48));
         PRESET_LIST.setX(this.width / 2 + 30);
@@ -288,6 +296,7 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
         this.btnHurtSounds.visible = currentTab == 2;
         this.voicePitchSlider.visible = currentTab == 2;
         this.btnShowTooltips.visible = currentTab == 2;
+        this.btnHolidayThemes.visible = currentTab == 2;
     }
 
 
@@ -340,7 +349,7 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
         } else if(currentTab == 1) {
             ctx.drawTexture(BACKGROUND_PHYSICS, (this.width) / 2 - 42, (this.height) / 2 - 43, 0, 0, 178, 104, 512, 512);
         } else if(currentTab == 2) {
-            ctx.drawTexture(BACKGROUND_MISC, (this.width) / 2 - 42, (this.height) / 2 - 43, 0, 0, 178, 104, 512, 512);
+            ctx.drawTexture(BACKGROUND_MISC, (this.width) / 2 - 42, (this.height) / 2 - 43, 0, 0, 178, 128, 512, 512);
         }
 
         int x = this.width / 2;
@@ -349,16 +358,7 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
         //ctx.fill(x + 29, y - 63 - 21, x + 189, y - 60, 0x55000000);
         ctx.drawText(textRenderer, getTitle(), x - textRenderer.getWidth(getTitle()) / 2, y - 82, 0xFFFFFF, false);
 
-        if(client != null && client.world != null) {
-            int xP = this.width / 2 - 90;
-            int yP = this.height / 2 + 44;
-            PlayerEntity ent = client.world.getPlayerByUuid(this.playerUUID);
-            if(ent != null) {
-                ctx.enableScissor(xP - 38, yP - 97, xP + 38, yP + 9);
-                GuiUtils.drawEntityOnScreen(ctx, xP, yP + 60, 70, (xP - mouseX), (yP - 46 - mouseY), ent);
-                ctx.disableScissor();
-            }
-        }
+        renderPlayerInFrame(ctx, this.width / 2 - 90, this.height / 2 + 44, mouseX, mouseY);
     }
 
     @Override
