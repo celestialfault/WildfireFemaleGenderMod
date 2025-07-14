@@ -1,3 +1,7 @@
+>[!warning]
+> This branch is not going to see any support outside of fixing serious issues/crashes.
+> (aka, "this was not all that fun so I've decided I'm not going to be backporting to a version this old ever again")
+
 A few notes:
 
 - Armor texture data has not at all been tested. It *might* explode. Hopefully not, though.
@@ -7,5 +11,6 @@ A few notes:
 Missing features:
 
 - Support for `{"x": x, "y": y}` texture data in resource packs
+- Holiday features
 - Contributor capes
 - Contributor names tooltip doesn't show when hovering over the text in the mod's GUI
