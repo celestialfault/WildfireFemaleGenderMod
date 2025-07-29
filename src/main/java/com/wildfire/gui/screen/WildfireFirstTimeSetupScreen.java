@@ -22,22 +22,18 @@ import com.wildfire.gui.GuiUtils;
 import com.wildfire.gui.WildfireButton;
 import com.wildfire.main.WildfireGender;
 import com.wildfire.main.WildfireGenderClient;
-import com.wildfire.main.WildfireHelper;
 import com.wildfire.main.config.GlobalConfig;
 import com.wildfire.main.entitydata.PlayerConfig;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.MathHelper;
-import org.joml.Quaternionf;
+import org.joml.Vector2f;
 
-import java.text.Normalizer;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -45,8 +41,6 @@ import java.util.concurrent.CompletionException;
 
 @Environment(EnvType.CLIENT)
 public class WildfireFirstTimeSetupScreen extends BaseWildfireScreen {
-
-	//TODO: PROPER TRANSLATIONS
 
 	private static final Text TITLE = Text.translatable("wildfire_gender.first_time_setup.title").formatted(Formatting.UNDERLINE);
 	private static final Text DESCRIPTION = Text.translatable("wildfire_gender.first_time_setup.description");
@@ -66,16 +60,16 @@ public class WildfireFirstTimeSetupScreen extends BaseWildfireScreen {
 		int x = this.width / 2;
 		int y = this.height / 2;
 
-		// why must Java be?
+		final var config = GlobalConfig.INSTANCE;
 		final var ref = new Object() {
 			WildfireButton no = null;
 		};
 
-		this.addDrawableChild(new WildfireButton(x + 3, y + 74, 128, 20,
-				ENABLE_CLOUD_SYNCING,
-				button -> {
-					var config = GlobalConfig.INSTANCE;
-					//Enable both settings, they can always disable automatic later? TBD
+		addButton(builder -> builder
+				.message(() -> ENABLE_CLOUD_SYNCING)
+				.position(x + 3, y + 74)
+				.size(128, 20)
+				.onPress(button -> {
 					config.set(GlobalConfig.CLOUD_SYNC_ENABLED, true);
 					config.set(GlobalConfig.AUTOMATIC_CLOUD_SYNC, true);
 					config.set(GlobalConfig.FIRST_TIME_LOAD, false);
@@ -89,10 +83,11 @@ public class WildfireFirstTimeSetupScreen extends BaseWildfireScreen {
 				}));
 
 
-		this.addDrawableChild(ref.no = new WildfireButton(x - 131, y + 74, 128, 20,
-				DISABLE_CLOUD_SYNCING,
-				button -> {
-					var config = GlobalConfig.INSTANCE;
+		ref.no = addButton(builder -> builder
+				.message(() -> DISABLE_CLOUD_SYNCING)
+				.position(x - 131, y + 74)
+				.size(128, 20)
+				.onPress(button -> {
 					config.set(GlobalConfig.CLOUD_SYNC_ENABLED, false);
 					config.set(GlobalConfig.AUTOMATIC_CLOUD_SYNC, false);
 					config.set(GlobalConfig.FIRST_TIME_LOAD, false);
@@ -140,7 +135,7 @@ public class WildfireFirstTimeSetupScreen extends BaseWildfireScreen {
 		if(client == null || client.world == null) return;
 		super.render(ctx, mouseX, mouseY, delta);
 
-		MatrixStack mStack = ctx.getMatrices();
+		var mStack = ctx.getMatrices();
 
 		int x = this.width / 2;
 		int y = this.height / 2;
@@ -152,11 +147,10 @@ public class WildfireFirstTimeSetupScreen extends BaseWildfireScreen {
 		//TODO: Vertical scroll bar for longer text?
 		GuiUtils.drawCenteredTextWrapped(ctx, textRenderer, DESCRIPTION, x + 32, y + 2, (int) ((256-65)), 0xFFFFFF);
 
-
 		mStack.push();
-			mStack.translate(x, y + 47, 0);
-			mStack.scale(0.8f, 0.8f, 1);
-			mStack.translate(-x, -y - 47, 0);
+		mStack.translate(x, y + 47, 0);
+		mStack.scale(0.8f, 0.8f, 1);
+		mStack.translate(-x, -y - 47, 0);
 		GuiUtils.drawCenteredTextWrapped(ctx, textRenderer, NOTICE, x, y + 68, (int) ((256-10) * 1.2f), 4210752);
 		mStack.pop();
 

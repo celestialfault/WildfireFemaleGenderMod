@@ -17,8 +17,9 @@ The mod also features cloud sync support (as of 4.0 on 1.21.2+) to allow for syn
 to other players on servers that don't have the mod installed.
 
 ## Default Controls
+H - Open Customization Settings
 
-G - Open Customization Settings
+[Pre 1.21.6] G - Open Customization Settings
 
 ## License
 
