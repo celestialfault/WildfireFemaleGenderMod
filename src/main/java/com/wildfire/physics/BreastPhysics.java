@@ -42,7 +42,7 @@ public class BreastPhysics {
 	//Y-Axis
 	private float bounceVel = 0, targetBounceY = 0, velocity = 0, positionY, prePositionY;
 	//Rotation
-	private float bounceRotVel = 0, targetRotVel = 0, rotVelocity = 0, wfg_bounceRotation, wfg_preBounceRotation;
+	private float bounceRotVel = 0, bounceRotVelY = 0, targetRotVel = 0, targetRotVelY = 0, rotVelocity = 0, rotVelocityY = 0, wfg_bounceRotation, wfg_preBounceRotation, wfg_bounceRotationY, wfg_preBounceRotationY;
 
 	private float breastSize = 0, preBreastSize = 0;
 
@@ -124,6 +124,7 @@ public class BreastPhysics {
 		this.prePositionY = this.positionY;
 		this.prePositionX = this.positionX;
 		this.wfg_preBounceRotation = this.wfg_bounceRotation;
+		this.wfg_preBounceRotationY = this.wfg_bounceRotationY;
 		this.preBreastSize = this.breastSize;
 
 		if(this.prePos == null) {
@@ -206,6 +207,7 @@ public class BreastPhysics {
 		lastVerticalMoveVelocity = vertVelocity;
 
 		this.targetBounceY = (float) motion.y * bounceIntensity;
+
 		this.targetBounceY += breastWeight;
 //		float horizVel = (float) Math.sqrt(Math.pow(motion.x, 2) + Math.pow(motion.z, 2)) * (bounceIntensity);
 
@@ -346,6 +348,11 @@ public class BreastPhysics {
 		targetBounceY = MathHelper.clamp(targetBounceY, -1.5f, 2.5f);
 		targetRotVel = MathHelper.clamp(targetRotVel, -25f, 25f);
 
+		//Vertical Rotation Breast Physics
+		targetRotVelY = (float) motion.y * bounceIntensity;
+		targetRotVelY = MathHelper.clamp(targetRotVelY, -2f, 2f);
+
+
 		this.velocity = MathHelper.lerp(bounceAmount, this.velocity, (this.targetBounceY - this.bounceVel) * delta);
 		this.bounceVel += this.velocity * percent * 1.1625f;
 
@@ -356,7 +363,12 @@ public class BreastPhysics {
 		this.rotVelocity = MathHelper.lerp(bounceAmount, this.rotVelocity, (this.targetRotVel - this.bounceRotVel) * delta);
 		this.bounceRotVel += this.rotVelocity * percent;
 
+		//Y
+		this.rotVelocityY = MathHelper.lerp(bounceAmount, this.rotVelocityY, (this.targetRotVelY - this.bounceRotVelY) * delta);
+		this.bounceRotVelY += this.rotVelocityY * percent;
+
 		this.wfg_bounceRotation = this.bounceRotVel;
+		this.wfg_bounceRotationY = this.bounceRotVelY;
 		this.positionX = this.bounceVelX;
 		this.positionY = this.bounceVel;
 
@@ -391,6 +403,13 @@ public class BreastPhysics {
 	}
 	public float getPreBounceRotation() {
 		return this.wfg_preBounceRotation;
+	}
+
+	public float getBounceRotationY() {
+		return this.wfg_bounceRotationY;
+	}
+	public float getPreBounceRotationY() {
+		return this.wfg_preBounceRotationY;
 	}
 
 	private int clampMovement(float movement) {
@@ -436,4 +455,5 @@ public class BreastPhysics {
 		}
 		return point / median;
 	}
+
 }

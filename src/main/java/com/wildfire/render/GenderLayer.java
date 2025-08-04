@@ -69,7 +69,7 @@ public class GenderLayer<S extends BipedEntityRenderState, M extends BipedEntity
 	protected IGenderArmor genderArmor;
 	protected boolean isChestplateOccupied, bounceEnabled, breathingAnimation;
 	protected float breastOffsetX, breastOffsetY, breastOffsetZ, lPhysPositionY, lPhysPositionX, rPhysPositionY, rPhysPositionX,
-			lPhysBounceRotation, rPhysBounceRotation, breastSize, zOffset, outwardAngle;
+			lPhysBounceRotation, rPhysBounceRotation, lPhysBounceRotationY, rPhysBounceRotationY, breastSize, zOffset, outwardAngle;
 
 	static {
 		lBreastWear = new OverlayModelBox(true, 64, 64, 17, 34, -4F, 0.0F, 0F, 4, 5, 3, 0.0F, false);
@@ -171,6 +171,8 @@ public class GenderLayer<S extends BipedEntityRenderState, M extends BipedEntity
 		lPhysPositionY = MathHelper.lerp(partialTicks, leftBreastPhysics.getPrePositionY(), leftBreastPhysics.getPositionY());
 		lPhysPositionX = MathHelper.lerp(partialTicks, leftBreastPhysics.getPrePositionX(), leftBreastPhysics.getPositionX());
 		lPhysBounceRotation = MathHelper.lerp(partialTicks, leftBreastPhysics.getPreBounceRotation(), leftBreastPhysics.getBounceRotation());
+		lPhysBounceRotationY = MathHelper.lerp(partialTicks, leftBreastPhysics.getPreBounceRotationY(), leftBreastPhysics.getBounceRotationY());
+
 		if(breasts.isUniboob()) {
 			rPhysPositionY = lPhysPositionY;
 			rPhysPositionX = lPhysPositionX;
@@ -180,20 +182,18 @@ public class GenderLayer<S extends BipedEntityRenderState, M extends BipedEntity
 			rPhysPositionY = MathHelper.lerp(partialTicks, rightBreastPhysics.getPrePositionY(), rightBreastPhysics.getPositionY());
 			rPhysPositionX = MathHelper.lerp(partialTicks, rightBreastPhysics.getPrePositionX(), rightBreastPhysics.getPositionX());
 			rPhysBounceRotation = MathHelper.lerp(partialTicks, rightBreastPhysics.getPreBounceRotation(), rightBreastPhysics.getBounceRotation());
+			rPhysBounceRotationY = MathHelper.lerp(partialTicks, rightBreastPhysics.getPreBounceRotationY(), rightBreastPhysics.getBounceRotationY());
 		}
 
 		breastSize = Math.min(bSize * 1.5f, 0.7f); // Limit the max size to 0.7f
 
-		if (bSize > 0.7f) {
-			breastSize = bSize; // If bSize exceeds 0.7f, use bSize
-		}
-
-		if (breastSize < 0.02f) {
+		if (breastSize < 0.01f) {
 			return false; // Return false if breastSize is too small
 		}
 
 		zOffset = 0.0625f - (bSize * 0.0625f); // Calculate zOffset
-		breastSize += 0.5f * Math.abs(bSize - 0.7f) * 2f; // Adjust breastSize based on bSize
+
+		breastSize += 0.1f * (bSize * 2f); // Adjust breastSize based on bSize
 
 		float resistance = MathHelper.clamp(genderArmor.physicsResistance(), 0, 1);
 		//Note: We only check if the breathing animation should be enabled if the chestplate's physics resistance
@@ -245,7 +245,7 @@ public class GenderLayer<S extends BipedEntityRenderState, M extends BipedEntity
 			matrixStack.translate(-0.0625f * 2 * (side.isLeft ? 1 : -1), 0, 0);
 		}
 		if(bounceEnabled) {
-			matrixStack.multiply(new Quaternionf().rotationXYZ(0, (float)((side.isLeft ? lPhysBounceRotation : rPhysBounceRotation) * (Math.PI / 180f)), 0));
+			matrixStack.multiply(new Quaternionf().rotationXYZ((float)((side.isLeft ? lPhysBounceRotationY : rPhysBounceRotationY) * (Math.PI / 180f)), (float)((side.isLeft ? lPhysBounceRotation : rPhysBounceRotation) * (Math.PI / 180f)), 0));
 		}
 		if(!breasts.isUniboob()) {
 			matrixStack.translate(0.0625f * 2 * (side.isLeft ? 1 : -1), 0, 0);
@@ -257,8 +257,8 @@ public class GenderLayer<S extends BipedEntityRenderState, M extends BipedEntity
 			rotation -= (side.isLeft ? lPhysPositionY : rPhysPositionY) / 12f;
 		}
 
-		rotation = Math.min(rotation, breastSize + 0.2f);
-		rotation = Math.min(rotation, 1); //hard limit for MAX
+		//rotation = Math.min(rotation, breastSize + 0.2f);
+		//rotation = Math.min(rotation, 1); //hard limit for MAX
 
 		if(isChestplateOccupied) {
 			matrixStack.translate(0, 0, 0.01f);
