@@ -18,7 +18,7 @@
 
 package com.wildfire.gui.screen;
 
-import com.wildfire.events.EntityHurtSoundEvent;
+import com.wildfire.events.PlayerHurtSoundEvent;
 import com.wildfire.gui.WildfireSlider;
 import com.wildfire.main.WildfireGender;
 import com.wildfire.main.config.ClientConfig;
@@ -292,13 +292,26 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
 				.update(plr::updateVoicePitch)
 				.save(value -> {
 					plr.save();
-					var clientPlayer = Objects.requireNonNull(minecraft).player;
+					var clientPlayer = minecraft.player;
 					if(clientPlayer != null) {
-						EntityHurtSoundEvent.EVENT.invoker().onHurt(clientPlayer, clientPlayer.damageSources().generic());
+						PlayerHurtSoundEvent.play(clientPlayer);
 					}
 				})
 				.step(0.01)
 				.active(plr.hasHurtSounds()));
+
+		addButton(builder -> builder
+				.message(() -> Component.translatable("wildfire_gender.hurt_sound_behavior", config.get(ClientConfig.HURT_SOUND_BEHAVIOR).getDisplayName()))
+				.tooltip(Tooltip.create(config.get(ClientConfig.HURT_SOUND_BEHAVIOR).getDescription()))
+				.position(this.width / 2 - 36 + HALF_WIDTH + 2, tabOffsetY + 22)
+				.size(HALF_WIDTH + 3, 20)
+				.onPress(button -> {
+					var next = config.get(ClientConfig.HURT_SOUND_BEHAVIOR).next();
+					config.set(ClientConfig.HURT_SOUND_BEHAVIOR, next);
+					config.save();
+					button.updateMessage();
+					button.setTooltip(Tooltip.create(next.getDescription()));
+				}));
 
 		addButton(builder -> builder
 				.message(() -> Component.translatable("wildfire_gender.char_settings.hide_in_armor", plr.showBreastsInArmor() ? DISABLED : ENABLED))

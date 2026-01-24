@@ -16,21 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.wildfire.main;
+@NullMarked
+package com.wildfire.main.sound;
 
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
-import net.minecraft.sounds.SoundEvent;
-
-public final class WildfireSounds {
-	private WildfireSounds() {
-		throw new UnsupportedOperationException();
-	}
-
-	public static final SoundEvent FEMALE_HURT = SoundEvent.createVariableRangeEvent(Identifier.fromNamespaceAndPath(WildfireGender.MODID, "female_hurt"));
-
-	static void register() {
-		Registry.register(BuiltInRegistries.SOUND_EVENT, FEMALE_HURT.location(), FEMALE_HURT);
-	}
-}
+import org.jspecify.annotations.NullMarked;

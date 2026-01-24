@@ -81,6 +81,13 @@
 	"wildfire_gender.tooltip.override_armor_physics.line1": "Breast physics will no longer be reduced/suppressed by any worn armor while enabled; this is primarily intended for use with resource packs that hide armor.",
 	"wildfire_gender.tooltip.override_armor_physics.line2": "This affects how you see other players and yourself, but does not affect how others see you.",
 
+	"wildfire_gender.hurt_sound_behavior": "Hurt Sounds: %s",
+	"wildfire_gender.hurt_sound_behavior.client_only_disclaimer": "This affects how you hear hurt sounds from yourself and others, but does not affect how others hear your own hurt sounds.",
+	"wildfire_gender.hurt_sound_behavior.overlay": "Overlay",
+	"wildfire_gender.hurt_sound_behavior.overlay.description": "Overlays the gender hurt sound on top of the vanilla sound",
+	"wildfire_gender.hurt_sound_behavior.replace": "Replace",
+	"wildfire_gender.hurt_sound_behavior.replace.description": "Replaces the vanilla hurt sound with the gender hurt sound",
+
 	"wildfire_gender.char_settings.hide_in_armor": "Hide In Armor: %s",
 	"wildfire_gender.char_settings.show_armor_stat": "Show Armor Tooltip: %s",
 	"wildfire_gender.char_settings.hurt_sounds": "Female Hurt Sounds: %s",

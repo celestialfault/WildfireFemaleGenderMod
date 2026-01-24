@@ -18,7 +18,7 @@
 
 package com.wildfire.main.config.enums;
 
-import com.wildfire.main.WildfireSounds;
+import com.wildfire.main.sound.WildfireSounds;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;

@@ -18,10 +18,16 @@
 
 package com.wildfire.mixins;
 
-import com.wildfire.events.EntityHurtSoundEvent;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.sugar.Local;
+import com.wildfire.events.PlayerHurtSoundEvent;
 import com.wildfire.events.EntityTickEvent;
+import com.wildfire.main.sound.HurtSound;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -41,15 +47,36 @@ abstract class LivingEntityMixin extends Entity {
 
 	// TODO would it be worth adding an extra @Inject to #animateDamage(float) to account for servers (namely hypixel)
 	//		using DamageTiltS2CPacket instead of the standard entity damage packet?
-	@Inject(
+	@WrapOperation(
 		method = "handleDamageEvent",
 		at = @At(
 			value = "INVOKE",
 			target = "Lnet/minecraft/world/entity/LivingEntity;playSound(Lnet/minecraft/sounds/SoundEvent;FF)V"
 		)
 	)
-	public void wildfiregender$playGenderHurtSound(DamageSource damageSource, CallbackInfo ci) {
-		EntityHurtSoundEvent.EVENT.invoker().onHurt((LivingEntity)(Object)this, damageSource);
+	public void wildfiregender$playGenderHurtSound(
+		LivingEntity instance,
+		SoundEvent soundEvent,
+		float volume,
+		float pitch,
+		Operation<Void> original,
+		@Local(argsOnly = true) DamageSource source
+	) {
+		sound: {
+			if(!(instance instanceof AbstractClientPlayer player)) break sound;
+
+			HurtSound hurtSound = PlayerHurtSoundEvent.EVENT.invoker().onHurt(player, source);
+			if(hurtSound == null) break sound;
+
+			if(hurtSound.replaceVanillaSound()) {
+				soundEvent = hurtSound.sound();
+				pitch = hurtSound.pitch();
+			} else {
+				instance.playSound(hurtSound.sound(), 1f, hurtSound.pitch());
+			}
+		}
+
+		original.call(instance, soundEvent, volume, pitch);
 	}
 
 	@Inject(method = "tick", at = @At("TAIL"))

@@ -16,26 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.wildfire.events;
+package com.wildfire.main.sound;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.event.Event;
-import net.fabricmc.fabric.api.event.EventFactory;
-import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.LivingEntity;
+import com.wildfire.main.config.ClientConfig;
+import com.wildfire.main.config.enums.HurtSoundBehavior;
+import net.minecraft.sounds.SoundEvent;
 
-/**
- * Event invoked when <b>any</b> {@link LivingEntity} plays a hurt sound.
- */
-@FunctionalInterface
-@Environment(EnvType.CLIENT)
-public interface EntityHurtSoundEvent {
-	Event<EntityHurtSoundEvent> EVENT = EventFactory.createArrayBacked(EntityHurtSoundEvent.class, listeners -> (entity, source) -> {
-		for(var listener : listeners) {
-			listener.onHurt(entity, source);
-		}
-	});
-
-	void onHurt(LivingEntity entity, DamageSource source);
+public record HurtSound(SoundEvent sound, float pitch) {
+	public boolean replaceVanillaSound() {
+		return ClientConfig.INSTANCE.get(ClientConfig.HURT_SOUND_BEHAVIOR) == HurtSoundBehavior.REPLACE;
+	}
 }

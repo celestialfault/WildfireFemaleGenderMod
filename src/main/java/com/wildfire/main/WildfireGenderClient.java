@@ -25,6 +25,7 @@ import com.wildfire.main.config.Configuration;
 import com.wildfire.main.contributors.Contributors;
 import com.wildfire.main.entitydata.PlayerConfig;
 import com.wildfire.main.networking.WildfireSync;
+import com.wildfire.main.sound.WildfireSounds;
 import com.wildfire.render.debug.GenderDebugHudEntry;
 import com.wildfire.render.debug.PhysicsDebugHudEntry;
 import com.wildfire.resources.GenderArmorResourceManager;

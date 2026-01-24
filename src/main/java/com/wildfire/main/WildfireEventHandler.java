@@ -30,6 +30,7 @@ import com.wildfire.main.entitydata.EntityConfig;
 import com.wildfire.main.entitydata.PlayerConfig;
 import com.wildfire.main.networking.ServerboundSyncPacket;
 import com.wildfire.main.networking.WildfireSync;
+import com.wildfire.main.sound.HurtSound;
 import com.wildfire.render.GenderArmorLayer;
 import com.wildfire.render.GenderLayer;
 import com.wildfire.render.GenderRenderState;
@@ -48,13 +49,14 @@ import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
-import net.minecraft.util.Util;
+import net.minecraft.Optionull;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.toasts.ToastManager;
 import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.entity.ArmorStandRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
@@ -66,7 +68,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
-import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.Util;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.decoration.ArmorStand;
@@ -74,6 +76,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnknownNullability;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.Objects;
@@ -84,8 +87,8 @@ public final class WildfireEventHandler {
 		throw new UnsupportedOperationException();
 	}
 
-	private static final KeyMapping CONFIG_KEYBIND;
-	private static final KeyMapping TOGGLE_KEYBIND;
+	@UnknownNullability("null on dedicated servers")
+	private static final KeyMapping CONFIG_KEYBIND, TOGGLE_KEYBIND;
 	private static int timer = 0;
 
 	public static KeyMapping getConfigKeybind() {
@@ -139,7 +142,7 @@ public final class WildfireEventHandler {
 				WildfireEventHandler::renderHud
 		);
 		ArmorStatsTooltipEvent.EVENT.register(WildfireEventHandler::renderTooltip);
-		EntityHurtSoundEvent.EVENT.register(WildfireEventHandler::onEntityHurt);
+		PlayerHurtSoundEvent.EVENT.register(WildfireEventHandler::onEntityHurt);
 		EntityTickEvent.EVENT.register(WildfireEventHandler::onEntityTick);
 		PlayerNametagRenderEvent.EVENT.register(WildfireEventHandler::onPlayerNametag);
 	}
@@ -303,19 +306,18 @@ public final class WildfireEventHandler {
 	 * Play the relevant mod hurt sound when a player takes damage
 	 */
 	@Environment(EnvType.CLIENT)
-	private static void onEntityHurt(LivingEntity entity, DamageSource damageSource) {
+	private static @Nullable HurtSound onEntityHurt(AbstractClientPlayer player, @Nullable DamageSource damageSource) {
 		Minecraft client = Minecraft.getInstance();
-		if(client.player == null || client.level == null) return;
-		if(!(entity instanceof Player player) || !player.level().isClientSide()) return;
+		if(client.player == null || client.level == null) return null;
+		if(!player.level().isClientSide()) return null;
 
 		PlayerConfig genderPlayer = WildfireGender.getPlayerById(player.getUUID());
-		if(genderPlayer == null || !genderPlayer.hasHurtSounds()) return;
+		if(genderPlayer == null || !genderPlayer.hasHurtSounds()) return null;
 
-		SoundEvent hurtSound = genderPlayer.getGender().getHurtSound();
-		if(hurtSound != null) {
+		return Optionull.map(genderPlayer.getGender().getHurtSound(), sound -> {
 			float pitchVariation = (player.getRandom().nextFloat() - player.getRandom().nextFloat()) * 0.2F;
-			player.playSound(hurtSound, 1f, pitchVariation + genderPlayer.getVoicePitch());
-		}
+			return new HurtSound(sound, pitchVariation + genderPlayer.getVoicePitch());
+		});
 	}
 
 	/**

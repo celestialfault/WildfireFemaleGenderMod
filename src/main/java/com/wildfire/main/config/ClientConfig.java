@@ -18,6 +18,7 @@
 
 package com.wildfire.main.config;
 
+import com.wildfire.main.config.enums.HurtSoundBehavior;
 import com.wildfire.main.config.enums.ShowPlayerListMode;
 import com.wildfire.main.config.enums.SyncVerbosity;
 import com.wildfire.main.config.types.BooleanConfigKey;
@@ -48,6 +49,7 @@ public class ClientConfig extends AbstractConfiguration {
 	public static final EnumConfigKey<ShowPlayerListMode> ALWAYS_SHOW_LIST = new EnumConfigKey<>("alwaysShowList", ShowPlayerListMode.MOD_UI_ONLY, ShowPlayerListMode.BY_ID);
 
 	public static final BooleanConfigKey ARMOR_STAT = new BooleanConfigKey("armor_stat", true);
+	public static final EnumConfigKey<HurtSoundBehavior> HURT_SOUND_BEHAVIOR = new EnumConfigKey<>("hurt_sounds", HurtSoundBehavior.OVERLAY, HurtSoundBehavior.BY_ID);
 
 	public static final BooleanConfigKey HIDE_OWN_CONTRIBUTOR_TAG = new BooleanConfigKey("hide_own_contributor_nametag", false);
 
@@ -65,6 +67,7 @@ public class ClientConfig extends AbstractConfiguration {
 		INSTANCE.setDefault(SYNC_VERBOSITY);
 		INSTANCE.setDefault(ALWAYS_SHOW_LIST);
 		INSTANCE.setDefault(ARMOR_STAT);
+		INSTANCE.setDefault(HURT_SOUND_BEHAVIOR);
 		INSTANCE.setDefault(HIDE_OWN_CONTRIBUTOR_TAG);
 		INSTANCE.setDefault(SHOW_TOAST);
 		// HOLIDAY_COSMETICS is intentionally omitted
