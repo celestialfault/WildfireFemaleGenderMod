@@ -180,7 +180,7 @@ public final class WildfireEventHandler {
         if(player == null || !ClientConfig.INSTANCE.get(ClientConfig.ARMOR_STAT)) return;
         if(ClientConfig.INSTANCE.get(ClientConfig.ARMOR_PHYSICS_OVERRIDE)) return;
 
-        var playerConfig = WildfireGender.getPlayerById(player.getUUID());
+        var playerConfig = WildfireGenderClient.getPlayerById(player.getUUID());
         if(playerConfig == null || !playerConfig.getGender().canHaveBreasts()) return;
 
         var equippableComponent = item.get(DataComponents.EQUIPPABLE);
@@ -242,7 +242,7 @@ public final class WildfireEventHandler {
     private static void onClientTick(Minecraft client) {
         if(client.level == null || client.player == null) return;
 
-        PlayerConfig clientConfig = WildfireGender.getPlayerById(client.player.getUUID());
+        PlayerConfig clientConfig = WildfireGenderClient.getPlayerById(client.player.getUUID());
         timer++;
 
         // Only attempt to sync if the server will accept the packet, and only once every 5 ticks, or around 4 times a second
@@ -272,7 +272,7 @@ public final class WildfireEventHandler {
      */
     @Environment(EnvType.CLIENT)
     private static void clientDisconnect(ClientPacketListener networkHandler, Minecraft client) {
-        WildfireGender.CACHE.invalidateAll();
+        WildfireGenderClient.CACHE.invalidateAll();
         EntityConfig.CACHE.invalidateAll();
     }
 
@@ -292,7 +292,7 @@ public final class WildfireEventHandler {
      * Removes a disconnecting player from the cache on a server
      */
     private static void playerDisconnected(ServerGamePacketListenerImpl handler, MinecraftServer server) {
-        WildfireGender.CACHE.invalidate(handler.getPlayer().getUUID());
+        WildfireGenderServer.CACHE.invalidate(handler.getPlayer().getUUID());
     }
 
     /**
@@ -300,8 +300,10 @@ public final class WildfireEventHandler {
      */
     private static void onBeginTracking(Entity tracked, ServerPlayer syncTo) {
         if(tracked instanceof Player toSync) {
-            PlayerConfig genderToSync = WildfireGender.getPlayerById(toSync.getUUID());
-            if(genderToSync == null) return;
+            PlayerConfig genderToSync = WildfireGenderServer.getPlayerById(toSync.getUUID());
+            if(genderToSync == null) {
+                return;
+            }
             // Note that we intentionally don't check if we've previously synced a player with this code path;
             // because we use entity tracking to sync, it's entirely possible that one player would leave the
             // tracking distance of another, change their settings, and then re-enter their tracking distance;
@@ -318,9 +320,10 @@ public final class WildfireEventHandler {
     private static void onEntityHurt(LivingEntity entity, DamageSource damageSource) {
         Minecraft client = Minecraft.getInstance();
         if(client.player == null || client.level == null) return;
+        //noinspection resource
         if(!(entity instanceof Player player) || !player.level().isClientSide()) return;
 
-        PlayerConfig genderPlayer = WildfireGender.getPlayerById(player.getUUID());
+        PlayerConfig genderPlayer = WildfireGenderClient.getPlayerById(player.getUUID());
         if(genderPlayer == null || !genderPlayer.hasHurtSounds()) return;
 
         SoundEvent hurtSound = genderPlayer.getGender().getHurtSound();
@@ -348,7 +351,7 @@ public final class WildfireEventHandler {
      * Apply player settings to chestplates equipped onto armor stands
      */
     private static void onEquipArmorStand(Player player, ItemStack item) {
-        PlayerConfig playerConfig = WildfireGender.getPlayerById(player.getUUID());
+        PlayerConfig playerConfig = WildfireGenderServer.getPlayerById(player.getUUID());
         if(playerConfig == null) {
             // while we shouldn't have our tag on the stack still, we're still checking to catch any armor
             // that may still have the tag from older versions, or from potential cross-mod interactions

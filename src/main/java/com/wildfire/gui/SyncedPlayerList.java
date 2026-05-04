@@ -18,21 +18,20 @@
 
 package com.wildfire.gui;
 
-import com.wildfire.main.WildfireGender;
+import com.wildfire.main.WildfireGenderClient;
 import com.wildfire.main.config.enums.Gender;
 import com.wildfire.main.contributors.Contributors;
 import com.wildfire.main.entitydata.PlayerConfig;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
 
 public final class SyncedPlayerList {
     private SyncedPlayerList() {
@@ -86,7 +85,7 @@ public final class SyncedPlayerList {
                 continue;
             }
 
-            var config = WildfireGender.getPlayerById(entry.getProfile().id());
+            var config = WildfireGenderClient.getPlayerById(entry.getProfile().id());
             if(config == null || config.syncStatus == PlayerConfig.SyncStatus.UNKNOWN) {
                 continue;
             }

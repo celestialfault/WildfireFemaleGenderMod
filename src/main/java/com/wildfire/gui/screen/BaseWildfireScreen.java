@@ -22,6 +22,7 @@ import com.wildfire.gui.GuiUtils;
 import com.wildfire.gui.WildfireButton;
 import com.wildfire.gui.WildfireSlider;
 import com.wildfire.main.WildfireGender;
+import com.wildfire.main.WildfireGenderClient;
 import com.wildfire.main.entitydata.PlayerConfig;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -60,7 +61,7 @@ public abstract class BaseWildfireScreen extends Screen {
     }
 
     public @Nullable PlayerConfig getPlayer() {
-        return WildfireGender.getPlayerById(this.playerUUID);
+        return WildfireGenderClient.getPlayerById(this.playerUUID);
     }
 
     protected void renderPlayerInFrame(GuiGraphicsExtractor graphics, int xP, int yP, int mouseX, int mouseY) {

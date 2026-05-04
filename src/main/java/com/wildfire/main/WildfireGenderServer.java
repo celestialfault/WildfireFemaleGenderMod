@@ -18,23 +18,24 @@
 
 package com.wildfire.main;
 
-import com.mojang.logging.LogUtils;
-import com.wildfire.main.networking.WildfireSync;
-import net.fabricmc.api.ModInitializer;
-import net.minecraft.resources.Identifier;
-import org.slf4j.Logger;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.wildfire.main.entitydata.PlayerConfig;
+import org.jetbrains.annotations.Nullable;
+import java.util.UUID;
 
-public final class WildfireGender implements ModInitializer {
-    public static final String MODID = "wildfire_gender";
-    public static final Logger LOGGER = LogUtils.getLogger();
-
-    @Override
-    public void onInitialize() {
-        WildfireSync.register();
-        WildfireEventHandler.registerCommonEvents();
+public final class WildfireGenderServer {
+    private WildfireGenderServer() {
     }
 
-    public static Identifier id(String path) {
-        return Identifier.fromNamespaceAndPath(MODID, path);
+    public static final LoadingCache<UUID, PlayerConfig> CACHE = CacheBuilder.newBuilder().build(CacheLoader.from(PlayerConfig::new));
+
+    public static @Nullable PlayerConfig getPlayerById(UUID id) {
+        return CACHE.getIfPresent(id);
+    }
+
+    public static PlayerConfig getOrAddPlayerById(UUID id) {
+        return CACHE.getUnchecked(id);
     }
 }

@@ -20,7 +20,7 @@ package com.wildfire.gui;
 
 import com.google.common.base.Suppliers;
 import com.google.gson.JsonObject;
-import com.wildfire.main.WildfireGender;
+import com.wildfire.main.WildfireGenderClient;
 import com.wildfire.main.cloud.CloudSync;
 import com.wildfire.main.contributors.Contributor;
 import com.wildfire.main.contributors.Contributors;
@@ -103,7 +103,7 @@ public class FakeGUIPlayer {
 
             config.forceSimplifiedPhysics = true;
 
-            var cached = WildfireGender.getPlayerById(uuid);
+            var cached = WildfireGenderClient.getPlayerById(uuid);
             if(cached == null) {
                 CloudSync.getProfile(uuid, true).thenAccept(json -> {
                     if(json != null) {

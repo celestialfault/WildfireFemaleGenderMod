@@ -203,7 +203,7 @@ public class WildfireCommand {
         boolean allPlayers = getOrDefault(ctx, "allPlayers", false, Boolean.class);
         boolean showEntities = getOrDefault(ctx, "showEntities", false, Boolean.class);
 
-        var players = dump(WildfireGender.CACHE, ctx.getSource().getLevel(), !allPlayers);
+        var players = dump(WildfireGenderClient.CACHE, ctx.getSource().getLevel(), !allPlayers);
         if(!players.isEmpty()) {
             send(ctx, "Synced Players (" + players.size() + "):");
             for(var line : players) {
@@ -250,7 +250,7 @@ public class WildfireCommand {
     }
 
     private static int invalidateCache(CommandContext<FabricClientCommandSource> ctx) {
-        WildfireGender.CACHE.invalidateAll();
+        WildfireGenderClient.CACHE.invalidateAll();
         EntityConfig.CACHE.invalidateAll();
 
         send(ctx, "Cache has been invalidated!");
@@ -288,7 +288,7 @@ public class WildfireCommand {
         var world = player.level();
 
         var item = new ItemStack(Items.IRON_CHESTPLATE);
-        var config = WildfireGender.getOrAddPlayerById(player.getUUID());
+        var config = WildfireGenderClient.getOrAddPlayerById(player.getUUID());
         var component = BreastDataComponent.fromPlayer(player, config);
         if(component == null) {
             ctx.getSource().sendError(Component.literal("Returned breast data component was null; do you have Hide in Armor on?"));

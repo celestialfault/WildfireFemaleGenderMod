@@ -19,6 +19,7 @@
 package com.wildfire.render.debug;
 
 import com.wildfire.main.WildfireGender;
+import com.wildfire.main.WildfireGenderClient;
 import com.wildfire.physics.BreastPhysics;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -39,7 +40,7 @@ public class PhysicsDebugHudEntry implements DebugScreenEntry {
     public void display(DebugScreenDisplayer lines, @Nullable Level world, @Nullable LevelChunk clientChunk, @Nullable LevelChunk chunk) {
         var player = Minecraft.getInstance().player;
         if(player == null) return;
-        var config = WildfireGender.getPlayerById(player.getUUID());
+        var config = WildfireGenderClient.getPlayerById(player.getUUID());
         if(config == null) return;
 
         List<String> info = new ArrayList<>();

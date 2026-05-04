@@ -28,15 +28,14 @@ import com.wildfire.main.config.ClientConfig;
 import com.wildfire.main.config.Configuration;
 import com.wildfire.main.config.enums.Gender;
 import com.wildfire.main.config.types.ConfigKey;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.ApiStatus;
-
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * A version of {@link EntityConfig} backed by a {@link Configuration} for use with players
@@ -222,15 +221,6 @@ public class PlayerConfig extends EntityConfig {
         needsCloudSync = true;
     }
 
-    /**
-     * @deprecated Use {@code plr.save()} instead
-     */
-    @Deprecated(forRemoval = true)
-    @ApiStatus.ScheduledForRemoval(inVersion = "First release of 26.1")
-    public static void saveGenderInfo(PlayerConfig plr) {
-        plr.save();
-    }
-
     @Override
     public boolean hasJacketLayer() {
         throw new UnsupportedOperationException("PlayerConfig does not support #hasJacketLayer(); use Player#isModelPartShown instead");
@@ -291,20 +281,16 @@ public class PlayerConfig extends EntityConfig {
         CACHED,
 
         /**
-         * <p>Indicates that the relevant configuration has had its data loaded from a sync packet,
-         * or from a profile retrieved from {@link CloudSync the cloud sync server}.</p>
-         *
-         * <p>This is currently only set on the client.</p>
+         * Indicates that the relevant configuration has had its data loaded from a
+         * {@link com.wildfire.main.networking.WildfireSync sync packet}, or (on the client only) from
+         * a profile retrieved from {@link CloudSync the cloud sync server}.
          */
-        // TODO this should be set on dedicated servers if/when the player config cache is split
-        //		into separate server-sided & client-sided caches
         SYNCED,
 
         /**
          * <p>Indicates that this configuration has an unknown sync state.</p>
          *
-         * <p>This is the default sync state for new configuration instances, and on dedicated servers is
-         * the only sync state.</p>
+         * <p>This is the default sync state for new player configurations.</p>
          */
         UNKNOWN,
     }

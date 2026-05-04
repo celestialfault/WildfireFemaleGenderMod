@@ -22,13 +22,19 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.wildfire.api.IGenderArmor;
-import com.wildfire.main.WildfireGender;
+import com.wildfire.main.WildfireGenderClient;
 import com.wildfire.main.WildfireHelper;
 import com.wildfire.main.config.Configuration;
 import com.wildfire.main.config.enums.Gender;
 import com.wildfire.main.config.types.ConfigKey;
 import com.wildfire.main.uvs.UVLayout;
 import com.wildfire.physics.BreastPhysics;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.function.Consumer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
@@ -43,13 +49,6 @@ import net.minecraft.world.item.component.CustomData;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.function.Consumer;
-
 /**
  * <p>A stripped down version of a {@link PlayerConfig player's config}, intended for use with non-player entities.</p>
  *
@@ -59,6 +58,7 @@ import java.util.function.Consumer;
  */
 public class EntityConfig {
 
+    @Environment(EnvType.CLIENT)
     public static final LoadingCache<UUID, EntityConfig> CACHE = CacheBuilder.newBuilder()
             .expireAfterAccess(Duration.ofMinutes(5))
             .build(CacheLoader.from(EntityConfig::new));
@@ -146,13 +146,16 @@ public class EntityConfig {
      *
      * @apiNote Configuration settings for {@link PlayerConfig}s may not be immediately available upon being
      *          returned, and may take several seconds to be populated if loaded from the
-     *          {@link com.wildfire.main.cloud.CloudSync cloud sync server}.
+     *          {@link com.wildfire.main.cloud.CloudSync cloud sync server}.<br>
+     *          Dedicated servers should instead directly access the
+     *          {@link com.wildfire.main.WildfireGenderServer#CACHE server player cache}.
      *
      * @return The relevant {@link EntityConfig}, or {@link PlayerConfig} if given a {@link Player player}
      */
+    @Environment(EnvType.CLIENT)
     public static EntityConfig getEntity(LivingEntity entity) {
         if(entity instanceof Player) {
-            return WildfireGender.getOrAddPlayerById(entity.getUUID());
+            return WildfireGenderClient.getOrAddPlayerById(entity.getUUID());
         }
         return CACHE.getUnchecked(entity.getUUID());
     }

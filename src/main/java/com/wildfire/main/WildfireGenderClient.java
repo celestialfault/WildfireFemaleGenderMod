@@ -18,6 +18,9 @@
 
 package com.wildfire.main;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.gson.JsonObject;
 import com.wildfire.main.cloud.CloudSync;
 import com.wildfire.main.config.ClientConfig;
@@ -28,28 +31,37 @@ import com.wildfire.main.networking.WildfireSync;
 import com.wildfire.render.debug.GenderDebugHudEntry;
 import com.wildfire.render.debug.PhysicsDebugHudEntry;
 import com.wildfire.resources.GenderArmorResourceManager;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.Duration;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.debug.DebugScreenEntries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.packs.PackType;
+import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
-
 @Environment(EnvType.CLIENT)
-public class WildfireGenderClient implements ClientModInitializer {
+public final class WildfireGenderClient implements ClientModInitializer {
     private static final Executor LOAD_EXECUTOR = Util.ioPool().forName("wildfire_gender$loadPlayerData");
+
+    public static final LoadingCache<UUID, PlayerConfig> CACHE = CacheBuilder.newBuilder()
+        .expireAfterAccess(Duration.ofMinutes(15))
+        .build(CacheLoader.from(key -> {
+            var config = new PlayerConfig(key);
+            // markForSync being true will only ever do anything for the client player
+            loadGenderInfo(config, true, false);
+            return config;
+        }));
 
     @Override
     public void onInitializeClient() {
@@ -91,8 +103,16 @@ public class WildfireGenderClient implements ClientModInitializer {
         }
     }
 
+    public static @Nullable PlayerConfig getPlayerById(UUID id) {
+        return WildfireGenderClient.CACHE.getIfPresent(id);
+    }
+
+    public static PlayerConfig getOrAddPlayerById(UUID id) {
+        return WildfireGenderClient.CACHE.getUnchecked(id);
+    }
+
     public static CompletableFuture<@Nullable PlayerConfig> loadGenderInfo(UUID uuid, boolean markForSync, boolean bypassQueue) {
-        var cache = WildfireGender.getPlayerById(uuid);
+        var cache = getPlayerById(uuid);
         if(cache == null) {
             return CompletableFuture.completedFuture(null);
         }

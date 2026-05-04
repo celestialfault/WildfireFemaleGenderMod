@@ -97,7 +97,7 @@ public final class GuiUtils {
         }
     }
 
-    // copy of InventoryScreen#renderEntityInInventoryFollowsMouse that allows for applying an X/Y offset to the drawn entity
+    // copy of InventoryScreen#extractEntityInInventoryFollowsMouse that allows for applying an X/Y offset to the drawn entity
     public static void drawEntityOnScreen(GuiGraphicsExtractor graphics, int x1, int y1, int x2, int y2, int size, float mouseX, float mouseY, float xOffset, float yOffset, LivingEntity entity) {
         float centerX = (x1 + x2) / 2.0F;
         float centerY = (y1 + y2) / 2.0F;

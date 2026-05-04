@@ -19,6 +19,7 @@
 package com.wildfire.main.networking;
 
 import com.wildfire.main.WildfireGender;
+import com.wildfire.main.WildfireGenderServer;
 import com.wildfire.main.config.enums.Gender;
 import com.wildfire.main.entitydata.Breasts;
 import com.wildfire.main.entitydata.PlayerConfig;
@@ -59,8 +60,9 @@ public final class ServerboundSyncPacket extends AbstractSyncPacket implements C
 
     public void handle(ServerPlayNetworking.Context context) {
         ServerPlayer player = context.player();
-        PlayerConfig plr = WildfireGender.getOrAddPlayerById(player.getUUID());
+        PlayerConfig plr = WildfireGenderServer.getOrAddPlayerById(player.getUUID());
         updatePlayerFromPacket(plr);
+        plr.syncStatus = PlayerConfig.SyncStatus.SYNCED;
         WildfireSync.sendToAllClients(player, plr);
     }
 }
