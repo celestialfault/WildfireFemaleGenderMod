@@ -31,8 +31,6 @@ import com.wildfire.main.networking.WildfireSync;
 import com.wildfire.render.debug.GenderDebugHudEntry;
 import com.wildfire.render.debug.PhysicsDebugHudEntry;
 import com.wildfire.resources.GenderArmorResourceManager;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.UUID;
@@ -65,8 +63,9 @@ public final class WildfireGenderClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        tryMigrate("WildfireGender", Configuration.CONFIG_DIR);
-        tryMigrate("wildfire_gender.json", "female_gender_mod.json");
+        Path configDir = FabricLoader.getInstance().getConfigDir();
+        WildfireHelper.tryRename(configDir.resolve("WildfireGender"), configDir.resolve(Configuration.CONFIG_DIR));
+        WildfireHelper.tryRename(configDir.resolve("wildfire_gender.json"), configDir.resolve("female_gender_mod.json"));
 
         ClientConfig.INSTANCE.load();
         WildfireSounds.register();
@@ -80,27 +79,6 @@ public final class WildfireGenderClient implements ClientModInitializer {
             DebugScreenEntries.register(PhysicsDebugHudEntry.ID, new PhysicsDebugHudEntry());
         }
         WildfireCommand.init();
-    }
-
-    private static void tryMigrate(String oldPath, String newPath) {
-        Path oldFile = FabricLoader.getInstance().getConfigDir().resolve(oldPath);
-        Path newFile = FabricLoader.getInstance().getConfigDir().resolve(newPath);
-
-        if(Files.notExists(oldFile)) {
-            WildfireGender.LOGGER.debug("{} doesn't exist, nothing to migrate", oldPath);
-            return;
-        }
-        if(Files.exists(oldFile) && Files.exists(newFile)) {
-            WildfireGender.LOGGER.warn("Cannot migrate {} to {} as both exist", oldPath, oldPath);
-            return;
-        }
-
-        try {
-            Files.move(oldFile, newFile);
-            WildfireGender.LOGGER.info("Migrated {} to '{}'", oldPath, newFile);
-        } catch (IOException e) {
-            WildfireGender.LOGGER.error("Failed to move {} to {}", oldPath, newFile, e);
-        }
     }
 
     public static @Nullable PlayerConfig getPlayerById(UUID id) {
@@ -119,7 +97,7 @@ public final class WildfireGenderClient implements ClientModInitializer {
         return loadGenderInfo(cache, markForSync, bypassQueue);
     }
 
-    public static CompletableFuture<PlayerConfig> loadGenderInfo(PlayerConfig player, boolean markForSync, boolean bypassQueue) {
+    public static CompletableFuture<PlayerConfig> loadGenderInfo(final PlayerConfig player, final boolean markForSync, final boolean bypassQueue) {
         return CompletableFuture.supplyAsync(() -> {
             var uuid = player.uuid;
             if(player.hasLocalConfig()) {

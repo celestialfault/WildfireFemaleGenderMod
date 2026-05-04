@@ -25,6 +25,12 @@ import com.mojang.serialization.codecs.PrimitiveCodec;
 import com.wildfire.api.IGenderArmor;
 import com.wildfire.main.config.types.FloatConfigKey;
 import com.wildfire.resources.GenderArmorResourceManager;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.OptionalInt;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Function;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
@@ -35,10 +41,6 @@ import net.minecraft.util.TriState;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 
-import java.util.OptionalInt;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Function;
-
 public final class WildfireHelper {
 
     private WildfireHelper() {
@@ -48,9 +50,7 @@ public final class WildfireHelper {
     public static final PrimitiveCodec<TriState> TRISTATE = new PrimitiveCodec<>() {
         @Override
         public <T> DataResult<TriState> read(final DynamicOps<T> ops, final T input) {
-            return DataResult.success(ops.getBooleanValue(input)
-                    .map(v -> v ? TriState.TRUE : TriState.FALSE)
-                    .result().orElse(TriState.DEFAULT));
+            return DataResult.success(ops.getBooleanValue(input).map(TriState::from).result().orElse(TriState.DEFAULT));
         }
 
         @Override
@@ -70,6 +70,7 @@ public final class WildfireHelper {
     public static int randInt(int min, int max) {
         return ThreadLocalRandom.current().nextInt(min, max + 1);
     }
+
     public static float randFloat(float min, float max) {
         return (float) ThreadLocalRandom.current().nextDouble(min, (double) max + 1);
     }
@@ -112,6 +113,24 @@ public final class WildfireHelper {
 
     public static double snapToStep(double value, double stepSize) {
         return Math.round(value / stepSize) * stepSize;
+    }
+
+    public static void tryRename(Path oldFile, Path newFile) {
+        if(Files.notExists(oldFile)) {
+            WildfireGender.LOGGER.debug("{} doesn't exist, nothing to rename", oldFile.getFileName());
+            return;
+        }
+        if(Files.exists(oldFile) && Files.exists(newFile)) {
+            WildfireGender.LOGGER.warn("Cannot rename {} to {} as both exist", oldFile.getFileName(), newFile.getFileName());
+            return;
+        }
+
+        try {
+            Files.move(oldFile, newFile);
+            WildfireGender.LOGGER.info("Moved {} to '{}'", oldFile.getFileName(), newFile);
+        } catch (IOException e) {
+            WildfireGender.LOGGER.error("Failed to move {} to '{}'", oldFile.getFileName(), newFile, e);
+        }
     }
 
     public static OptionalInt getTextColor(ChatFormatting formatting) {
