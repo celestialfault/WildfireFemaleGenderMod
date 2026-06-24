@@ -37,6 +37,7 @@ public class GenderConfigs {
     public static final JsonObject DEFAULT_FEMALE;
     public static final JsonObject DEFAULT_MALE;
 
+    // TODO these could be hard coded
     static {
         DEFAULT_FEMALE = loadConfig("modeldata/female_default.json");
         DEFAULT_MALE = loadConfig("modeldata/male_default.json");

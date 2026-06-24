@@ -18,6 +18,7 @@
 
 package com.wildfire.gui;
 
+import com.wildfire.gui.screen.BaseWildfireScreen;
 import com.wildfire.main.WildfireGenderClient;
 import com.wildfire.main.config.enums.Gender;
 import com.wildfire.main.contributors.Contributors;
@@ -26,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -38,14 +38,11 @@ public final class SyncedPlayerList {
         throw new UnsupportedOperationException();
     }
 
-    private static int ticks = 0;
-    private static volatile List<SyncedPlayer> syncedPlayers = Collections.emptyList();
-
-    static {
-        ClientTickEvents.END_CLIENT_TICK.register(SyncedPlayerList::onTick);
-    }
+    private static long TICK = -1;
+    private static List<SyncedPlayer> SYNCED_PLAYERS = Collections.emptyList();
 
     public static void drawSyncedPlayers(GuiGraphicsExtractor context, Font font) {
+        var syncedPlayers = getSyncedPlayers();
         if(syncedPlayers.isEmpty()) {
             return;
         }
@@ -53,32 +50,36 @@ public final class SyncedPlayerList {
         var header = Component.translatable("wildfire_gender.wardrobe.players_using_mod").withStyle(ChatFormatting.AQUA);
         context.text(font, header, 5, 5, 0xFFFFFFFF, true);
 
-        int yPos = 18;
+        int line = 0;
         for(var entry : syncedPlayers) {
-            var text = Component.empty()
-                    .append(Component.literal(entry.name()).withColor(entry.color()))
-                    .append(" - ")
-                    .append(entry.gender().getDisplayName());
-            context.text(font, text, 10, yPos, 0xFFFFFFFF, false);
-            yPos += 10;
+            context.text(font, entry.line(), 10, 18 + (10 * line++), 0xFFFFFFFF, false);
         }
     }
 
-    // TODO this design is largely redundant now, as this was designed at a point where it was assumed
-    //		that HUD rendering would also receive the same render split treatment as entities did, which
-    //		appears to now be incorrect
-    private static void onTick(Minecraft client) {
-        if(ticks++ % 5 != 0) {
-            return;
+    private static List<SyncedPlayer> getSyncedPlayers() {
+        var client = Minecraft.getInstance();
+        long currentTick = client.clientTickCount;
+        if(currentTick != TICK) {
+            TICK = currentTick;
+            SYNCED_PLAYERS = computeSyncedList();
         }
+        return SYNCED_PLAYERS;
+    }
 
-        var clientPlayer = Minecraft.getInstance().player;
+    private static List<SyncedPlayer> computeSyncedList() {
+        var client = Minecraft.getInstance();
+        var clientPlayer = client.player;
         if(clientPlayer == null) {
-            syncedPlayers = Collections.emptyList();
-            return;
+            SYNCED_PLAYERS = Collections.emptyList();
+            return Collections.emptyList();
         }
 
-        var list = new ArrayList<SyncedPlayer>();
+        int max = (client.getWindow().getGuiScaledHeight() - 32) / 10;
+        //~ if >=26.2 'client.screen' -> 'client.gui.screen()'
+        if(!(client.gui.screen() instanceof BaseWildfireScreen)) {
+            max = Math.max(3, max / 5);
+        }
+        List<SyncedPlayer> list = new ArrayList<>();
 
         for(var entry : clientPlayer.connection.getListedOnlinePlayers()) {
             if(Objects.equals(entry.getProfile().id(), clientPlayer.getUUID())) {
@@ -91,16 +92,37 @@ public final class SyncedPlayerList {
             }
 
             var color = Contributors.getColor(entry.getProfile().id());
-            list.add(new SyncedPlayer(entry.getProfile().name(), color == null ? 0xFFFFFF : color, config.getGender()));
+            list.add(new SyncedPlayer.Player(entry.getProfile().name(), color == null ? 0xFFFFFF : color, config.getGender()));
+        }
 
-            if(list.size() >= 40) {
-                break;
+        if(list.size() > max) {
+            int overflow = list.size() - max;
+            list = list.subList(0, max - 1);
+            list.add(new SyncedPlayer.Overflow(overflow));
+        }
+
+        return list;
+    }
+
+    private interface SyncedPlayer {
+        Component line();
+
+        record Player(String name, int color, Gender gender) implements SyncedPlayer {
+            @Override
+            public Component line() {
+                return Component.empty()
+                    .append(Component.literal(name).withColor(color))
+                    .append(" - ")
+                    .append(gender.getDisplayName());
             }
         }
 
-        syncedPlayers = list;
-    }
-
-    private record SyncedPlayer(String name, int color, Gender gender) {
+        record Overflow(int remaining) implements SyncedPlayer {
+            @Override
+            public Component line() {
+                return Component.translatable("wildfire_gender.wardrobe.players_using_mod.overflow", remaining)
+                    .withStyle(ChatFormatting.GRAY);
+            }
+        }
     }
 }
