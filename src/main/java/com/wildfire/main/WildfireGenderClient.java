@@ -46,6 +46,7 @@ import net.minecraft.client.gui.components.debug.DebugScreenEntries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.util.Util;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 @Environment(EnvType.CLIENT)
@@ -89,14 +90,8 @@ public final class WildfireGenderClient implements ClientModInitializer {
         return WildfireGenderClient.CACHE.getUnchecked(id);
     }
 
-    public static CompletableFuture<@Nullable PlayerConfig> loadGenderInfo(UUID uuid, boolean markForSync, boolean bypassQueue) {
-        var cache = getPlayerById(uuid);
-        if(cache == null) {
-            return CompletableFuture.completedFuture(null);
-        }
-        return loadGenderInfo(cache, markForSync, bypassQueue);
-    }
-
+    /// @apiNote Use [#getOrAddPlayerById(UUID)] or [#CACHE] instead
+    @ApiStatus.Internal
     public static CompletableFuture<PlayerConfig> loadGenderInfo(final PlayerConfig player, final boolean markForSync, final boolean bypassQueue) {
         return CompletableFuture.supplyAsync(() -> {
             var uuid = player.uuid;

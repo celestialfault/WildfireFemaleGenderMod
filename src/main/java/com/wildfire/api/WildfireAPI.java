@@ -52,38 +52,40 @@ public final class WildfireAPI {
             vec2i -> IntStream.of(vec2i.x(), vec2i.y())
     ), VEC2I_LEGACY_CODEC);
 
-    /**
-     * Get the cached config for a {@link Player}
-     *
-     * @deprecated This method currently doesn't serve any clear purpose, and may be removed in the future.
-     *             Please open an issue to explain your use case if you depend on this method.
-     *
-     * @apiNote This method will not load a player's config if they aren't already cached, and will only return
-     *          the config of players the mod has already loaded.
-     *
-     * @param  uuid  the uuid of the target {@link Player}
-     * @see    PlayerConfig
-     */
-    @Deprecated
+    /// Get the cached config for a [Player]
+    ///
+    /// @deprecated This method has been obsoleted by split player caches; instead, directly access the underlying
+    ///             [client-sided][WildfireGenderClient#getPlayerById(UUID)] or
+    ///             [server-sided][com.wildfire.main.WildfireGenderServer#getPlayerById(UUID)] cache(s).
+    ///
+    /// @apiNote This method will not load a player's config if they aren't already cached, and will only return
+    ///          the config of players the mod has already loaded.
+    ///
+    ///          This method only returns player configs from the [client-sided cache][WildfireGenderClient].
+    ///
+    /// @param  uuid  the uuid of the target [Player]
+    /// @see    WildfireGenderClient#getPlayerById(UUID)
+    /// @see    com.wildfire.main.WildfireGenderServer#getPlayerById(UUID)
+    @Deprecated(forRemoval = true)
     @Environment(EnvType.CLIENT)
     public static @Nullable PlayerConfig getPlayerById(UUID uuid) {
         return WildfireGenderClient.getPlayerById(uuid);
     }
 
-    /**
-     * Get the player's {@link Gender}
-     *
-     * @deprecated This method currently doesn't serve any clear purpose, and may be removed in the future.
-     *             Please open an issue to explain your use case if you depend on this method.
-     *
-     * @param  uuid  the uuid of the target {@link Player}.
-     * @see    Gender
-     */
-    @Deprecated
+    /// Get the player's [Gender]
+    ///
+    /// @deprecated See [#getPlayerById(UUID)]
+    ///
+    /// @param  uuid  the uuid of the target [Player].
+    /// @see    #getPlayerById(UUID)
+    /// @see    PlayerConfig#getGender()
+    @Deprecated(forRemoval = true)
     @Environment(EnvType.CLIENT)
     public static Gender getPlayerGender(UUID uuid) {
         PlayerConfig cfg = WildfireGenderClient.getPlayerById(uuid);
-        if(cfg == null) return Configuration.GENDER.getDefault();
+        if(cfg == null) {
+            return Configuration.GENDER.getDefault();
+        }
         return cfg.getGender();
     }
 }
