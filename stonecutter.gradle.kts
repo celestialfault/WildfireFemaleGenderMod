@@ -1,6 +1,7 @@
 import com.wildfire.ATtoCTConverter
 import com.wildfire.OptimizePng
 import com.wildfire.ValidateJson
+import dev.kikugie.stonecutter.build.config.ReplacementContainer
 
 plugins {
     id("dev.kikugie.stonecutter")
@@ -77,4 +78,36 @@ tasks.register("publishMods") {
     description = "Publish mod to both platforms, for both loaders, and all versions"
     group = "publishing"
     dependsOn(stonecutter.tasks.named("publishMods") { branch.id == "fabric" || branch.id == "neoforge" })
+}
+
+stonecutter parameters {
+    for((name, value) in project.replacements) {
+        if(value.strings.isNotEmpty()) {
+            val config = Action<ReplacementContainer.StringReplacementSpec> {
+                direction = eval(current.version, value.`when`)
+                for((old, new) in value.strings) {
+                    replace(old, new)
+                }
+            }
+
+            when(value.alwaysActive) {
+                true -> replacements.string(action = config)
+                false -> replacements.string(name, action = config)
+            }
+        }
+
+        if(value.regex.isNotEmpty()) {
+            val config = Action<ReplacementContainer.RegexReplacementSpec> {
+                direction = eval(current.version, value.`when`)
+                for((forward, backward) in value.regex) {
+                    replace(forward.pattern, forward.replacement, backward.pattern, backward.replacement)
+                }
+            }
+
+            when(value.alwaysActive) {
+                true -> replacements.regex(action = config)
+                false -> replacements.regex(name, action = config)
+            }
+        }
+    }
 }

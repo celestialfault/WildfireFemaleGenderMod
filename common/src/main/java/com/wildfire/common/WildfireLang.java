@@ -20,7 +20,6 @@ package com.wildfire.common;
 
 import com.wildfire.api.WildfireAPI;
 import java.util.Arrays;
-import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextColor;
@@ -239,10 +238,10 @@ public enum WildfireLang {
     }
 
     //? if <26.2 {
-    /*public MutableComponent translateColored(ChatFormatting color) {
+    /*public MutableComponent translateColored(net.minecraft.ChatFormatting color) {
         return translate().withStyle(color);
     }
-    public MutableComponent translateColored(ChatFormatting color, Object... args) {
+    public MutableComponent translateColored(net.minecraft.ChatFormatting color, Object... args) {
         return translate(args).withStyle(color);
     }
     *///?}

@@ -83,7 +83,7 @@ loom {
         } else {
             // Enable DCEVM when using JBR
             if(javaToolchains.launcherFor(java.toolchain).map { it.metadata.vendor }.getOrElse("").contains("JetBrains")) {
-                jvmArguments.addAll("-XX:+AllowEnhancedClassRedefinition")
+                jvmArguments.add("-XX:+AllowEnhancedClassRedefinition")
             }
             sourceSet.set("runMain")
         }

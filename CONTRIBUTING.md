@@ -24,7 +24,7 @@ Contributed translations should be placed within the `common` project's resource
 
 ## Contributing code changes
 
-**Contributions made using Large Language Models/LLMs (or any other similar form of Generative AI) will be rejected.**
+**Contributions made using generative AI (Large Language Models, "Agents", etc.) will be rejected.**
 
 If you're contributing a feature (or the changes are otherwise large enough to need more review than
 a simple bug fix), please open an issue or otherwise ask for feedback beforehand.
@@ -33,8 +33,8 @@ This project is split into a `common` project, along with projects for each supp
 with further subprojects for every supported Minecraft version for each project (using [Stonecutter](https://stonecutter.kikugie.dev/)); see
 [`./versions.json5`](./versions.json5) for the list of supported versions and the loader(s) they target.
 
-Any loader-specific logic should be limited, with as much of it handled through interfaces like `LoaderAgnostics`
-in the `common` module as possible.
+Any loader-specific logic in `common` should be limited, with as much of it handled through interfaces like
+`LoaderAgnostics` and their associated per-loader implementations as possible.
 
 If any changes you make result in generated data files needing to be updated, use the `:runData` Gradle task
 to regenerate them; **do not manually edit the generated files!**

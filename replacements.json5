@@ -1,0 +1,82 @@
+{
+    // See https://stonecutter.kikugie.dev/wiki/config/params.html#replacements
+    // TL;DR: define a new replacement here, such as:
+    //
+    //  // tip: add a '!' prefix to the name to invert it (i.e. make it active by default)
+    //  name: {
+    //    when: ">=26.2",
+    //    // If set to true, this replacement will always be active and cannot be disabled; use sparingly,
+    //    // and only for replacements that are verbose enough to not accidentally match anything it shouldn't.
+    //    //alwaysActive: false,
+    //    strings: [
+    //      ["old.api", "new.api"],
+    //    ],
+    //  },
+    //
+    // Then, wherever relevant, toggle the replacement like so:
+    //
+    //  //~ name *or use '//~ !name' instead to disable inverted replacements*
+    //  // ... code ...
+
+    "26.2": {
+        when: ">=26.2",
+        alwaysActive: true,
+        strings: [
+            ["setScreen(", "gui.setScreen("],
+            ["getToastManager(", "gui.toastManager("],
+            ["getTabList(", "hud.getTabList("],
+            [".screen ", ".gui.screen() "],
+        ],
+    },
+
+    "26.3": {
+        when: ">=26.3-rc-2",
+        alwaysActive: true,
+        strings: [
+            ["com.mojang.authlib.yggdrasil.YggdrasilMinecraftSessionService", "com.mojang.authlib.services.MinecraftServicesSessionService"],
+            ["YggdrasilMinecraftSessionService", "MinecraftServicesSessionService"],
+        ],
+    },
+
+    "!entity_types": {
+        when: ">=26.2",
+        strings: [
+            ["EntityType", "EntityTypes"],
+        ],
+    },
+
+    color_as_rgb: {
+        when: ">=26.2",
+        strings: [
+            ["TextColor.fromRgb(0xFFAA00)", "TextColor.GOLD"],
+            ["TextColor.fromRgb(0xFF55FF)", "TextColor.LIGHT_PURPLE"],
+            ["TextColor.fromRgb(0xFFFFFF)", "TextColor.WHITE"],
+        ],
+    },
+
+    "!named_text_color": {
+        when: ">=26.2",
+        regex: [
+            {
+                forward: {
+                    pattern: "withStyle\\(net\\.minecraft\\.ChatFormatting\\.([A-Z_]+)",
+                    replacement: "withColor(TextColor.$1",
+                },
+                backward: {
+                    pattern: "withColor\\(TextColor\\.([A-Z_]+)",
+                    replacement: "withStyle(net.minecraft.ChatFormatting.$1",
+                },
+            },
+            {
+                forward: {
+                    pattern: "net\\.minecraft\\.ChatFormatting\\.([A-Z_]+)",
+                    replacement: "TextColor.$1",
+                },
+                backward: {
+                    pattern: "TextColor\\.([A-Z_]+)",
+                    replacement: "net.minecraft.ChatFormatting.$1",
+                },
+            },
+        ],
+    },
+}

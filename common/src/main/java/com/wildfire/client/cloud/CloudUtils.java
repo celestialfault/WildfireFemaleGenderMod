@@ -18,13 +18,10 @@
 
 package com.wildfire.client.cloud;
 
-import com.mojang.authlib.HttpDiscoveryService;
 import com.mojang.authlib.services.MinecraftServicesSessionService;
 import com.wildfire.client.ClientHelper;
 import com.wildfire.common.WildfireGender;
-import java.util.Map;
 import net.minecraft.client.Minecraft;
-import org.jspecify.annotations.Nullable;
 
 public final class CloudUtils {
     private CloudUtils() {
@@ -62,9 +59,5 @@ public final class CloudUtils {
         WildfireGender.LOGGER.warn(message, args);
         WildfireGender.LOGGER.warn("Cloud sync will be unavailable for this session");
         loggedSessionTamperWarning = true;
-    }
-
-    public static String buildQuery(@Nullable Map<String, @Nullable Object> query) {
-        return HttpDiscoveryService.buildQuery(query);
     }
 }

@@ -2,7 +2,9 @@ import java.util.Properties
 
 plugins {
     `kotlin-dsl`
+    // this kotlin version should be synced with what the current gradle major version bundles (2.2.0 for 9.x)
     kotlin("jvm") version "2.2.0"
+    kotlin("plugin.serialization") version "2.2.0"
 }
 
 repositories {
@@ -21,4 +23,5 @@ val modPublishVersion: String = rootProps.getProperty("mod_publish_version")
 dependencies {
     implementation("dev.kikugie:stonecutter:${stonecutterVersion}")
     implementation("me.modmuss50.mod-publish-plugin:me.modmuss50.mod-publish-plugin.gradle.plugin:${modPublishVersion}")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${providers.gradleProperty("ktx_serialization_version").get()}")
 }
