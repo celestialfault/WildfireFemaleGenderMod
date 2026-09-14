@@ -19,6 +19,7 @@
 package com.wildfire.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.wildfire.api.client.WildfireClientAPI;
 import com.wildfire.client.cloud.CloudSync;
 import com.wildfire.client.config.ClientConfig;
 import com.wildfire.client.gui.SyncedPlayerList;
@@ -30,9 +31,9 @@ import com.wildfire.common.WildfireGender;
 import com.wildfire.common.WildfireHelper;
 import com.wildfire.common.WildfireLang;
 import com.wildfire.common.config.value.ConfigValue;
-import com.wildfire.common.entitydata.EntityConfig;
-import com.wildfire.common.entitydata.EntityConfigHolder;
-import com.wildfire.common.entitydata.PlayerConfigHolder;
+import com.wildfire.common.entities.EntityConfigHolder;
+import com.wildfire.common.entities.armorstands.ArmorStandConfigHolder;
+import com.wildfire.common.entities.players.PlayerConfigHolder;
 import com.wildfire.common.networking.WildfireSync;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -104,7 +105,7 @@ public final class WildfireClientEventHandler {
             return;
         }
 
-        var playerConfig = WildfireGender.getPlayerById(player.getUUID());
+        var playerConfig = WildfireClientAPI.players().get(player);
         if (playerConfig == null || !playerConfig.gender().get().canHaveBreasts()) {
             return;
         }
@@ -137,7 +138,9 @@ public final class WildfireClientEventHandler {
     public static void onEntityUnload(Entity entity, Level world) {
         // note that we don't attempt to unload players; they're instead only ever unloaded once we leave a world,
         // or once they disconnect
-        EntityConfigHolder.CACHE.invalidate(entity.getUUID());
+        if(entity instanceof ArmorStand armorStand) {
+            WildfireClientAPI.armorStands().invalidate(armorStand);
+        }
     }
 
     /// Perform various actions that should happen once per client tick, such as syncing client player settings to the server.
@@ -148,9 +151,9 @@ public final class WildfireClientEventHandler {
         timer++;
 
         if (timer % 5 == 0) {
-            PlayerConfigHolder clientConfig = WildfireGender.getPlayerById(client.player.getUUID());
+            PlayerConfigHolder clientConfig = WildfireClientAPI.players().get(client.player);
             // Only attempt to sync if the server will accept the packet, and only once every 5 ticks, or around 4 times a second
-            if (client.isMultiplayerServer() && clientConfig != null) {
+            if (clientConfig != null) {
                 // sendToServer will only actually send a packet if any changes have been made that need to be synced, or if we haven't synced before.
                 WildfireSync.sendToServer(client.player.connection.getConnection(), clientConfig);
             }
@@ -173,8 +176,8 @@ public final class WildfireClientEventHandler {
 
     /// Clears all caches when the client player disconnects from a server/closes a singleplayer world
     public static void clientDisconnect() {
-        WildfireGender.CACHE.invalidateAll();
-        EntityConfigHolder.CACHE.invalidateAll();
+        WildfireClientAPI.players().invalidateAll();
+        WildfireClientAPI.armorStands().invalidateAll();
     }
 
     public static void clientJoin(Minecraft client) {
@@ -188,13 +191,14 @@ public final class WildfireClientEventHandler {
     public static void onEntityTick(LivingEntity entity) {
         //Note: We don't need to check if the entity is frozen as far as /tick is concerned,
         // as the tick event shouldn't happen in the first place if the entity is frozen
-        if (EntityConfig.isSupportedEntity(entity)) {
-            EntityConfigHolder<?> cfg = EntityConfigHolder.getEntity(entity);
-            if (entity instanceof ArmorStand) {
-                cfg.readFromStack(entity.getItemBySlot(EquipmentSlot.CHEST));
-            }
-            cfg.breastPhysics().tick(entity);
+        EntityConfigHolder<?> cfg = WildfireClientAPI.getConfig(entity);
+        if(cfg == null) {
+            return;
         }
+        if(cfg instanceof ArmorStandConfigHolder armorStandCfg) {
+            armorStandCfg.readFromStack(entity.getItemBySlot(EquipmentSlot.CHEST));
+        }
+        cfg.breastPhysics().tick(entity);
     }
 
     public static void addAvatarRenderLayers(@Nullable AvatarRenderer<?> avatarRenderer, EquipmentLayerRenderer equipmentRenderer,

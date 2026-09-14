@@ -19,8 +19,8 @@
 package com.wildfire.common.networking;
 
 import com.wildfire.common.WildfireGender;
-import com.wildfire.common.entitydata.PlayerConfig;
-import com.wildfire.common.entitydata.PlayerConfigHolder;
+import com.wildfire.common.entities.players.PlayerConfig;
+import com.wildfire.common.entities.players.PlayerConfigHolder;
 import com.wildfire.common.networking.packets.sync.ClientboundSyncPacket;
 import com.wildfire.common.networking.packets.sync.ServerboundSyncPacket;
 import net.minecraft.network.Connection;

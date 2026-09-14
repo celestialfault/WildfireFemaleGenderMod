@@ -24,7 +24,7 @@ import com.wildfire.client.ClientHelper;
 import com.wildfire.common.WildfireGender;
 import com.wildfire.common.WildfireHelper;
 import com.wildfire.client.config.ClientConfig;
-import com.wildfire.common.entitydata.BreastState;
+import com.wildfire.common.entities.BreastState;
 import com.wildfire.api.uvs.UVLayout;
 import com.wildfire.client.render.WildfireModelRenderer.BreastModelBox;
 import com.wildfire.client.render.WildfireModelRenderer.OverlayModelBox;

@@ -19,13 +19,18 @@
 package com.wildfire.client.gui.screen;
 
 import com.google.common.base.Suppliers;
+import com.wildfire.api.client.WildfireClientAPI;
+import com.wildfire.client.WildfireGenderClient;
+import com.wildfire.client.config.ClientConfig;
 import com.wildfire.client.gui.FakeGUIPlayer;
 import com.wildfire.client.gui.WildfireButton;
 import com.wildfire.common.WildfireGender;
-import com.wildfire.client.WildfireGenderClient;
-import com.wildfire.client.config.ClientConfig;
 import com.wildfire.common.WildfireLang;
-import com.wildfire.common.entitydata.PlayerConfigHolder;
+import com.wildfire.common.entities.players.PlayerConfigHolder;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.function.Supplier;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
@@ -37,12 +42,6 @@ import net.minecraft.network.chat.TextColor;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.CommonColors;
 import org.jetbrains.annotations.UnknownNullability;
-
-import java.util.Objects;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
-import java.util.function.Supplier;
 import org.jspecify.annotations.Nullable;
 
 /// @apiNote Only use this on the client side
@@ -112,20 +111,18 @@ public class WildfireFirstTimeSetupScreen extends BaseWildfireScreen {
     }
 
     private CompletableFuture<Void> doInitialSync() {
-        var client = Objects.requireNonNull(this.minecraft);
-        assert client.player != null;
-        var clientUUID = client.player.getUUID();
+        assert minecraft.player != null;
+        final var uuid = minecraft.player.getUUID();
 
-        WildfireGender.CACHE.asMap().values()
-            .removeIf(config -> config.syncStatus == PlayerConfigHolder.SyncStatus.UNKNOWN);
+        WildfireClientAPI.players().invalidateIf(config -> config.syncStatus == PlayerConfigHolder.SyncStatus.UNKNOWN);
 
         return CompletableFuture.runAsync(() -> {
-            var clientConfig = WildfireGender.getOrAddPlayerById(clientUUID);
+            var clientConfig = WildfireClientAPI.players().getOrCreate(uuid);
             if(!clientConfig.hasLocalConfig()) {
                 try {
                     // note that we wait for this to ensure that we don't have any inconsistencies with the synced
                     // data once we open the main menu
-                    WildfireGenderClient.loadGenderInfo(clientUUID, false, true).join();
+                    WildfireGenderClient.loadGenderInfo(uuid, false, true).join();
                 } catch(CompletionException _) {
                     // loadGenderInfo should log any errors for us
                     return;

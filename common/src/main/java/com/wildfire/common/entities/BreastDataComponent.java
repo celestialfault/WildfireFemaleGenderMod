@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.wildfire.common.entitydata;
+package com.wildfire.common.entities;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -24,6 +24,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.wildfire.api.WildfireAPI;
 import com.wildfire.common.config.value.ConfigKey;
 import com.wildfire.common.config.validator.ConfigRange;
+import com.wildfire.common.entities.players.PlayerConfigHolder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;

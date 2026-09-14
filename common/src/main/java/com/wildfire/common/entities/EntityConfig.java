@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.wildfire.common.entitydata;
+package com.wildfire.common.entities;
 
 import com.mojang.datafixers.Products.P3;
 import com.mojang.serialization.Codec;
@@ -27,8 +27,7 @@ import com.wildfire.api.Gender;
 import com.wildfire.common.config.value.ConfigKey;
 import com.wildfire.common.config.value.ConfigValue;
 import com.wildfire.common.config.UVs;
-import net.minecraft.world.entity.Avatar;
-import net.minecraft.world.entity.LivingEntity;
+import com.wildfire.common.entities.players.PlayerConfig;
 import net.minecraft.world.entity.decoration.ArmorStand;
 
 /// A stripped down version of a [`player's config`][PlayerConfig], intended for use with non-player entities.
@@ -39,14 +38,6 @@ import net.minecraft.world.entity.decoration.ArmorStand;
 public class EntityConfig  {
 
     public static final ConfigKey<Gender> GENDER = new ConfigKey<>(Gender.MALE, Gender.CODEC_OR_LEGACY, Gender.STREAM_CODEC);
-
-    /// @return `true` if the mod has support for the provided entity
-    public static boolean isSupportedEntity(LivingEntity entity) {
-        // TODO mannequins are not properly supported right now; this method only returns true to indicate that
-        //        our rendering does technically support it, despite the fact that there is no way to properly utilize
-        //        them without using janky workarounds.
-        return entity instanceof Avatar || entity instanceof ArmorStand;
-    }
 
     public static final Codec<EntityConfig> CODEC = RecordCodecBuilder.create(instance -> codecGroup(instance)
         .apply(instance, EntityConfig::new)

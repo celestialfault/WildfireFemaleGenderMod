@@ -16,25 +16,39 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.wildfire.client.physics;
+package com.wildfire.api;
 
-import com.wildfire.api.IGenderArmor;
-import com.wildfire.client.WildfireClientHelper;
+import com.wildfire.common.entities.EntityConfig;
 import com.wildfire.common.entities.EntityConfigHolder;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import org.jetbrains.annotations.ApiStatus;
+import org.jspecify.annotations.Nullable;
+import java.util.UUID;
+import java.util.function.Predicate;
 
-public record BothBreastsPhysics(BreastPhysics left, BreastPhysics right) {
-
-    public BothBreastsPhysics(EntityConfigHolder<?> configHolder) {
-        this(new BreastPhysics(configHolder), new BreastPhysics(configHolder));
+public interface EntityCache<TYPE extends EntityConfigHolder<CONFIG>, CONFIG extends EntityConfig> {
+    default @Nullable TYPE get(LivingEntity entity) {
+        return get(entity.getUUID());
     }
 
-    /// @apiNote Only call this on the client side, or the implementation will crash
-    public void tick(LivingEntity entity) {
-        IGenderArmor armor = WildfireClientHelper.getArmorConfig(entity.getItemBySlot(EquipmentSlot.CHEST));
-
-        left.update(entity, armor);
-        right.update(entity, armor);
+    default TYPE getOrCreate(LivingEntity entity) {
+        return getOrCreate(entity.getUUID());
     }
+
+    @Nullable TYPE get(UUID uuid);
+    TYPE getOrCreate(UUID uuid);
+
+    @ApiStatus.Internal
+    default void invalidate(LivingEntity entity) {
+        invalidate(entity.getUUID());
+    }
+
+    @ApiStatus.Internal
+    void invalidate(UUID uuid);
+
+    @ApiStatus.Internal
+    void invalidateAll();
+
+    @ApiStatus.Internal
+    void invalidateIf(Predicate<TYPE> predicate);
 }

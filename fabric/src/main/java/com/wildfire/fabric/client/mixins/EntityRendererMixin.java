@@ -19,9 +19,10 @@
 package com.wildfire.fabric.client.mixins;
 
 import com.llamalad7.mixinextras.sugar.Local;
+import com.wildfire.api.client.WildfireClientAPI;
 import com.wildfire.fabric.client.FabricClientHelper;
-import com.wildfire.common.entitydata.EntityConfig;
-import com.wildfire.common.entitydata.EntityConfigHolder;
+import com.wildfire.common.entities.EntityConfig;
+import com.wildfire.common.entities.EntityConfigHolder;
 import com.wildfire.client.render.GenderRenderState;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
@@ -39,8 +40,8 @@ abstract class EntityRendererMixin {
     @Inject(method = "createRenderState(Lnet/minecraft/world/entity/Entity;F)Lnet/minecraft/client/renderer/entity/state/EntityRenderState;", at = @At("TAIL"))
     public void captureEntityRenderState(Entity entity, float partialTicks, CallbackInfoReturnable<? extends EntityRenderState> ci, @Local(name = "state") EntityRenderState state) {
         if (entity instanceof LivingEntity livingEntity && state instanceof HumanoidRenderState humanoidState) {
-            if (EntityConfig.isSupportedEntity(livingEntity)) {
-                var config = EntityConfigHolder.getEntity(livingEntity);
+            var config = WildfireClientAPI.getConfig(livingEntity);
+            if(config != null) {
                 humanoidState.setData(FabricClientHelper.STATE, new GenderRenderState(config, livingEntity, humanoidState, partialTicks));
             }
         }

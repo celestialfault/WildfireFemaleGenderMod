@@ -20,13 +20,14 @@ package com.wildfire.client;
 
 import com.google.gson.JsonObject;
 import com.wildfire.api.WildfireAPI;
+import com.wildfire.api.client.WildfireClientAPI;
 import com.wildfire.common.LoaderAgnostics;
 import com.wildfire.common.WildfireGender;
 import com.wildfire.client.cloud.CloudSync;
 import com.wildfire.client.config.ClientConfig;
 import com.wildfire.common.config.Configuration;
 import com.wildfire.client.contributors.Contributors;
-import com.wildfire.common.entitydata.PlayerConfigHolder;
+import com.wildfire.common.entities.players.PlayerConfigHolder;
 import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
@@ -56,7 +57,7 @@ public class WildfireGenderClient {
             WildfireGender.LOGGER.debug("{} doesn't exist, nothing to migrate", oldPath);
             return;
         } else if (Files.exists(oldFile) && Files.exists(newFile)) {
-            WildfireGender.LOGGER.warn("Cannot migrate {} to {} as both exist", oldPath, oldPath);
+            WildfireGender.LOGGER.warn("Cannot migrate {} to {} as both exist", oldPath, newPath);
             return;
         }
 
@@ -69,7 +70,7 @@ public class WildfireGenderClient {
     }
 
     public static CompletableFuture<@Nullable PlayerConfigHolder> loadGenderInfo(UUID uuid, boolean markForSync, boolean bypassQueue) {
-        var cache = WildfireGender.getPlayerById(uuid);
+        var cache = WildfireClientAPI.players().get(uuid);
         if(cache == null) {
             return CompletableFuture.completedFuture(null);
         }

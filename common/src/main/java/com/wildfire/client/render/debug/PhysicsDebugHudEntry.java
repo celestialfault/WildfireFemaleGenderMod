@@ -18,6 +18,7 @@
 
 package com.wildfire.client.render.debug;
 
+import com.wildfire.api.client.WildfireClientAPI;
 import com.wildfire.common.WildfireGender;
 import com.wildfire.client.physics.BreastPhysics;
 import com.wildfire.client.physics.BothBreastsPhysics;
@@ -40,7 +41,7 @@ public class PhysicsDebugHudEntry implements DebugScreenEntry {
     public void display(DebugScreenDisplayer lines, @Nullable Level world, @Nullable LevelChunk clientChunk, @Nullable LevelChunk chunk) {
         var player = Minecraft.getInstance().player;
         if(player == null) return;
-        var config = WildfireGender.getPlayerById(player.getUUID());
+        var config = WildfireClientAPI.players().get(player);
         if(config == null) return;
 
         BothBreastsPhysics breastPhysics = config.breastPhysics();

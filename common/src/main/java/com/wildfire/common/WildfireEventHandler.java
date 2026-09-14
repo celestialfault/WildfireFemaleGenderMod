@@ -18,8 +18,9 @@
 
 package com.wildfire.common;
 
-import com.wildfire.common.entitydata.BreastDataComponent;
-import com.wildfire.common.entitydata.PlayerConfigHolder;
+import com.wildfire.api.server.WildfireServerAPI;
+import com.wildfire.common.entities.BreastDataComponent;
+import com.wildfire.common.entities.players.PlayerConfigHolder;
 import com.wildfire.common.networking.WildfireSync;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -33,14 +34,16 @@ public final class WildfireEventHandler {
 
     /// Removes a disconnecting player from the cache on a server
     public static void playerDisconnected(Player player) {
-        WildfireGender.CACHE.invalidate(player.getUUID());
+        WildfireServerAPI.players().invalidate(player);
     }
 
     /// Send a sync packet when a player enters the render distance of another player
     public static void onBeginTracking(Entity tracked, ServerPlayer syncTo) {
         if(tracked instanceof Player toSync) {
-            PlayerConfigHolder genderToSync = WildfireGender.getPlayerById(toSync.getUUID());
-            if(genderToSync == null) return;
+            PlayerConfigHolder genderToSync = WildfireServerAPI.players().get(toSync);
+            if(genderToSync == null) {
+                return;
+            }
             // Note that we intentionally don't check if we've previously synced a player with this code path;
             // because we use entity tracking to sync, it's entirely possible that one player would leave the
             // tracking distance of another, change their settings, and then re-enter their tracking distance;
@@ -52,7 +55,7 @@ public final class WildfireEventHandler {
 
     /// Apply player settings to chestplates equipped onto armor stands
     public static void onEquipArmorStand(Player player, ItemStack item) {
-        PlayerConfigHolder playerConfig = WildfireGender.getPlayerById(player.getUUID());
+        PlayerConfigHolder playerConfig = WildfireServerAPI.players().get(player);
         if(playerConfig == null) {
             // while we shouldn't have our tag on the stack still, we're still checking to catch any armor
             // that may still have the tag from older versions, or from potential cross-mod interactions

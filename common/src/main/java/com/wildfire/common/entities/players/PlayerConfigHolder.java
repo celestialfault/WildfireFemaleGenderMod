@@ -16,21 +16,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.wildfire.common.entitydata;
+package com.wildfire.common.entities.players;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.JsonOps;
 import com.wildfire.client.ClientHelper;
-import com.wildfire.client.gui.screen.BaseWildfireScreen;
-import com.wildfire.common.WildfireGender;
-import com.wildfire.common.WildfireLang;
 import com.wildfire.client.cloud.CloudSync;
 import com.wildfire.client.cloud.SyncLog;
 import com.wildfire.client.config.ClientConfig;
+import com.wildfire.client.gui.screen.BaseWildfireScreen;
+import com.wildfire.common.WildfireGender;
+import com.wildfire.common.WildfireLang;
 import com.wildfire.common.config.Configuration;
 import com.wildfire.common.config.value.ConfigKey;
 import com.wildfire.common.config.value.ConfigValue;
+import com.wildfire.common.entities.EntityConfigHolder;
+import com.wildfire.common.entities.Sounds;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -38,9 +40,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.ApiStatus;
 
+// TODO split further into Avatar & Player configs
 public class PlayerConfigHolder extends EntityConfigHolder<PlayerConfig> {
 
     /// `true` if this config should be synced to the connected server on the next attempt
@@ -64,17 +66,6 @@ public class PlayerConfigHolder extends EntityConfigHolder<PlayerConfig> {
     public PlayerConfigHolder(UUID uuid) {
         cfgFile = new Configuration<>(uuid.toString(), PlayerConfig.CODEC);
         super(uuid, PlayerConfig.createDefault());
-    }
-
-    // these shouldn't ever be called on players, but just to be safe, override with a noop.
-    @Override
-    public void readFromStack(ItemStack chestplate) {
-    }
-
-
-    @Override
-    public boolean hasJacketLayer() {
-        throw new UnsupportedOperationException("PlayerConfig does not support #hasJacketLayer(); use Player#isModelPartShown instead");
     }
 
     public SyncStatus getSyncStatus() {
@@ -148,11 +139,9 @@ public class PlayerConfigHolder extends EntityConfigHolder<PlayerConfig> {
     }
 
     // TODO add support for mannequins?
-    public void updateFromPacket(PlayerConfig config, boolean fromServer) {
+    public void updateFromPacket(PlayerConfig config) {
         this.config = config;
-        if (fromServer) {
-            this.syncStatus = SyncStatus.SYNCED;
-        }
+        this.syncStatus = SyncStatus.SYNCED;
     }
 
     @Override

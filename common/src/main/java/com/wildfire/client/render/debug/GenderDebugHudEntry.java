@@ -19,9 +19,10 @@
 package com.wildfire.client.render.debug;
 
 import com.wildfire.api.IGenderArmor;
+import com.wildfire.api.client.WildfireClientAPI;
 import com.wildfire.common.WildfireGender;
-import com.wildfire.common.entitydata.EntityConfig;
-import com.wildfire.common.entitydata.EntityConfigHolder;
+import com.wildfire.common.entities.EntityConfig;
+import com.wildfire.common.entities.EntityConfigHolder;
 import com.wildfire.client.physics.BreastPhysics;
 import com.wildfire.client.resources.GenderArmorResourceManager;
 import net.minecraft.ChatFormatting;
@@ -64,13 +65,16 @@ public class GenderDebugHudEntry implements DebugScreenEntry {
     public void display(DebugScreenDisplayer lines, @Nullable Level world, @Nullable LevelChunk clientChunk, @Nullable LevelChunk chunk) {
         var client = Minecraft.getInstance();
         var target = clientPlayer ? client.player : client.crosshairPickEntity;
-        if(!(target instanceof LivingEntity living) || !EntityConfig.isSupportedEntity(living)) {
+        if(!(target instanceof LivingEntity living)) {
             return;
         }
 
-        var config = EntityConfigHolder.getEntity(living);
-        List<String> info = new ArrayList<>();
+        var config = WildfireClientAPI.getConfig(living);
+        if(config == null) {
+            return;
+        }
 
+        List<String> info = new ArrayList<>();
         info.add(PREFIX + " Gender Data");
         info.add("UUID: " + target.getUUID());
         info.addAll(config.getDebugInfo());

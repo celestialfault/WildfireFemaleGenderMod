@@ -23,6 +23,3 @@ accessible method net/minecraft/client/renderer/entity/ArmorStandRenderer getRen
 
 accessible method net/minecraft/client/renderer/entity/LivingEntityRenderer isBodyVisible (Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;)Z
 accessible method net/minecraft/client/renderer/entity/IllusionerRenderer isBodyVisible (Lnet/minecraft/client/renderer/entity/state/IllusionerRenderState;)Z
-
-#? if <26.2
-#accessible method net/minecraft/client/Minecraft isMultiplayerServer ()Z

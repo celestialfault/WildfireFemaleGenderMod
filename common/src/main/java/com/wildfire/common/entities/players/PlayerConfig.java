@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.wildfire.common.entitydata;
+package com.wildfire.common.entities.players;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
@@ -26,6 +26,9 @@ import com.wildfire.api.Gender;
 import com.wildfire.common.config.value.ConfigKey;
 import com.wildfire.common.config.value.ConfigValue;
 import com.wildfire.common.config.UVs;
+import com.wildfire.common.entities.Breasts;
+import com.wildfire.common.entities.EntityConfig;
+import com.wildfire.common.entities.Sounds;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 
