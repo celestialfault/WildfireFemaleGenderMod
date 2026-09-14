@@ -57,7 +57,7 @@ public class NeoSync {
         // The packet will only be sent to the server if the client's version matches the one from the server in the sync hello, so registering the channel is harmless
         registrar.playToServer(ServerboundSyncPacket.TYPE, ServerboundSyncPacket.STREAM_CODEC, (packet, context) -> {
             if (context.player() instanceof ServerPlayer player) {//Should always be true
-                packet.handle(player.level().getServer(), player);
+                packet.handle(player);
             } else {
                 WildfireGender.LOGGER.warn(WildfireSync.MARKER, "Server received a sync packet but the player wasn't a server player? This shouldn't be possible.");
             }
