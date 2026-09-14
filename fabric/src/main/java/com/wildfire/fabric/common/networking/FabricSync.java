@@ -71,7 +71,7 @@ public class FabricSync {
 
         ServerPlayConnectionEvents.INIT.register((listener, _) -> {
             if (WildfireNetworking.INSTANCE.versionMatches(listener.connection)) {
-                ServerPlayNetworking.registerReceiver(listener, ServerboundSyncPacket.TYPE, (packet, context) -> packet.handle(context.server(), context.player()));
+                ServerPlayNetworking.registerReceiver(listener, ServerboundSyncPacket.TYPE, (packet, context) -> packet.handle(context.player()));
             } else {
                 WildfireGender.LOGGER.debug(WildfireSync.MARKER, "{} is not using a supported sync protocol version (or doesn't have the mod), not registering receivers",
                     listener.getPlayer()

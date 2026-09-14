@@ -26,7 +26,6 @@ import com.wildfire.common.networking.WildfireSync;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 
 public record ServerboundSyncPacket(AvatarConfig config) implements CustomPacketPayload {
@@ -39,7 +38,7 @@ public record ServerboundSyncPacket(AvatarConfig config) implements CustomPacket
         return TYPE;
     }
 
-    public void handle(MinecraftServer server, ServerPlayer player) {
+    public void handle(ServerPlayer player) {
         WildfireGender.LOGGER.debug(WildfireSync.MARKER, "Received player data from player {}", player);
         PlayerConfigHolder plr = WildfireServerAPI.players().getOrCreate(player);
         plr.updateFromPacket(config);
