@@ -25,13 +25,13 @@ import com.wildfire.client.WildfireGenderClient;
 import com.wildfire.common.entities.EntityConfig;
 import com.wildfire.common.entities.EntityConfigHolder;
 import com.wildfire.common.entities.armorstands.ArmorStandConfigHolder;
-import com.wildfire.common.entities.avatars.AvatarConfigHolder;
+import com.wildfire.common.entities.avatars.MannequinConfigHolder;
 import com.wildfire.common.entities.players.PlayerConfigHolder;
 import java.time.Duration;
 import java.util.UUID;
-import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.world.entity.decoration.Mannequin;
 import net.minecraft.world.entity.player.Player;
 import org.jspecify.annotations.Nullable;
 
@@ -42,7 +42,7 @@ public final class WildfireClientAPI {
 
     private static final EntityCache<PlayerConfigHolder> PLAYERS;
     private static final EntityCache<ArmorStandConfigHolder> ARMOR_STANDS;
-    private static final EntityCache<AvatarConfigHolder> AVATARS;
+    private static final EntityCache<MannequinConfigHolder> MANNEQUINS;
 
     static {
         final CacheLoader<UUID, PlayerConfigHolder> playerLoader = CacheLoader.from(uuid -> {
@@ -53,14 +53,14 @@ public final class WildfireClientAPI {
 
         PLAYERS = new EntityCacheImpl<>(playerLoader, Duration.ofMinutes(15));
         ARMOR_STANDS = new EntityCacheImpl<>(CacheLoader.from(ArmorStandConfigHolder::new), Duration.ofMinutes(5));
-        AVATARS = new EntityCacheImpl<>(CacheLoader.from(AvatarConfigHolder::new), Duration.ofMinutes(5));
+        MANNEQUINS = new EntityCacheImpl<>(CacheLoader.from(MannequinConfigHolder::new), Duration.ofMinutes(5));
     }
 
     @Nullable
     public static EntityConfigHolder<? extends EntityConfig> getConfig(LivingEntity entity) {
         return switch(entity) {
             case Player _ -> players().getOrCreate(entity);
-            case Avatar _ -> avatars().getOrCreate(entity);
+            case Mannequin _ -> mannequins().getOrCreate(entity);
             case ArmorStand _ -> armorStands().getOrCreate(entity);
             default -> null;
         };
@@ -71,9 +71,9 @@ public final class WildfireClientAPI {
         return PLAYERS;
     }
 
-    /// Returns the [EntityCache] supplying [AvatarConfigHolder] instances for client-side mannequin entities
-    public static EntityCache<AvatarConfigHolder> avatars() {
-        return AVATARS;
+    /// Returns the [EntityCache] supplying [MannequinConfigHolder] instances for client-side mannequin entities
+    public static EntityCache<MannequinConfigHolder> mannequins() {
+        return MANNEQUINS;
     }
 
     /// Returns the [EntityCache] supplying [ArmorStandConfigHolder] instances for client-side armor stand entities

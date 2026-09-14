@@ -28,7 +28,7 @@ import com.wildfire.client.contributors.Contributors;
 import com.wildfire.common.WildfireGender;
 import com.wildfire.common.entities.avatars.AbstractAvatarConfigHolder;
 import com.wildfire.common.entities.avatars.AvatarConfig;
-import com.wildfire.common.entities.avatars.AvatarConfigHolder;
+import com.wildfire.common.entities.avatars.MannequinConfigHolder;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -112,7 +112,7 @@ public class FakeGUIPlayer {
             // As it is possible a mod adds other names to render upside down, so we might be as compatible as possible
             entity.setCustomName(Component.literal(name));
 
-            AvatarConfigHolder config = WildfireClientAPI.avatars().getOrCreate(entity);
+            MannequinConfigHolder config = WildfireClientAPI.mannequins().getOrCreate(entity);
             config.forceSimplifiedPhysics = true;
 
             var cached = WildfireClientAPI.players().get(uuid);
