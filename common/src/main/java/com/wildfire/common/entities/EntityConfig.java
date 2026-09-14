@@ -19,14 +19,12 @@
 package com.wildfire.common.entities;
 
 import com.mojang.datafixers.Products.P3;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.mojang.serialization.codecs.RecordCodecBuilder.Instance;
 import com.mojang.serialization.codecs.RecordCodecBuilder.Mu;
 import com.wildfire.api.Gender;
+import com.wildfire.common.config.UVs;
 import com.wildfire.common.config.value.ConfigKey;
 import com.wildfire.common.config.value.ConfigValue;
-import com.wildfire.common.config.UVs;
 import com.wildfire.common.entities.players.PlayerConfig;
 import net.minecraft.world.entity.decoration.ArmorStand;
 
@@ -35,13 +33,9 @@ import net.minecraft.world.entity.decoration.ArmorStand;
 /// Unlike players, this has very minimal configuration support.
 ///
 /// Currently only used for [`armor stands`][ArmorStand], and as a superclass for [`player configs`][PlayerConfig].
-public class EntityConfig  {
+public abstract class EntityConfig  {
 
     public static final ConfigKey<Gender> GENDER = new ConfigKey<>(Gender.MALE, Gender.CODEC_OR_LEGACY, Gender.STREAM_CODEC);
-
-    public static final Codec<EntityConfig> CODEC = RecordCodecBuilder.create(instance -> codecGroup(instance)
-        .apply(instance, EntityConfig::new)
-    );
 
     protected static <CONFIG extends EntityConfig> P3<Mu<CONFIG>, Gender, Breasts, UVs> codecGroup(Instance<CONFIG> instance) {
         return instance.group(
