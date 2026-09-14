@@ -23,7 +23,7 @@ import com.wildfire.api.EntityCache;
 import com.wildfire.api.impl.EntityCacheImpl;
 import com.wildfire.common.entities.EntityConfig;
 import com.wildfire.common.entities.EntityConfigHolder;
-import com.wildfire.common.entities.avatars.AvatarConfigHolder;
+import com.wildfire.common.entities.avatars.MannequinConfigHolder;
 import com.wildfire.common.entities.players.PlayerConfigHolder;
 import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.LivingEntity;
@@ -36,11 +36,11 @@ public final class WildfireServerAPI {
     }
 
     private static final EntityCache<PlayerConfigHolder> PLAYERS;
-    private static final EntityCache<AvatarConfigHolder> AVATARS;
+    private static final EntityCache<MannequinConfigHolder> AVATARS;
 
     static {
         PLAYERS = new EntityCacheImpl<>(CacheLoader.from(PlayerConfigHolder::new));
-        AVATARS = new EntityCacheImpl<>(CacheLoader.from(AvatarConfigHolder::new));
+        AVATARS = new EntityCacheImpl<>(CacheLoader.from(MannequinConfigHolder::new));
     }
 
     @Nullable
@@ -57,8 +57,8 @@ public final class WildfireServerAPI {
         return PLAYERS;
     }
 
-    /// Returns the [EntityCache] supplying [AvatarConfigHolder] instances for server-side mannequin entities
-    public static EntityCache<AvatarConfigHolder> avatars() {
+    /// Returns the [EntityCache] supplying [MannequinConfigHolder] instances for server-side mannequin entities
+    public static EntityCache<MannequinConfigHolder> avatars() {
         return AVATARS;
     }
 }

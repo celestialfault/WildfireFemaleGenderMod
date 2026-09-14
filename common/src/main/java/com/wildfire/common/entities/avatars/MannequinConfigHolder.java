@@ -20,8 +20,8 @@ package com.wildfire.common.entities.avatars;
 
 import java.util.UUID;
 
-public class AvatarConfigHolder extends AbstractAvatarConfigHolder {
-    public AvatarConfigHolder(final UUID uuid) {
+public class MannequinConfigHolder extends AbstractAvatarConfigHolder {
+    public MannequinConfigHolder(final UUID uuid) {
         super(uuid, AvatarConfig.createDefault());
     }
 }
