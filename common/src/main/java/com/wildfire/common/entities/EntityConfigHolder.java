@@ -27,7 +27,7 @@ import java.util.UUID;
 import net.minecraft.ChatFormatting;
 import org.jetbrains.annotations.ApiStatus;
 
-public class EntityConfigHolder<CONFIG extends EntityConfig> {
+public abstract class EntityConfigHolder<CONFIG extends EntityConfig> {
     public final UUID uuid;
     // TODO ideally this physics object would be made entirely client-sided, but this class is
     //      used on both the client and server (primarily through PlayerConfigHolder), making it very
