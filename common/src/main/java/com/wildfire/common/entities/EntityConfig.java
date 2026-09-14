@@ -25,14 +25,14 @@ import com.wildfire.api.Gender;
 import com.wildfire.common.config.UVs;
 import com.wildfire.common.config.value.ConfigKey;
 import com.wildfire.common.config.value.ConfigValue;
-import com.wildfire.common.entities.players.PlayerConfig;
+import com.wildfire.common.entities.avatars.AvatarConfig;
 import net.minecraft.world.entity.decoration.ArmorStand;
 
-/// A stripped down version of a [`player's config`][PlayerConfig], intended for use with non-player entities.
+/// A stripped down version of a [`player's config`][AvatarConfig], intended for use with non-player entities.
 ///
 /// Unlike players, this has very minimal configuration support.
 ///
-/// Currently only used for [`armor stands`][ArmorStand], and as a superclass for [`player configs`][PlayerConfig].
+/// Currently only used for [`armor stands`][ArmorStand], and as a superclass for [`player configs`][AvatarConfig].
 public abstract class EntityConfig  {
 
     public static final ConfigKey<Gender> GENDER = new ConfigKey<>(Gender.MALE, Gender.CODEC_OR_LEGACY, Gender.STREAM_CODEC);

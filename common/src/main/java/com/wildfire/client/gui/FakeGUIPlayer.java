@@ -26,8 +26,9 @@ import com.wildfire.client.cloud.CloudSync;
 import com.wildfire.client.contributors.Contributor.Role;
 import com.wildfire.client.contributors.Contributors;
 import com.wildfire.common.WildfireGender;
-import com.wildfire.common.entities.players.PlayerConfig;
-import com.wildfire.common.entities.players.PlayerConfigHolder;
+import com.wildfire.common.entities.avatars.AbstractAvatarConfigHolder;
+import com.wildfire.common.entities.avatars.AvatarConfig;
+import com.wildfire.common.entities.avatars.AvatarConfigHolder;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -43,7 +44,7 @@ import org.jspecify.annotations.Nullable;
 
 public class FakeGUIPlayer {
 
-    public static final Consumer<PlayerConfig> FEMALE_CHANGES = config -> {
+    public static final Consumer<AvatarConfig> FEMALE_CHANGES = config -> {
         //The settings that need to be changed away from default
         config.gender.update(Gender.FEMALE);
         config.breasts.yOffset().update(-0.2F);
@@ -56,14 +57,14 @@ public class FakeGUIPlayer {
     private final Supplier<GUIMannequin> entity;
     private final @Nullable Component description;
 
-    public FakeGUIPlayer(String name, UUID uuid, @Nullable Component description, @Nullable Consumer<PlayerConfig> defaultGenderSettings) {
+    public FakeGUIPlayer(String name, UUID uuid, @Nullable Component description, @Nullable Consumer<AvatarConfig> defaultGenderSettings) {
         this.name = name;
         this.uuid = uuid;
         this.entity = createPlayerSupplier(this.uuid, this.name, defaultGenderSettings);
         this.description = description;
     }
 
-    public FakeGUIPlayer(String name, UUID uuid, @Nullable Consumer<PlayerConfig> defaultGenderSettings) {
+    public FakeGUIPlayer(String name, UUID uuid, @Nullable Consumer<AvatarConfig> defaultGenderSettings) {
         this(name, uuid, null, defaultGenderSettings);
     }
 
@@ -101,7 +102,7 @@ public class FakeGUIPlayer {
     }
 
     @SuppressWarnings("NullableProblems")
-    private static Supplier<GUIMannequin> createPlayerSupplier(final UUID uuid, final String name, final @Nullable Consumer<PlayerConfig> defaultGenderData) {
+    private static Supplier<GUIMannequin> createPlayerSupplier(final UUID uuid, final String name, final @Nullable Consumer<AvatarConfig> defaultGenderData) {
         return Suppliers.memoize(() -> {
             var client = Minecraft.getInstance();
             assert client.level != null;
@@ -111,8 +112,7 @@ public class FakeGUIPlayer {
             // As it is possible a mod adds other names to render upside down, so we might be as compatible as possible
             entity.setCustomName(Component.literal(name));
 
-            // TODO use avatar cache when that exists
-            PlayerConfigHolder config = WildfireClientAPI.players().getOrCreate(entity);
+            AvatarConfigHolder config = WildfireClientAPI.avatars().getOrCreate(entity);
             config.forceSimplifiedPhysics = true;
 
             var cached = WildfireClientAPI.players().get(uuid);
@@ -126,7 +126,7 @@ public class FakeGUIPlayer {
         });
     }
 
-    private static void loadFromCloud(UUID uuid, PlayerConfigHolder holder, @Nullable Consumer<PlayerConfig> defaults) {
+    private static void loadFromCloud(final UUID uuid, final AbstractAvatarConfigHolder holder, final @Nullable Consumer<AvatarConfig> defaults) {
         JsonObject profile;
         try {
             profile = CloudSync.getProfile(uuid, true).join();

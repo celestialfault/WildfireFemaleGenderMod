@@ -23,10 +23,11 @@ import com.wildfire.api.EntityCache;
 import com.wildfire.api.impl.EntityCacheImpl;
 import com.wildfire.common.entities.EntityConfig;
 import com.wildfire.common.entities.EntityConfigHolder;
-import com.wildfire.common.entities.players.PlayerConfig;
+import com.wildfire.common.entities.avatars.AvatarConfigHolder;
 import com.wildfire.common.entities.players.PlayerConfigHolder;
 import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import org.jspecify.annotations.Nullable;
 
 /// Server-side API methods for interacting with the Female Gender Mod
@@ -35,21 +36,29 @@ public final class WildfireServerAPI {
     }
 
     private static final EntityCache<PlayerConfigHolder> PLAYERS;
+    private static final EntityCache<AvatarConfigHolder> AVATARS;
 
     static {
         PLAYERS = new EntityCacheImpl<>(CacheLoader.from(PlayerConfigHolder::new));
+        AVATARS = new EntityCacheImpl<>(CacheLoader.from(AvatarConfigHolder::new));
     }
 
     @Nullable
     public static EntityConfigHolder<? extends EntityConfig> getConfig(LivingEntity entity) {
-        if(entity instanceof Avatar) {
-            return players().getOrCreate(entity);
-        }
-        return null;
+        return switch(entity) {
+            case Player _ -> players().getOrCreate(entity);
+            case Avatar _ -> avatars().getOrCreate(entity);
+            default -> null;
+        };
     }
 
     /// Returns the [EntityCache] supplying [PlayerConfigHolder] instances for server-side player entities
     public static EntityCache<PlayerConfigHolder> players() {
         return PLAYERS;
+    }
+
+    /// Returns the [EntityCache] supplying [AvatarConfigHolder] instances for server-side mannequin entities
+    public static EntityCache<AvatarConfigHolder> avatars() {
+        return AVATARS;
     }
 }
