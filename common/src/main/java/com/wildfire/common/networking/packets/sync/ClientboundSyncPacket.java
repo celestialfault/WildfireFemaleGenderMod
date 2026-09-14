@@ -18,9 +18,10 @@
 
 package com.wildfire.common.networking.packets.sync;
 
+import com.wildfire.api.client.WildfireClientAPI;
 import com.wildfire.common.WildfireGender;
-import com.wildfire.common.entitydata.PlayerConfig;
-import com.wildfire.common.entitydata.PlayerConfigHolder;
+import com.wildfire.common.entities.players.PlayerConfig;
+import com.wildfire.common.entities.players.PlayerConfigHolder;
 import com.wildfire.common.networking.WildfireSync;
 import io.netty.buffer.ByteBuf;
 import java.util.UUID;
@@ -52,7 +53,7 @@ public record ClientboundSyncPacket(UUID uuid, PlayerConfig config) implements C
             return;
         }
         WildfireGender.LOGGER.debug(WildfireSync.MARKER, "Received player data for player {}", uuid);
-        PlayerConfigHolder plr = WildfireGender.getOrAddPlayerById(uuid);
-        plr.updateFromPacket(config, true);
+        PlayerConfigHolder plr = WildfireClientAPI.players().getOrCreate(uuid);
+        plr.updateFromPacket(config);
     }
 }

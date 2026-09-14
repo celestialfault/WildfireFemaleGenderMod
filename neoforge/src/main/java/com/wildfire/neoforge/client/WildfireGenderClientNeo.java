@@ -20,6 +20,7 @@ package com.wildfire.neoforge.client;
 
 import com.google.common.reflect.TypeToken;
 import com.wildfire.api.WildfireAPI;
+import com.wildfire.api.client.WildfireClientAPI;
 import com.wildfire.client.ClientHelper;
 import com.wildfire.client.WildfireClientEventHandler;
 import com.wildfire.client.WildfireGenderClient;
@@ -33,9 +34,7 @@ import com.wildfire.client.render.debug.PhysicsDebugHudEntry;
 import com.wildfire.client.resources.GenderArmorResourceManager;
 import com.wildfire.common.LoaderAgnostics;
 import com.wildfire.common.WildfireGender;
-import com.wildfire.common.entitydata.EntityConfig;
-import com.wildfire.common.entitydata.EntityConfigHolder;
-import com.wildfire.common.entitydata.PlayerConfigHolder;
+import com.wildfire.common.entities.players.PlayerConfigHolder;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
@@ -120,7 +119,7 @@ public class WildfireGenderClientNeo {
             }
         });
         NeoForge.EVENT_BUS.addListener(EntityLeaveLevelEvent.class, event -> {
-            if (event.getLevel().isClientSide() && event.getEntity() instanceof LivingEntity entity && EntityConfig.isSupportedEntity(entity)) {
+            if (event.getLevel().isClientSide() && event.getEntity() instanceof LivingEntity entity) {
                 WildfireClientEventHandler.onEntityUnload(entity, event.getLevel());
             }
         });
@@ -166,9 +165,11 @@ public class WildfireGenderClientNeo {
     private void registerRenderStateModifiers(RegisterRenderStateModifiersEvent event) {
         event.registerEntityModifier(new TypeToken<LivingEntityRenderer<? extends LivingEntity, LivingEntityRenderState, ?>>() {
         }, (entity, renderState) -> {
-            if (renderState instanceof HumanoidRenderState state && EntityConfig.isSupportedEntity(entity)) {
-                var config = EntityConfigHolder.getEntity(entity);
-                state.setRenderData(NeoClientHelper.STATE, new GenderRenderState(config, entity, state, state.partialTick));
+            if (renderState instanceof HumanoidRenderState state) {
+                var config = WildfireClientAPI.getConfig(entity);
+                if(config != null) {
+                    state.setRenderData(NeoClientHelper.STATE, new GenderRenderState(config, entity, state, state.partialTick));
+                }
             }
         });
     }
@@ -208,7 +209,7 @@ public class WildfireGenderClientNeo {
                 if (p.hurtTime == p.hurtDuration && p.hurtTime > 0) {
                     //Note: We check hurtTime == hurtDuration and hurtTime > 0 or otherwise when the server sends a hurt sound to the client
                     // and the client will check itself instead of the player who was damaged.
-                    PlayerConfigHolder plr = WildfireGender.getPlayerById(p.getUUID());
+                    PlayerConfigHolder plr = WildfireClientAPI.players().get(p);
                     if (plr != null && plr.sounds().hurt().get()) {
                         Holder<SoundEvent> soundOverride = ClientHelper.INSTANCE.hurtSound(plr.gender().get());
                         if (soundOverride != null) {

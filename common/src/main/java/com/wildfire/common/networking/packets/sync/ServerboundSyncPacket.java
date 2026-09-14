@@ -18,9 +18,10 @@
 
 package com.wildfire.common.networking.packets.sync;
 
+import com.wildfire.api.server.WildfireServerAPI;
 import com.wildfire.common.WildfireGender;
-import com.wildfire.common.entitydata.PlayerConfig;
-import com.wildfire.common.entitydata.PlayerConfigHolder;
+import com.wildfire.common.entities.players.PlayerConfig;
+import com.wildfire.common.entities.players.PlayerConfigHolder;
 import com.wildfire.common.networking.WildfireSync;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -40,13 +41,8 @@ public record ServerboundSyncPacket(PlayerConfig config) implements CustomPacket
 
     public void handle(MinecraftServer server, ServerPlayer player) {
         WildfireGender.LOGGER.debug(WildfireSync.MARKER, "Received player data from player {}", player);
-        PlayerConfigHolder plr = WildfireGender.getOrAddPlayerById(player.getUUID());
-        if (!server.isSingleplayerOwner(player.nameAndId())) {
-            //Note: We skip bothering to update the config if the server is an integrated server hosted by the player who sent it
-            // In that case the actual backing config will have already been updated because of it being stored in a static field
-            // which has the side effect of reaching across logical sides and updating both the server and client at once.
-            plr.updateFromPacket(config, false);
-        }
+        PlayerConfigHolder plr = WildfireServerAPI.players().getOrCreate(player);
+        plr.updateFromPacket(config);
         WildfireSync.sendToAllClients(player, plr);
     }
 }

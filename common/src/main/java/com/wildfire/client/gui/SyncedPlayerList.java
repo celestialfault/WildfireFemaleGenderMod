@@ -18,22 +18,21 @@
 
 package com.wildfire.client.gui;
 
-import com.wildfire.client.gui.IFancyFontRenderer.TextAlignment;
-import com.wildfire.common.WildfireGender;
-import com.wildfire.common.WildfireLang;
 import com.wildfire.api.Gender;
+import com.wildfire.api.client.WildfireClientAPI;
 import com.wildfire.client.contributors.Contributors;
-import com.wildfire.common.entitydata.PlayerConfigHolder;
+import com.wildfire.client.gui.IFancyFontRenderer.TextAlignment;
+import com.wildfire.common.WildfireLang;
+import com.wildfire.common.entities.players.PlayerConfigHolder;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.PlayerTabOverlay;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.network.chat.Component;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.network.chat.numbers.NumberFormat;
 import net.minecraft.network.chat.numbers.StyledFormat;
@@ -117,7 +116,7 @@ public final class SyncedPlayerList {
                 continue;
             }
 
-            var config = WildfireGender.getPlayerById(entry.getProfile().id());
+            var config = WildfireClientAPI.players().get(entry.getProfile().id());
             if(config == null || config.syncStatus == PlayerConfigHolder.SyncStatus.UNKNOWN) {
                 continue;
             }

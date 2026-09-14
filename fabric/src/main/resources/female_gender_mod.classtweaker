@@ -30,6 +30,3 @@ accessible field net/minecraft/world/entity/LivingEntity$SwingState ticks I
 #?} else {
 #accessible method net/minecraft/world/entity/LivingEntity getCurrentSwingDuration ()I
 #?}
-
-#? if <26.2
-#accessible method net/minecraft/client/Minecraft isMultiplayerServer ()Z

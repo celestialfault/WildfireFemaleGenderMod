@@ -16,12 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+//~ !entity_types
 package com.wildfire.fabric.client.mixins;
 
-//~ !entity_types
+import com.wildfire.api.client.WildfireClientAPI;
 import com.wildfire.client.WildfireClientEventHandler;
-import com.wildfire.common.WildfireGender;
-import com.wildfire.common.entitydata.PlayerConfigHolder;
+import com.wildfire.common.entities.players.PlayerConfigHolder;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -51,7 +51,7 @@ abstract class LivingEntityMixin extends Entity {
     )
     public void playGenderHurtSound(DamageSource damageSource, CallbackInfo ci) {
         if ((LivingEntity)(Object)this instanceof Player player && player.level().isClientSide()) {
-            PlayerConfigHolder genderPlayer = WildfireGender.getPlayerById(player.getUUID());
+            PlayerConfigHolder genderPlayer = WildfireClientAPI.players().get(player);
             if (genderPlayer != null) {
                 genderPlayer.tryPlayHurtSound(player);
             }
