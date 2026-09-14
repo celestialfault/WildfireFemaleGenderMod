@@ -26,11 +26,11 @@ import com.wildfire.client.gui.FakeGUIPlayer;
 import com.wildfire.client.gui.WildfireButton;
 import com.wildfire.common.WildfireGender;
 import com.wildfire.common.WildfireLang;
-import com.wildfire.common.entities.players.PlayerConfigHolder;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.function.Supplier;
+import com.wildfire.common.entities.players.SyncStatus;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
@@ -114,7 +114,7 @@ public class WildfireFirstTimeSetupScreen extends BaseWildfireScreen {
         assert minecraft.player != null;
         final var uuid = minecraft.player.getUUID();
 
-        WildfireClientAPI.players().invalidateIf(config -> config.syncStatus == PlayerConfigHolder.SyncStatus.UNKNOWN);
+        WildfireClientAPI.players().invalidateIf(config -> config.syncStatus == SyncStatus.UNKNOWN);
 
         return CompletableFuture.runAsync(() -> {
             var clientConfig = WildfireClientAPI.players().getOrCreate(uuid);

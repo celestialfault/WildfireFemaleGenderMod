@@ -27,6 +27,12 @@ import java.util.UUID;
 import net.minecraft.ChatFormatting;
 import org.jetbrains.annotations.ApiStatus;
 
+/// Holds and provides an entity's [EntityConfig]
+///
+/// The [`provided configuration`][#config()] should not be assumed to be persistent, as the instance
+/// stored on any of these holder objects may be replaced at any point (such as from a sync packet).
+///
+/// @param <CONFIG> The [EntityConfig] type supplied by this holder
 public abstract class EntityConfigHolder<CONFIG extends EntityConfig> {
     public final UUID uuid;
     // TODO ideally this physics object would be made entirely client-sided, but this class is
@@ -46,6 +52,7 @@ public abstract class EntityConfigHolder<CONFIG extends EntityConfig> {
         this.config = config;
     }
 
+    /// @return The current [entity configuration][CONFIG]
     public CONFIG config() {
         return config;
     }

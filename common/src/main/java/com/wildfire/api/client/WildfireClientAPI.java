@@ -24,34 +24,32 @@ import com.wildfire.api.impl.EntityCacheImpl;
 import com.wildfire.client.WildfireGenderClient;
 import com.wildfire.common.entities.EntityConfig;
 import com.wildfire.common.entities.EntityConfigHolder;
-import com.wildfire.common.entities.armorstands.ArmorStandConfig;
 import com.wildfire.common.entities.armorstands.ArmorStandConfigHolder;
-import com.wildfire.common.entities.players.PlayerConfig;
 import com.wildfire.common.entities.players.PlayerConfigHolder;
+import java.time.Duration;
+import java.util.UUID;
 import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import org.jspecify.annotations.Nullable;
-import java.util.UUID;
 
 /// Client-side API methods for interacting with the Female Gender Mod
 public final class WildfireClientAPI {
     private WildfireClientAPI() {
     }
 
-    private static final EntityCache<ArmorStandConfigHolder, ArmorStandConfig> ARMOR_STANDS;
-    private static final EntityCache<PlayerConfigHolder, PlayerConfig> PLAYERS;
+    private static final EntityCache<ArmorStandConfigHolder> ARMOR_STANDS;
+    private static final EntityCache<PlayerConfigHolder> PLAYERS;
 
     static {
-        ARMOR_STANDS = new EntityCacheImpl<>(ArmorStandConfigHolder::new, ArmorStandConfig.CODEC, true);
-
         final CacheLoader<UUID, PlayerConfigHolder> playerLoader = CacheLoader.from(uuid -> {
             var holder = new PlayerConfigHolder(uuid);
             WildfireGenderClient.loadGenderInfo(holder, true, false);
             return holder;
         });
 
-        PLAYERS = new EntityCacheImpl<>(playerLoader, PlayerConfig.CODEC, true);
+        PLAYERS = new EntityCacheImpl<>(playerLoader, Duration.ofMinutes(15));
+        ARMOR_STANDS = new EntityCacheImpl<>(CacheLoader.from(ArmorStandConfigHolder::new), Duration.ofMinutes(5));
     }
 
     @Nullable
@@ -63,11 +61,11 @@ public final class WildfireClientAPI {
         };
     }
 
-    public static EntityCache<PlayerConfigHolder, PlayerConfig> players() {
+    public static EntityCache<PlayerConfigHolder> players() {
         return PLAYERS;
     }
 
-    public static EntityCache<ArmorStandConfigHolder, ArmorStandConfig> armorStands() {
+    public static EntityCache<ArmorStandConfigHolder> armorStands() {
         return ARMOR_STANDS;
     }
 }

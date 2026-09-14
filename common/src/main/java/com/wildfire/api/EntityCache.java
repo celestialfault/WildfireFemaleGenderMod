@@ -20,18 +20,18 @@ package com.wildfire.api;
 
 import com.wildfire.common.entities.EntityConfig;
 import com.wildfire.common.entities.EntityConfigHolder;
+import java.util.UUID;
+import java.util.function.Predicate;
 import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.Nullable;
-import java.util.UUID;
-import java.util.function.Predicate;
 
-public interface EntityCache<TYPE extends EntityConfigHolder<CONFIG>, CONFIG extends EntityConfig> {
-    default @Nullable TYPE get(LivingEntity entity) {
+public interface EntityCache<TYPE extends EntityConfigHolder<? extends EntityConfig>> {
+    default @Nullable TYPE get(final LivingEntity entity) {
         return get(entity.getUUID());
     }
 
-    default TYPE getOrCreate(LivingEntity entity) {
+    default TYPE getOrCreate(final LivingEntity entity) {
         return getOrCreate(entity.getUUID());
     }
 
@@ -39,7 +39,7 @@ public interface EntityCache<TYPE extends EntityConfigHolder<CONFIG>, CONFIG ext
     TYPE getOrCreate(UUID uuid);
 
     @ApiStatus.Internal
-    default void invalidate(LivingEntity entity) {
+    default void invalidate(final LivingEntity entity) {
         invalidate(entity.getUUID());
     }
 

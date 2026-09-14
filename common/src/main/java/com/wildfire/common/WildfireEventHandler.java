@@ -66,7 +66,7 @@ public final class WildfireEventHandler {
         }
 
         // Note that we always attach player data to the item stack as a server has no concept of resource packs,
-        // making it impossible to compare against any armor data that isn't registered through the mod API.
+        // making it impossible to compare against any armor data that may exist.
         BreastDataComponent component = BreastDataComponent.fromPlayer(player, playerConfig);
         if(component != null) {
             component.write(item);

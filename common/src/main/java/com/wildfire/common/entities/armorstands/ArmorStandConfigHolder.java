@@ -35,8 +35,8 @@ public class ArmorStandConfigHolder extends EntityConfigHolder<ArmorStandConfig>
     protected boolean jacketLayer = true;
     protected @Nullable BreastDataComponent fromComponent;
 
-    public ArmorStandConfigHolder(final UUID uuid, final ArmorStandConfig config) {
-        super(uuid, config);
+    public ArmorStandConfigHolder(final UUID uuid) {
+        super(uuid, ArmorStandConfig.createDefault());
     }
 
     /// Copy gender settings included in the given [`item NBT`][ItemStack] to the current entity
