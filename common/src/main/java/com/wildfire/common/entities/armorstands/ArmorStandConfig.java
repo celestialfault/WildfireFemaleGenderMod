@@ -19,6 +19,7 @@
 package com.wildfire.common.entities.armorstands;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.wildfire.api.Gender;
 import com.wildfire.common.config.UVs;
@@ -32,5 +33,10 @@ public class ArmorStandConfig extends EntityConfig {
 
     protected ArmorStandConfig(final Gender gender, final Breasts breasts, final UVs uvs) {
         super(gender, breasts, uvs);
+    }
+
+    public static ArmorStandConfig createDefault() {
+        //Note: Theoretically this can never fail so it is safe to use getOrThrow as everything in the codec has orElse(default)
+        return CODEC.parse(JsonOps.INSTANCE, JsonOps.INSTANCE.emptyMap()).getOrThrow();
     }
 }

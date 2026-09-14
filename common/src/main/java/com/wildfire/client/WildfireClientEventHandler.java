@@ -27,7 +27,6 @@ import com.wildfire.client.gui.WildfireToast;
 import com.wildfire.client.gui.screen.WardrobeBrowserScreen;
 import com.wildfire.client.render.GenderArmorLayer;
 import com.wildfire.client.render.GenderLayer;
-import com.wildfire.common.WildfireGender;
 import com.wildfire.common.WildfireHelper;
 import com.wildfire.common.WildfireLang;
 import com.wildfire.common.config.value.ConfigValue;
@@ -136,8 +135,7 @@ public final class WildfireClientEventHandler {
 
     /// Remove (non-player) entities from the client cache when they're unloaded
     public static void onEntityUnload(Entity entity, Level world) {
-        // note that we don't attempt to unload players; they're instead only ever unloaded once we leave a world,
-        // or once they disconnect
+        // players are intentionally not cleared here, only when we disconnect or when they expire normally
         if(entity instanceof ArmorStand armorStand) {
             WildfireClientAPI.armorStands().invalidate(armorStand);
         }

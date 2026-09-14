@@ -21,38 +21,30 @@ package com.wildfire.api.impl;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.JsonOps;
 import com.wildfire.api.EntityCache;
 import com.wildfire.common.entities.EntityConfig;
 import com.wildfire.common.entities.EntityConfigHolder;
 import java.time.Duration;
 import java.util.UUID;
-import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import net.minecraft.util.Util;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.Nullable;
 
 @ApiStatus.Internal
-public class EntityCacheImpl<TYPE extends EntityConfigHolder<CONFIG>, CONFIG extends EntityConfig> implements EntityCache<TYPE, CONFIG> {
+public class EntityCacheImpl<TYPE extends EntityConfigHolder<? extends EntityConfig>> implements EntityCache<TYPE> {
     private final LoadingCache<UUID, TYPE> cache;
 
-    public EntityCacheImpl(final CacheLoader<UUID, TYPE> loader, final Codec<CONFIG> codec, final boolean autoExpire) {
+    public EntityCacheImpl(final CacheLoader<UUID, TYPE> loader, final @Nullable Duration expiryTime) {
         this.cache = Util.make(CacheBuilder.newBuilder(), builder -> {
-            if(autoExpire) {
-                builder.expireAfterAccess(Duration.ofMinutes(15));
+            if(expiryTime != null) {
+                builder.expireAfterAccess(expiryTime);
             }
         }).build(loader);
     }
 
-    public EntityCacheImpl(final BiFunction<UUID, CONFIG, TYPE> constructor, final Codec<CONFIG> codec, final boolean autoExpire) {
-        final CacheLoader<UUID, TYPE> loader = CacheLoader.from(uuid -> {
-            // the assumption here is that the provided codec can handle an empty object
-            CONFIG newConfig = codec.parse(JsonOps.INSTANCE, JsonOps.INSTANCE.emptyMap()).getOrThrow();
-            return constructor.apply(uuid, newConfig);
-        });
-        this(loader, codec, autoExpire);
+    public EntityCacheImpl(final CacheLoader<UUID, TYPE> loader) {
+        this(loader, null);
     }
 
     @Override
@@ -80,6 +72,7 @@ public class EntityCacheImpl<TYPE extends EntityConfigHolder<CONFIG>, CONFIG ext
         cache.asMap().values().removeIf(predicate);
     }
 
+    @ApiStatus.Internal
     public LoadingCache<UUID, TYPE> cache() {
         return cache;
     }

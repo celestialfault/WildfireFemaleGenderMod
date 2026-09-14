@@ -34,10 +34,10 @@ public final class WildfireServerAPI {
     private WildfireServerAPI() {
     }
 
-    private static final EntityCache<PlayerConfigHolder, PlayerConfig> PLAYERS;
+    private static final EntityCache<PlayerConfigHolder> PLAYERS;
 
     static {
-        PLAYERS = new EntityCacheImpl<>(CacheLoader.from(PlayerConfigHolder::new), PlayerConfig.CODEC, false);
+        PLAYERS = new EntityCacheImpl<>(CacheLoader.from(PlayerConfigHolder::new));
     }
 
     @Nullable
@@ -49,7 +49,7 @@ public final class WildfireServerAPI {
     }
 
     /// Returns the [EntityCache] supplying [PlayerConfigHolder] instances for server-side player entities
-    public static EntityCache<PlayerConfigHolder, PlayerConfig> players() {
+    public static EntityCache<PlayerConfigHolder> players() {
         return PLAYERS;
     }
 }

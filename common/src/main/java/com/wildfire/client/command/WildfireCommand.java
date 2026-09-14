@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import com.wildfire.common.entities.players.SyncStatus;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.commands.SharedSuggestionProvider;
@@ -244,17 +245,15 @@ public class WildfireCommand {
         return Command.SINGLE_SUCCESS;
     }
 
-    private static <HOLDER extends EntityConfigHolder<CONFIG>, CONFIG extends EntityConfig> List<Component> dump(
-        EntityCache<HOLDER, CONFIG> cache,
-        Level world,
-        boolean ignoreEmptyConfig
+    private static <HOLDER extends EntityConfigHolder<? extends EntityConfig>> List<Component> dump(
+        EntityCache<HOLDER> cache, Level world, boolean ignoreEmptyConfig
     ) {
-        Cache<UUID, HOLDER> underlying = ((EntityCacheImpl<HOLDER, CONFIG>) cache).cache();
+        Cache<UUID, HOLDER> underlying = ((EntityCacheImpl<HOLDER>) cache).cache();
         List<Component> lines = new ArrayList<>();
         for (var entry : underlying.asMap().entrySet()) {
             UUID uuid = entry.getKey();
             HOLDER config = entry.getValue();
-            if (config instanceof PlayerConfigHolder playerConfig && playerConfig.getSyncStatus() == PlayerConfigHolder.SyncStatus.UNKNOWN && ignoreEmptyConfig) {
+            if (config instanceof PlayerConfigHolder playerConfig && playerConfig.getSyncStatus() == SyncStatus.UNKNOWN && ignoreEmptyConfig) {
                 continue;
             }
             Entity entity = world.getEntity(uuid);

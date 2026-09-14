@@ -28,6 +28,7 @@ import com.wildfire.client.config.ClientConfig;
 import com.wildfire.common.config.Configuration;
 import com.wildfire.client.contributors.Contributors;
 import com.wildfire.common.entities.players.PlayerConfigHolder;
+import com.wildfire.common.entities.players.SyncStatus;
 import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
@@ -82,7 +83,7 @@ public class WildfireGenderClient {
             var uuid = player.uuid;
             if(player.hasLocalConfig()) {
                 player.loadFromDisk(markForSync);
-            } else if(player.syncStatus == PlayerConfigHolder.SyncStatus.UNKNOWN) {
+            } else if(player.syncStatus == SyncStatus.UNKNOWN) {
                 JsonObject data;
                 try {
                     var future = bypassQueue ? CloudSync.getProfile(uuid) : CloudSync.queueFetch(uuid);
@@ -93,7 +94,7 @@ public class WildfireGenderClient {
                 }
                 // make sure the server we're connected to hasn't provided player data while we were fetching data from
                 // the sync server
-                if(data != null && player.syncStatus == PlayerConfigHolder.SyncStatus.UNKNOWN) {
+                if(data != null && player.syncStatus == SyncStatus.UNKNOWN) {
                     player.updateFromJson(data);
                     if(markForSync) {
                         player.needsSync = true;

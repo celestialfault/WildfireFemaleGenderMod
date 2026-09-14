@@ -48,18 +48,18 @@ public class PlayerConfigHolder extends EntityConfigHolder<PlayerConfig> {
     /// `true` if this config should be synced to the connected server on the next attempt
     ///
     /// This only has an effect for the client player.
-    public boolean needsSync;
+    public volatile boolean needsSync;
 
     /// `true` if this config should be synced to the [`cloud sync server`][CloudSync] on the next attempt
     ///
     /// This only has an effect for the client player.
-    public boolean needsCloudSync;
+    public volatile boolean needsCloudSync;
 
     /// The current sync status of this player config
     ///
     /// @see #needsSync
     /// @see SyncStatus
-    public SyncStatus syncStatus = SyncStatus.UNKNOWN;
+    public volatile SyncStatus syncStatus = SyncStatus.UNKNOWN;
 
     private final Configuration<PlayerConfig> cfgFile;
 
@@ -101,7 +101,7 @@ public class PlayerConfigHolder extends EntityConfigHolder<PlayerConfig> {
 
     /// Loads the current player's settings from a file on disk
     ///
-    /// @param markForSync`true` if [#needsSync] should be set to true
+    /// @param markForSync `true` if [#needsSync] should be set to true
     public void loadFromDisk(boolean markForSync) {
         this.syncStatus = SyncStatus.CACHED;
         config = cfgFile.load();
@@ -171,29 +171,8 @@ public class PlayerConfigHolder extends EntityConfigHolder<PlayerConfig> {
     public final Sounds sounds() {
         return config.sounds;
     }
+
     public final ConfigValue<Boolean> showBreastsInArmor() {
         return config.showBreastsInArmor;
-    }
-
-    public enum SyncStatus {
-        /// Indicates that the relevant configuration has had its data loaded from a file on disk.
-        ///
-        /// This is only applicable on a client, as dedicated servers do not read player data from
-        /// configuration files.
-        CACHED,
-
-        /// Indicates that the relevant configuration has had its data loaded from a sync packet,
-        /// or from a profile retrieved from [`the cloud sync server`][CloudSync].
-        ///
-        /// This is currently only set on the client.
-        // TODO this should be set on dedicated servers if/when the player config cache is split
-        //		into separate server-sided & client-sided caches
-        SYNCED,
-
-        /// Indicates that this configuration has an unknown sync state.
-        ///
-        /// This is the default sync state for new configuration instances, and on dedicated servers is
-        /// the only sync state.
-        UNKNOWN,
     }
 }

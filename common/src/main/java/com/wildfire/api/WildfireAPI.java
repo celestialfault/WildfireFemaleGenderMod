@@ -27,6 +27,8 @@ import org.joml.Vector2ic;
 
 /// Common API methods for interacting with the Female Gender Mod
 public final class WildfireAPI {
+    private WildfireAPI() {
+    }
 
     /// Mod ID for the mod
     public static final String MODID = "female_gender_mod";
