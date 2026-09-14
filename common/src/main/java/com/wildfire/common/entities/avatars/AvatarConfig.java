@@ -16,12 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.wildfire.common.entities.players;
+package com.wildfire.common.entities.avatars;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.wildfire.common.config.Configuration;
 import com.wildfire.api.Gender;
 import com.wildfire.common.config.value.ConfigKey;
 import com.wildfire.common.config.value.ConfigValue;
@@ -32,18 +31,17 @@ import com.wildfire.common.entities.Sounds;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 
-/// A version of [EntityConfig] backed by a [Configuration] for use with players
-public class PlayerConfig extends EntityConfig {
+public class AvatarConfig extends EntityConfig {
 
     private static final ConfigKey<Boolean> SHOW_IN_ARMOR = ConfigKey.DEFAULT_TRUE;
 
-    public static final Codec<PlayerConfig> CODEC = RecordCodecBuilder.create(instance -> codecGroup(instance)
+    public static final Codec<AvatarConfig> CODEC = RecordCodecBuilder.create(instance -> codecGroup(instance)
         .and(Sounds.CODEC_OR_LEGACY.forGetter(config -> config.sounds))
         .and(SHOW_IN_ARMOR.codecOrDefault("show_in_armor").forGetter(config -> config.showBreastsInArmor.get()))
-        .apply(instance, PlayerConfig::new));
+        .apply(instance, AvatarConfig::new));
     // remember to update SyncHelloPacket.VERSION when modifying this codec if the changes result in a change
     // to the underlying packet structure
-    public static final StreamCodec<ByteBuf, PlayerConfig> STREAM_CODEC = StreamCodec.composite(
+    public static final StreamCodec<ByteBuf, AvatarConfig> STREAM_CODEC = StreamCodec.composite(
         //From EntityConfig
         GENDER.streamCodec(), config -> config.gender.get(),
         Breasts.STREAM_CODEC, config -> config.breasts,
@@ -51,11 +49,11 @@ public class PlayerConfig extends EntityConfig {
         //From PlayerConfig
         Sounds.STREAM_CODEC, config -> config.sounds,
         SHOW_IN_ARMOR.streamCodec(), config -> config.showBreastsInArmor.get(),
-        PlayerConfig::new
+        AvatarConfig::new
     );
-    public static final StreamCodec<ByteBuf, PlayerConfig> COMPACT_STREAM_CODEC = new StreamCodec<>() {
+    public static final StreamCodec<ByteBuf, AvatarConfig> COMPACT_STREAM_CODEC = new StreamCodec<>() {
         @Override
-        public PlayerConfig decode(final ByteBuf input) {
+        public AvatarConfig decode(final ByteBuf input) {
             if (input.readBoolean()) {
                 return STREAM_CODEC.decode(input);
             }
@@ -63,7 +61,7 @@ public class PlayerConfig extends EntityConfig {
         }
 
         @Override
-        public void encode(final ByteBuf output, final PlayerConfig config) {
+        public void encode(final ByteBuf output, final AvatarConfig config) {
             if (config.gender.get() == Gender.MALE) {
                 output.writeBoolean(false);
             } else {
@@ -73,7 +71,7 @@ public class PlayerConfig extends EntityConfig {
         }
     };
 
-    public static PlayerConfig createDefault() {
+    public static AvatarConfig createDefault() {
         //Note: Theoretically this can never fail so it is safe to use getOrThrow as everything in the codec has orElse(default)
         return CODEC.parse(JsonOps.INSTANCE, JsonOps.INSTANCE.emptyMap()).getOrThrow();
     }
@@ -81,7 +79,7 @@ public class PlayerConfig extends EntityConfig {
     public final ConfigValue<Boolean> showBreastsInArmor;
     public final Sounds sounds;
 
-    private PlayerConfig(Gender gender, Breasts breasts, UVs uvs, Sounds sounds, boolean showBreastsInArmor) {
+    private AvatarConfig(Gender gender, Breasts breasts, UVs uvs, Sounds sounds, boolean showBreastsInArmor) {
         this.sounds = sounds;
         this.showBreastsInArmor = SHOW_IN_ARMOR.createValueHandler(showBreastsInArmor);
         super(gender, breasts, uvs);

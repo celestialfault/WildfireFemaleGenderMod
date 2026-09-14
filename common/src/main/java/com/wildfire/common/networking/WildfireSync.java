@@ -19,7 +19,7 @@
 package com.wildfire.common.networking;
 
 import com.wildfire.common.WildfireGender;
-import com.wildfire.common.entities.players.PlayerConfig;
+import com.wildfire.common.entities.avatars.AvatarConfig;
 import com.wildfire.common.entities.players.PlayerConfigHolder;
 import com.wildfire.common.networking.packets.sync.ClientboundSyncPacket;
 import com.wildfire.common.networking.packets.sync.ServerboundSyncPacket;
@@ -56,7 +56,7 @@ public final class WildfireSync {
     /// Sync a player's configuration to another connected player
     ///
     /// @param sendTo The [`player`][ServerPlayer] to send the sync to
-    /// @param toSync The [`configuration`][PlayerConfig] for the player being synced
+    /// @param toSync The [`configuration`][AvatarConfig] for the player being synced
     public static void sendToClient(ServerPlayer sendTo, PlayerConfigHolder toSync) {
         if (WildfireNetworking.INSTANCE.canSyncToPlayer(sendTo)) {
             WildfireGender.LOGGER.debug(MARKER, "Sending profile for {} to other player {}", toSync.uuid, sendTo.getUUID());
@@ -66,7 +66,7 @@ public final class WildfireSync {
 
     /// Send the client player's configuration to the server for syncing to other players
     ///
-    /// @param plr The [`configuration`][PlayerConfig] for the client player
+    /// @param plr The [`configuration`][AvatarConfig] for the client player
     ///
     /// @apiNote Only call on the client
     public static void sendToServer(Connection connection, PlayerConfigHolder plr) {

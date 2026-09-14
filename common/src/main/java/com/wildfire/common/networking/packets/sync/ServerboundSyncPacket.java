@@ -20,7 +20,7 @@ package com.wildfire.common.networking.packets.sync;
 
 import com.wildfire.api.server.WildfireServerAPI;
 import com.wildfire.common.WildfireGender;
-import com.wildfire.common.entities.players.PlayerConfig;
+import com.wildfire.common.entities.avatars.AvatarConfig;
 import com.wildfire.common.entities.players.PlayerConfigHolder;
 import com.wildfire.common.networking.WildfireSync;
 import io.netty.buffer.ByteBuf;
@@ -29,10 +29,10 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 
-public record ServerboundSyncPacket(PlayerConfig config) implements CustomPacketPayload {
+public record ServerboundSyncPacket(AvatarConfig config) implements CustomPacketPayload {
 
     public static final Type<ServerboundSyncPacket> TYPE = WildfireGender.serverBoundPacket("sync");
-    public static final StreamCodec<ByteBuf, ServerboundSyncPacket> STREAM_CODEC = PlayerConfig.COMPACT_STREAM_CODEC.map(ServerboundSyncPacket::new, ServerboundSyncPacket::config);
+    public static final StreamCodec<ByteBuf, ServerboundSyncPacket> STREAM_CODEC = AvatarConfig.COMPACT_STREAM_CODEC.map(ServerboundSyncPacket::new, ServerboundSyncPacket::config);
 
     @Override
     public Type<? extends CustomPacketPayload> type() {

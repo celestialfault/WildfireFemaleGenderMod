@@ -26,7 +26,7 @@ import com.wildfire.common.entities.BreastState;
 import com.wildfire.common.entities.EntityConfig;
 import com.wildfire.common.entities.EntityConfigHolder;
 import com.wildfire.common.entities.armorstands.ArmorStandConfigHolder;
-import com.wildfire.common.entities.players.PlayerConfig;
+import com.wildfire.common.entities.avatars.AvatarConfig;
 import com.wildfire.api.uvs.UVLayout;
 import com.wildfire.client.physics.BreastPhysics;
 import com.wildfire.client.physics.BothBreastsPhysics;
@@ -88,10 +88,10 @@ public class GenderRenderState {
         } else if(entityConfig instanceof ArmorStandConfigHolder armorStandConfig) {
             this.hasJacketLayer = armorStandConfig.hasJacketLayer();
         } else {
-            this.hasJacketLayer = entityConfig.config() instanceof PlayerConfig;
+            this.hasJacketLayer = entityConfig.config() instanceof AvatarConfig;
         }
 
-        if (entityConfig.config() instanceof PlayerConfig playerConfig) {
+        if (entityConfig.config() instanceof AvatarConfig playerConfig) {
             this.showBreastsInArmor = playerConfig.showBreastsInArmor.get();
         } else {
             this.showBreastsInArmor = true;

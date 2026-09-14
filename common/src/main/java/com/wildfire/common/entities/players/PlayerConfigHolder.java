@@ -30,9 +30,8 @@ import com.wildfire.common.WildfireGender;
 import com.wildfire.common.WildfireLang;
 import com.wildfire.common.config.Configuration;
 import com.wildfire.common.config.value.ConfigKey;
-import com.wildfire.common.config.value.ConfigValue;
-import com.wildfire.common.entities.EntityConfigHolder;
-import com.wildfire.common.entities.Sounds;
+import com.wildfire.common.entities.avatars.AbstractAvatarConfigHolder;
+import com.wildfire.common.entities.avatars.AvatarConfig;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -42,8 +41,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.ApiStatus;
 
-// TODO split further into Avatar & Player configs
-public class PlayerConfigHolder extends EntityConfigHolder<PlayerConfig> {
+public class PlayerConfigHolder extends AbstractAvatarConfigHolder {
 
     /// `true` if this config should be synced to the connected server on the next attempt
     ///
@@ -61,11 +59,11 @@ public class PlayerConfigHolder extends EntityConfigHolder<PlayerConfig> {
     /// @see SyncStatus
     public volatile SyncStatus syncStatus = SyncStatus.UNKNOWN;
 
-    private final Configuration<PlayerConfig> cfgFile;
+    private final Configuration<AvatarConfig> cfgFile;
 
     public PlayerConfigHolder(UUID uuid) {
-        cfgFile = new Configuration<>(uuid.toString(), PlayerConfig.CODEC);
-        super(uuid, PlayerConfig.createDefault());
+        cfgFile = new Configuration<>(uuid.toString(), AvatarConfig.CODEC);
+        super(uuid, AvatarConfig.createDefault());
     }
 
     public SyncStatus getSyncStatus() {
@@ -110,7 +108,7 @@ public class PlayerConfigHolder extends EntityConfigHolder<PlayerConfig> {
         }
     }
 
-    /// Saves the settings stored in this [PlayerConfig] to the underlying [Configuration],
+    /// Saves the settings stored in this [AvatarConfig] to the underlying [Configuration],
     /// and then attempts to [`save to disk`][Configuration#save].
     public void save() {
         cfgFile.save(config);
@@ -123,7 +121,7 @@ public class PlayerConfigHolder extends EntityConfigHolder<PlayerConfig> {
     ///
     /// @return A new copy of the player's [`saved config values`][JsonObject]
     public JsonElement toJson() {
-        return PlayerConfig.CODEC.encodeStart(JsonOps.INSTANCE, config).resultOrPartial().orElseGet(JsonObject::new);
+        return AvatarConfig.CODEC.encodeStart(JsonOps.INSTANCE, config).resultOrPartial().orElseGet(JsonObject::new);
     }
 
     /// Update player data from the provided [JsonObject]
@@ -133,24 +131,14 @@ public class PlayerConfigHolder extends EntityConfigHolder<PlayerConfig> {
     ///
     /// @param serialized The [JsonObject] to merge with the existing config for this player
     public void updateFromJson(JsonElement serialized) {
-        //TODO: If not success do we want to log it failed? Can it even fail? Given the fact everything has orDefault
-        PlayerConfig.CODEC.parse(JsonOps.INSTANCE, serialized).ifSuccess(parsed -> config = parsed);
-        this.syncStatus = SyncStatus.SYNCED;
-    }
-
-    // TODO add support for mannequins?
-    public void updateFromPacket(PlayerConfig config) {
-        this.config = config;
+        super.updateFromJson(serialized);
         this.syncStatus = SyncStatus.SYNCED;
     }
 
     @Override
-    public List<String> getDebugInfo() {
-        List<String> lines = super.getDebugInfo();
-        lines.add(1, "Sync status: " + getSyncStatus());
-        lines.add("Female hurt sounds: " + sounds().hurt());
-        lines.add("Show in armor: " + showBreastsInArmor());
-        return lines;
+    public void updateFromPacket(final AvatarConfig config) {
+        super.updateFromPacket(config);
+        this.syncStatus = SyncStatus.SYNCED;
     }
 
     /// Play the relevant mod hurt sound when a player takes damage
@@ -166,13 +154,10 @@ public class PlayerConfigHolder extends EntityConfigHolder<PlayerConfig> {
         }
     }
 
-    // Bouncer methods for config values that act upon the current config instance
-
-    public final Sounds sounds() {
-        return config.sounds;
-    }
-
-    public final ConfigValue<Boolean> showBreastsInArmor() {
-        return config.showBreastsInArmor;
+    @Override
+    public List<String> getDebugInfo() {
+        List<String> lines = super.getDebugInfo();
+        lines.add(1, "Sync status: " + getSyncStatus());
+        return lines;
     }
 }
