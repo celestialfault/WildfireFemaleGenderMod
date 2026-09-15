@@ -42,7 +42,11 @@ val Project.basePublishingOps get() = modPublishExtension.publishOptions {
     val loader = stonecutterBuild.branch.project.property("loader") as String
     val modVer: String = stonecutterBuild.properties["mod_version"]
     val verTitle: String = stonecutterBuild.properties["publish.version_title"]
-    val loaderName : String = if (loader == "fabric") "Fabric" else "NeoForge"
+    val loaderName: String = when(loader) {
+        "fabric" -> "Fabric"
+        "neoforge" -> "NeoForge"
+        else -> error("Unexpected loader $loader should not be configuring mod publishing!!")
+    }
 
     displayName.set("$modVer for $loaderName $verTitle")
     //Note: The version is set automatically, but maybe we want to set it to the modVer instead?

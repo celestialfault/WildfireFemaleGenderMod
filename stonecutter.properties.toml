@@ -1,5 +1,5 @@
 # Mod Properties
-mod_version = "5.0.0-Beta.4"
+mod_version = "5.0.0-Beta.5"
 mod_license = "LGPL-3.0"
 mod_id = "female_gender_mod"
 mod_description = "Adds extra customization options to the player model by adding breasts for a more feminine appearance"
@@ -64,7 +64,7 @@ publish.modrinth = "bcOsQHnC"
     publish.max_version = "26.2"
 
 ["26.3"]
-    meta.supported_minecraft_versions = ">=26.3-alpha.10 <26.4"
+    meta.supported_minecraft_versions = ">=26.3 <26.4"
     meta.minecraft_version_range = "[26.3,26.4)"
     dependencies.fabric_api = "0.160.5"
     dependencies.neo_version = "26.3.0.0-beta"
