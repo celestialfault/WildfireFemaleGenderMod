@@ -43,7 +43,7 @@ base {
     archivesName.set(modName.replace(' ', '-'))
 }
 
-version = "${loader}-${modVersion}+mc${stonecutterBuild.current.project}"
+version = "${modVersion}+mc${stonecutterBuild.current.project}-${loader}"
 
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(javaVersion))
@@ -131,7 +131,8 @@ tasks.named<ProcessResources>("processResources") {
     val expandProps = mapOf(
         "version" to modVersion,
         "minecraft_version" to stonecutterBuild.current.version,
-        "major_minecraft_version" to stonecutterBuild.current.project,
+        "minecraft_version_range" to stonecutterBuild.properties["meta.minecraft_version_range"],
+        "supported_minecraft_versions" to stonecutterBuild.properties["meta.supported_minecraft_versions"],
         "fabric_version" to stonecutterBuild.properties["dependencies.fabric_api"],
         "fabric_loader_version" to stonecutterBuild.properties["dependencies.fabric_loader_version"],
         "mod_name" to modName,
@@ -144,8 +145,9 @@ tasks.named<ProcessResources>("processResources") {
         "authors_list" to authors.asTomlList(),
         "contributors" to contributors.asListedElements(),
         "contributors_list" to contributors.asTomlList(),
-        "neoforge_version" to stonecutterBuild.properties["dependencies.min_neo_version"],
-        "java_version" to javaVersion
+        // may be omitted during snapshot cycles
+        "neoforge_version" to (stonecutterBuild.properties.getOrNull("dependencies.min_neo_version") ?: "${stonecutterBuild.current.version}.0-beta"),
+        "java_version" to javaVersion,
     )
     inputs.properties(expandProps)
 
@@ -173,26 +175,5 @@ listOf("apiElements", "runtimeElements", "sourcesElements", "javadocElements").f
         attributes {
             attribute(loaderAttribute, loader)
         }
-    }
-}
-
-stonecutterBuild.replacements {
-    string(stonecutterBuild.current.parsed >= "26.2") {
-        replace("setScreen(", "gui.setScreen(")
-        replace("getToastManager(", "gui.toastManager(")
-        replace("getTabList(", "hud.getTabList(")
-        replace(".screen ", ".gui.screen() ")
-        replace("EntityType", "EntityTypes")
-    }
-    string(stonecutterBuild.current.parsed >= "26.2", "color_as_rgb") {
-        replace("TextColor.fromRgb(0xFFAA00)", "TextColor.GOLD")
-        replace("TextColor.fromRgb(0xFF55FF)", "TextColor.LIGHT_PURPLE")
-        replace("TextColor.fromRgb(0xFFFFFF)", "TextColor.WHITE")
-    }
-    regex(stonecutterBuild.current.parsed >= "26.2", "!named_text_color") {
-        replace("withStyle\\(net\\.minecraft\\.ChatFormatting\\.([A-Z_]+)", "withColor(TextColor.$1",
-            "withColor\\(TextColor\\.([A-Z_]+)", "withStyle(net.minecraft.ChatFormatting.$1")
-        replace("net\\.minecraft\\.ChatFormatting\\.([A-Z_]+)", "TextColor.$1",
-            "TextColor\\.([A-Z_]+)", "net.minecraft.ChatFormatting.$1")
     }
 }

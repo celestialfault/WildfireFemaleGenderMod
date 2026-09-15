@@ -37,7 +37,7 @@ neoForge {
         configureEach {
             systemProperty("neoforge.enabledGameTestNamespaces", modId)
             ideName = "NeoForge ${name.replaceFirstChar(Char::titlecase)} ($path)"
-            gameDirectory = file("../../run")
+            gameDirectory = sc.branch.project.layout.projectDirectory.dir("run")
 
             val forceAnsi = providers.gradleProperty("forge_force_ansi")
             if (forceAnsi.isPresent) {
@@ -76,6 +76,20 @@ neoForge {
 
         register("server") {
             server()
+        }
+    }
+}
+
+repositories {
+    val snapshotPr: Int? = sc.properties.getOrNull("dependencies.neoforge_snapshot_pr")
+    if (snapshotPr != null) {
+        maven {
+            name = "Maven for PR #${snapshotPr}"
+            url = uri("https://prmaven.neoforged.net/NeoForge/pr${snapshotPr}")
+            content {
+                includeModule("net.neoforged", "neoforge")
+                includeModule("net.neoforged", "testframework")
+            }
         }
     }
 }

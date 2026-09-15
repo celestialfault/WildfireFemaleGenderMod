@@ -1,10 +1,12 @@
 import com.wildfire.ATtoCTConverter
 import com.wildfire.OptimizePng
 import com.wildfire.ValidateJson
+import dev.kikugie.stonecutter.build.config.ReplacementContainer
+import dev.kikugie.stonecutter.data.tree.ProjectNode
 
 plugins {
     id("dev.kikugie.stonecutter")
-    id("net.neoforged.moddev") version "2.0.143" apply false
+    id("net.neoforged.moddev") version "2.0.147" apply false
     id("net.fabricmc.fabric-loom") version "1.17-SNAPSHOT" apply false
     id("idea")
 }
@@ -17,7 +19,7 @@ idea {
     }
 }
 
-stonecutter active "26.2"
+stonecutter active "26.3"
 
 tasks.named<Wrapper>("wrapper") {
     //Define wrapper values here so as to not have to always do so when updating gradlew.properties
@@ -73,8 +75,49 @@ tasks.register<ATtoCTConverter>("convertATtoCT") {
     ctPath = layout.projectDirectory.file("fabric/src/main/resources/${stonecutter.properties["mod_id"] as String}.classtweaker")
 }
 
+val loaderOnly: ProjectNode.() -> Boolean = {
+    branch.id == "fabric" || branch.id == "neoforge"
+}
+
 tasks.register("publishMods") {
     description = "Publish mod to both platforms, for both loaders, and all versions"
     group = "publishing"
-    dependsOn(stonecutter.tasks.named("publishMods") { branch.id == "fabric" || branch.id == "neoforge" })
+    dependsOn(stonecutter.tasks.named("publishMods", loaderOnly))
+}
+
+stonecutter tasks {
+    order("publishModrinth", filter = loaderOnly)
+    order("publishCurseforge", filter = loaderOnly)
+}
+
+stonecutter parameters {
+    for((name, value) in project.replacements) {
+        if(value.strings.isNotEmpty()) {
+            val config = Action<ReplacementContainer.StringReplacementSpec> {
+                direction = eval(current.version, value.`when`)
+                for((old, new) in value.strings) {
+                    replace(old, new)
+                }
+            }
+
+            when(value.alwaysActive) {
+                true -> replacements.string(action = config)
+                false -> replacements.string(name, action = config)
+            }
+        }
+
+        if(value.regex.isNotEmpty()) {
+            val config = Action<ReplacementContainer.RegexReplacementSpec> {
+                direction = eval(current.version, value.`when`)
+                for((forward, backward) in value.regex) {
+                    replace(forward.pattern, forward.replacement, backward.pattern, backward.replacement)
+                }
+            }
+
+            when(value.alwaysActive) {
+                true -> replacements.regex(action = config)
+                false -> replacements.regex(name, action = config)
+            }
+        }
+    }
 }
