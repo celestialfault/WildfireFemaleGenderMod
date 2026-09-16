@@ -133,10 +133,15 @@ public final class WildfireClientEventHandler {
         }
     }
 
-    /// Remove (non-player) entities from the client cache when they're unloaded
+    /// Remove (non-avatar) entities from the client cache when they're unloaded
     public static void onEntityUnload(Entity entity, Level world) {
-        // players are intentionally not cleared here, only when we disconnect or when they expire normally
+        // players and mannequins are intentionally not unloaded outside of disconnecting or expiring as their data relies
+        // on being loaded through external means (e.g. a sync packet, cloud sync, or a file on disk),
+        // which we may not always be able to rely on being resent (especially in the case of third-party servers),
+        // or would otherwise like to avoid loading from again where possible (in the case of disk reads)
         if(entity instanceof ArmorStand armorStand) {
+            // armor stands however can safely reload their data later if they're loaded again without relying
+            // on any external means, as their data is stored in their equipped chestplate item
             WildfireClientAPI.armorStands().invalidate(armorStand);
         }
     }
@@ -175,6 +180,7 @@ public final class WildfireClientEventHandler {
     /// Clears all caches when the client player disconnects from a server/closes a singleplayer world
     public static void clientDisconnect() {
         WildfireClientAPI.players().invalidateAll();
+        WildfireClientAPI.mannequins().invalidateAll();
         WildfireClientAPI.armorStands().invalidateAll();
     }
 
