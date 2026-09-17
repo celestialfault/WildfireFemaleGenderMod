@@ -23,19 +23,24 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.context.CommandContext;
+import com.wildfire.api.EntityCache;
+import com.wildfire.api.client.WildfireClientAPI;
+import com.wildfire.api.impl.EntityCacheImpl;
+import com.wildfire.api.server.WildfireServerAPI;
+import com.wildfire.client.config.ClientConfig;
 import com.wildfire.client.gui.screen.WardrobeBrowserScreen;
 import com.wildfire.client.gui.screen.WildfireFirstTimeSetupScreen;
-import com.wildfire.common.WildfireGender;
 import com.wildfire.common.WildfireLang;
-import com.wildfire.client.config.ClientConfig;
 import com.wildfire.common.config.enums.SyncVerbosity;
-import com.wildfire.common.entitydata.BreastDataComponent;
-import com.wildfire.common.entitydata.EntityConfigHolder;
-import com.wildfire.common.entitydata.PlayerConfigHolder;
+import com.wildfire.common.entities.BreastDataComponent;
+import com.wildfire.common.entities.EntityConfig;
+import com.wildfire.common.entities.EntityConfigHolder;
+import com.wildfire.common.entities.players.PlayerConfigHolder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import com.wildfire.common.entities.players.SyncStatus;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.commands.SharedSuggestionProvider;
@@ -50,6 +55,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.permissions.Permissions;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -67,7 +73,7 @@ public class WildfireCommand {
         WildfireLang.MISC_GM.translateColored(TextColor.WHITE)
     ));
 
-    public static <SOURCE extends SharedSuggestionProvider> void register(CommandDispatcher<SOURCE> dispatcher, ClientCommandHelper<SOURCE> helper) {
+    public static <SOURCE extends SharedSuggestionProvider> void register(final CommandDispatcher<SOURCE> dispatcher, final ClientCommandHelper<SOURCE> helper) {
         var debug = helper.literalArgumentBuilder("debug")
             .executes(ctx -> {
                 sendHelp(ctx, helper, WildfireLang.DEBUG_COMMAND,
@@ -100,19 +106,22 @@ public class WildfireCommand {
             .then(helper.literalArgumentBuilder("cache")
                 .then(helper.argument("allPlayers", BoolArgumentType.bool())
                     .executes(ctx -> getUsers(ctx, helper))
-                    .then(helper.argument("showEntities", BoolArgumentType.bool())
+                    .then(helper.argument("showArmorStands", BoolArgumentType.bool())
                         .executes(ctx -> getUsers(ctx, helper))))
                 .executes(ctx -> getUsers(ctx, helper)))
             .then(helper.literalArgumentBuilder("syncverbosity")
                 .then(helper.argument("level", new SyncVerbosity.SyncVerbosityArgumentType())
                     .executes(ctx -> setLogLevel(ctx, helper))));
 
+        // TODO split these out to a separate /fgmserver debug command
         if (Minecraft.getInstance().isLocalServer()) {
             debug.then(helper.literalArgumentBuilder("trim")
                     .then(helper.argument("glint", BoolArgumentType.bool())
                         .executes(ctx -> equipTrimmedChestplate(ctx, helper)))
                     .executes(ctx -> equipTrimmedChestplate(ctx, helper)))
                 .then(helper.literalArgumentBuilder("armorstand").executes(ctx -> spawnArmorStand(ctx, helper)));
+            debug.then(helper.literalArgumentBuilder("spcache")
+                .executes(ctx -> getSingleplayerUsers(ctx, helper)));
         }
 
         var root = dispatcher.register(helper.literalArgumentBuilder("femalegender")
@@ -140,7 +149,12 @@ public class WildfireCommand {
 
     }
 
-    public static <SOURCE extends SharedSuggestionProvider> void sendHelp(CommandContext<SOURCE> ctx, ClientCommandHelper<SOURCE> helper, WildfireLang header, WildfireLang... usageToDescription) {
+    public static <SOURCE extends SharedSuggestionProvider> void sendHelp(
+        CommandContext<SOURCE> ctx,
+        ClientCommandHelper<SOURCE> helper,
+        WildfireLang header,
+        WildfireLang... usageToDescription
+    ) {
         List<Component> lines = new ArrayList<>();
         lines.add(WildfireLang.GENERIC_SPACE.translate(COMMAND_PREFIX, header.translate().withStyle(style -> style.withUnderlined(true))));
 
@@ -160,9 +174,7 @@ public class WildfireCommand {
         // the .schedule() is necessary as otherwise the chat screen will simply immediately close the opened screen
         helper.getMinecraft(ctx.getSource()).schedule(() -> {
             LocalPlayer player = helper.getPlayer(ctx.getSource());
-            if (player != null) {
-                WardrobeBrowserScreen.open(client, player);
-            }
+            WardrobeBrowserScreen.open(client, player);
         });
         return Command.SINGLE_SUCCESS;
     }
@@ -197,10 +209,10 @@ public class WildfireCommand {
 
     private static <SOURCE extends SharedSuggestionProvider> int getUsers(CommandContext<SOURCE> ctx, ClientCommandHelper<SOURCE> helper) {
         boolean allPlayers = getOrDefault(ctx, "allPlayers", false, Boolean.class);
-        boolean showEntities = getOrDefault(ctx, "showEntities", false, Boolean.class);
+        boolean showArmorStands = getOrDefault(ctx, "showArmorStands", false, Boolean.class);
 
         Level level = helper.getLevel(ctx.getSource());
-        List<Component> players = dump(WildfireGender.CACHE, level, !allPlayers);
+        List<Component> players = dump(WildfireClientAPI.players(), level, !allPlayers);
         if (!players.isEmpty()) {
             send(ctx, helper, WildfireLang.COMMAND_SYNCED_PLAYERS.translate(players.size()));
             for (Component line : players) {
@@ -208,8 +220,8 @@ public class WildfireCommand {
             }
         }
 
-        if (showEntities) {
-            List<Component> entities = dump(EntityConfigHolder.CACHE, level, false);
+        if (showArmorStands) {
+            List<Component> entities = dump(WildfireClientAPI.armorStands(), level, false);
             if (!entities.isEmpty()) {
                 send(ctx, helper, WildfireLang.COMMAND_ENTITIES.translate(entities.size()));
                 for (Component line : entities) {
@@ -221,15 +233,28 @@ public class WildfireCommand {
         return Command.SINGLE_SUCCESS;
     }
 
-    private static List<Component> dump(Cache<UUID, ? extends EntityConfigHolder<?>> cache, Level world, boolean ignoreEmptyConfig) {
-        List<Component> lines = new ArrayList<>();
-        for (var entry : cache.asMap().entrySet()) {
-            UUID uuid = entry.getKey();
-            var config = entry.getValue();
-            if (config == null) {
-                continue;
+    private static <SOURCE extends SharedSuggestionProvider> int getSingleplayerUsers(CommandContext<SOURCE> ctx, ClientCommandHelper<SOURCE> helper) {
+        Level level = helper.getLevel(ctx.getSource());
+        List<Component> players = dump(WildfireServerAPI.players(), level, true);
+        if (!players.isEmpty()) {
+            send(ctx, helper, WildfireLang.COMMAND_SYNCED_PLAYERS.translate(players.size()));
+            for (Component line : players) {
+                send(ctx, helper, line);
             }
-            if (config instanceof PlayerConfigHolder playerConfig && playerConfig.getSyncStatus() == PlayerConfigHolder.SyncStatus.UNKNOWN && ignoreEmptyConfig) {
+        }
+
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private static <HOLDER extends EntityConfigHolder<? extends EntityConfig>> List<Component> dump(
+        EntityCache<HOLDER, ?> cache, Level world, boolean ignoreEmptyConfig
+    ) {
+        Cache<UUID, HOLDER> underlying = ((EntityCacheImpl<HOLDER, ?>) cache).cache();
+        List<Component> lines = new ArrayList<>();
+        for (var entry : underlying.asMap().entrySet()) {
+            UUID uuid = entry.getKey();
+            HOLDER config = entry.getValue();
+            if (config instanceof PlayerConfigHolder playerConfig && playerConfig.getSyncStatus() == SyncStatus.UNKNOWN && ignoreEmptyConfig) {
                 continue;
             }
             Entity entity = world.getEntity(uuid);
@@ -246,8 +271,9 @@ public class WildfireCommand {
     }
 
     private static <SOURCE extends SharedSuggestionProvider> int invalidateCache(CommandContext<SOURCE> ctx, ClientCommandHelper<SOURCE> helper) {
-        WildfireGender.CACHE.invalidateAll();
-        EntityConfigHolder.CACHE.invalidateAll();
+        WildfireClientAPI.players().invalidateAll();
+        WildfireClientAPI.mannequins().invalidateAll();
+        WildfireClientAPI.armorStands().invalidateAll();
 
         send(ctx, helper, WildfireLang.COMMAND_INVALIDATE_CACHE_SUCCESS.translate());
         return Command.SINGLE_SUCCESS;
@@ -285,7 +311,7 @@ public class WildfireCommand {
         var world = player.level();
 
         var item = new ItemStack(Items.IRON_CHESTPLATE);
-        var config = WildfireGender.getOrAddPlayerById(player.getUUID());
+        var config = WildfireServerAPI.players().getOrCreate(player);
         var component = BreastDataComponent.fromPlayer(player, config);
         if (component == null) {
             helper.sendFailure(ctx.getSource(), WildfireLang.COMMAND_ARMOR_STAND_NO_COMPONENT.translateColored(TextColor.RED));

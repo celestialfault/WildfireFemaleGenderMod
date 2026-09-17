@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.wildfire.common.entitydata;
+package com.wildfire.common.entities;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -40,8 +40,14 @@ import org.joml.Vector3fc;
 ///                 Negative values renders the breasts lower down, while positive values renders them higher up
 /// @param zOffset  How far back the player's breasts should be rendered, also referred to as Depth in the UI. A value between `0F` and `1F`
 /// @param cleavage How much rotation outward there should be on each of the player's breasts.  A value between `0F` and `0.1F`
-public record Breasts(ConfigValue<Float> xOffset, ConfigValue<Float> yOffset, ConfigValue<Float> zOffset, ConfigValue<Float> bustSize, ConfigValue<Float> cleavage,
-                      Physics physics) {
+public record Breasts(
+    ConfigValue<Float> xOffset,
+    ConfigValue<Float> yOffset,
+    ConfigValue<Float> zOffset,
+    ConfigValue<Float> bustSize,
+    ConfigValue<Float> cleavage,
+    Physics physics
+) {
 
     public static final ConfigKey<Float> BREASTS_OFFSET_X = ConfigKey.create(0.0F, -1, 1);
     public static final ConfigKey<Float> BREASTS_OFFSET_Y = ConfigKey.create(0.0F, -1, 1);
@@ -120,7 +126,12 @@ public record Breasts(ConfigValue<Float> xOffset, ConfigValue<Float> yOffset, Co
 
     /// @param uniboob  Determines if breast physics should be independent of each other; also referred to as Dual-Physics in the UI.
     ///                 `false` if physics should be independent on each breast, `true` if both should use the same physics
-    public record Physics(ConfigValue<Boolean> enabled, ConfigValue<Boolean> uniboob, ConfigValue<Float> bounceMultiplier, ConfigValue<Float> floppiness) {
+    public record Physics(
+        ConfigValue<Boolean> enabled,
+        ConfigValue<Boolean> uniboob,
+        ConfigValue<Float> bounceMultiplier,
+        ConfigValue<Float> floppiness
+    ) {
 
         private static final ConfigKey<Boolean> BREAST_PHYSICS = ConfigKey.DEFAULT_TRUE;
         private static final ConfigKey<Boolean> BREASTS_UNIBOOB = ConfigKey.DEFAULT_TRUE;

@@ -20,7 +20,7 @@ package com.wildfire.client.physics;
 
 import com.wildfire.api.IGenderArmor;
 import com.wildfire.client.config.ClientConfig;
-import com.wildfire.common.entitydata.EntityConfigHolder;
+import com.wildfire.common.entities.EntityConfigHolder;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;

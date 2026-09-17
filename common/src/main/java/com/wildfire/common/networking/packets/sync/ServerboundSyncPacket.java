@@ -18,35 +18,30 @@
 
 package com.wildfire.common.networking.packets.sync;
 
+import com.wildfire.api.server.WildfireServerAPI;
 import com.wildfire.common.WildfireGender;
-import com.wildfire.common.entitydata.PlayerConfig;
-import com.wildfire.common.entitydata.PlayerConfigHolder;
+import com.wildfire.common.entities.avatars.AvatarConfig;
+import com.wildfire.common.entities.players.PlayerConfigHolder;
 import com.wildfire.common.networking.WildfireSync;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 
-public record ServerboundSyncPacket(PlayerConfig config) implements CustomPacketPayload {
+public record ServerboundSyncPacket(AvatarConfig config) implements CustomPacketPayload {
 
     public static final Type<ServerboundSyncPacket> TYPE = WildfireGender.serverBoundPacket("sync");
-    public static final StreamCodec<ByteBuf, ServerboundSyncPacket> STREAM_CODEC = PlayerConfig.COMPACT_STREAM_CODEC.map(ServerboundSyncPacket::new, ServerboundSyncPacket::config);
+    public static final StreamCodec<ByteBuf, ServerboundSyncPacket> STREAM_CODEC = AvatarConfig.COMPACT_STREAM_CODEC.map(ServerboundSyncPacket::new, ServerboundSyncPacket::config);
 
     @Override
     public Type<? extends CustomPacketPayload> type() {
         return TYPE;
     }
 
-    public void handle(MinecraftServer server, ServerPlayer player) {
+    public void handle(ServerPlayer player) {
         WildfireGender.LOGGER.debug(WildfireSync.MARKER, "Received player data from player {}", player);
-        PlayerConfigHolder plr = WildfireGender.getOrAddPlayerById(player.getUUID());
-        if (!server.isSingleplayerOwner(player.nameAndId())) {
-            //Note: We skip bothering to update the config if the server is an integrated server hosted by the player who sent it
-            // In that case the actual backing config will have already been updated because of it being stored in a static field
-            // which has the side effect of reaching across logical sides and updating both the server and client at once.
-            plr.updateFromPacket(config, false);
-        }
+        PlayerConfigHolder plr = WildfireServerAPI.players().getOrCreate(player);
+        plr.updateFromPacket(config);
         WildfireSync.sendToAllClients(player, plr);
     }
 }

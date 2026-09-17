@@ -16,15 +16,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.wildfire.common.entitydata;
+package com.wildfire.common.entities;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.wildfire.api.WildfireAPI;
-import com.wildfire.common.WildfireGender;
+import com.wildfire.api.server.WildfireServerAPI;import com.wildfire.common.WildfireGender;
 import com.wildfire.common.config.value.ConfigKey;
 import com.wildfire.common.config.validator.ConfigRange;
+import com.wildfire.common.entities.players.PlayerConfigHolder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
@@ -107,7 +108,7 @@ public record BreastDataComponent(float breastSize, float cleavage, Vector3fc of
     }
 
     public static void writeToStack(Player player, ItemStack stack) {
-        PlayerConfigHolder playerConfig = WildfireGender.getPlayerById(player.getUUID());
+        PlayerConfigHolder playerConfig = WildfireServerAPI.players().get(player);
         if(playerConfig == null) {
             // while we shouldn't have our tag on the stack still, we're still checking to catch any armor
             // that may still have the tag from older versions, or from potential cross-mod interactions

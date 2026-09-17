@@ -17,6 +17,6 @@
  */
 
 @NullMarked
-package com.wildfire.common.entitydata;
+package com.wildfire.common.entities;
 
 import org.jspecify.annotations.NullMarked;

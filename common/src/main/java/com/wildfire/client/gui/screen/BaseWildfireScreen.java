@@ -18,11 +18,12 @@
 
 package com.wildfire.client.gui.screen;
 
+import com.wildfire.api.client.WildfireClientAPI;
 import com.wildfire.client.gui.IFancyFontRenderer;
 import com.wildfire.client.gui.WildfireButton;
 import com.wildfire.client.gui.WildfireSlider;
 import com.wildfire.common.WildfireGender;
-import com.wildfire.common.entitydata.PlayerConfigHolder;
+import com.wildfire.common.entities.players.PlayerConfigHolder;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
@@ -66,7 +67,7 @@ public abstract class BaseWildfireScreen extends Screen implements IFancyFontRen
     }
 
     public @Nullable PlayerConfigHolder getPlayer() {
-        return WildfireGender.getPlayerById(this.playerUUID);
+        return WildfireClientAPI.players().get(this.playerUUID);
     }
 
     protected void renderPlayerInFrame(GuiGraphicsExtractor graphics, int xP, int yP, int mouseX, int mouseY) {

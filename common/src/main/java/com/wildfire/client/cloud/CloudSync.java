@@ -35,8 +35,8 @@ import com.wildfire.common.LoaderAgnostics;
 import com.wildfire.common.WildfireGender;
 import com.wildfire.common.WildfireLang;
 import com.wildfire.common.config.enums.SyncVerbosity;
-import com.wildfire.common.entitydata.PlayerConfig;
-import com.wildfire.common.entitydata.PlayerConfigHolder;
+import com.wildfire.common.entities.avatars.AvatarConfig;
+import com.wildfire.common.entities.players.PlayerConfigHolder;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.math.BigInteger;
@@ -307,7 +307,7 @@ public final class CloudSync {
         return CompletableFuture.runAsync(() -> {
             var token = getAuthToken();
             var url = URI.create(getCloudServer() + "/player/" + config.uuid);
-            var json = PlayerConfig.CODEC.encodeStart(JsonOps.INSTANCE, config.config()).resultOrPartial().orElseGet(JsonObject::new).toString();
+            var json = AvatarConfig.CODEC.encodeStart(JsonOps.INSTANCE, config.config()).resultOrPartial().orElseGet(JsonObject::new).toString();
 
             SyncLog.add(WildfireLang.SYNC_LOG_START);
 

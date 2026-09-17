@@ -19,16 +19,19 @@
 package com.wildfire.client.gui;
 
 import com.google.common.base.Suppliers;
-import com.wildfire.common.WildfireGender;
-import com.wildfire.client.cloud.CloudSync;
+import com.google.gson.JsonObject;
 import com.wildfire.api.Gender;
+import com.wildfire.api.client.WildfireClientAPI;
+import com.wildfire.client.cloud.CloudSync;
 import com.wildfire.client.contributors.Contributor.Role;
 import com.wildfire.client.contributors.Contributors;
-import com.wildfire.common.entitydata.EntityConfigHolder;
-import com.wildfire.common.entitydata.PlayerConfig;
-import com.wildfire.common.entitydata.PlayerConfigHolder;
+import com.wildfire.common.WildfireGender;
+import com.wildfire.common.entities.avatars.AbstractAvatarConfigHolder;
+import com.wildfire.common.entities.avatars.AvatarConfig;
+import com.wildfire.common.entities.avatars.MannequinConfigHolder;
+import java.util.Objects;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
@@ -41,7 +44,7 @@ import org.jspecify.annotations.Nullable;
 
 public class FakeGUIPlayer {
 
-    public static final Consumer<PlayerConfig> FEMALE_CHANGES = config -> {
+    public static final Consumer<AvatarConfig> FEMALE_CHANGES = config -> {
         //The settings that need to be changed away from default
         config.gender.update(Gender.FEMALE);
         config.breasts.yOffset().update(-0.2F);
@@ -54,14 +57,14 @@ public class FakeGUIPlayer {
     private final Supplier<GUIMannequin> entity;
     private final @Nullable Component description;
 
-    public FakeGUIPlayer(String name, UUID uuid, @Nullable Component description, @Nullable Consumer<PlayerConfig> defaultGenderSettings) {
+    public FakeGUIPlayer(String name, UUID uuid, @Nullable Component description, @Nullable Consumer<AvatarConfig> defaultGenderSettings) {
         this.name = name;
         this.uuid = uuid;
         this.entity = createPlayerSupplier(this.uuid, this.name, defaultGenderSettings);
         this.description = description;
     }
 
-    public FakeGUIPlayer(String name, UUID uuid, @Nullable Consumer<PlayerConfig> defaultGenderSettings) {
+    public FakeGUIPlayer(String name, UUID uuid, @Nullable Consumer<AvatarConfig> defaultGenderSettings) {
         this(name, uuid, null, defaultGenderSettings);
     }
 
@@ -94,11 +97,12 @@ public class FakeGUIPlayer {
         GUIMannequin entity = this.entity.get();
         entity.applyLoadedSkin();
         entity.tickCount++; // This allows for playing the breathing animation
-        EntityConfigHolder.getEntity(entity).breastPhysics().tick(entity);
+        var cfg = Objects.requireNonNull(WildfireClientAPI.getConfig(entity));
+        cfg.breastPhysics().tick(entity);
     }
 
     @SuppressWarnings("NullableProblems")
-    private static Supplier<GUIMannequin> createPlayerSupplier(final UUID uuid, final String name, final @Nullable Consumer<PlayerConfig> defaultGenderData) {
+    private static Supplier<GUIMannequin> createPlayerSupplier(final UUID uuid, final String name, final @Nullable Consumer<AvatarConfig> defaultGenderData) {
         return Suppliers.memoize(() -> {
             var client = Minecraft.getInstance();
             assert client.level != null;
@@ -108,32 +112,35 @@ public class FakeGUIPlayer {
             // As it is possible a mod adds other names to render upside down, so we might be as compatible as possible
             entity.setCustomName(Component.literal(name));
 
-            PlayerConfigHolder config;
-            try {
-                // while we don't have proper support for mannequins right now, we can most certainly fake it
-                config = (PlayerConfigHolder) EntityConfigHolder.CACHE.get(entity.getUUID(), () -> new PlayerConfigHolder(entity.getUUID()));
-            } catch(ExecutionException | ClassCastException _) {
-                return entity;
-            }
-
+            MannequinConfigHolder config = WildfireClientAPI.mannequins().getOrCreate(entity);
             config.forceSimplifiedPhysics = true;
 
-            var cached = WildfireGender.getPlayerById(uuid);
+            var cached = WildfireClientAPI.players().get(uuid);
             if(cached == null) {
-                CloudSync.getProfile(uuid, true).thenAccept(json -> {
-                    if(json != null) {
-                        config.updateFromJson(json);
-                    } else if(defaultGenderData != null) {
-                        //Apply changes compared to the default configs
-                        defaultGenderData.accept(config.config());
-                    }
-                });
+                CompletableFuture.runAsync(() -> loadFromCloud(uuid, config, defaultGenderData));
             } else {
                 config.updateFromJson(cached.toJson());
             }
 
             return entity;
         });
+    }
+
+    private static void loadFromCloud(final UUID uuid, final AbstractAvatarConfigHolder holder, final @Nullable Consumer<AvatarConfig> defaults) {
+        JsonObject profile;
+        try {
+            profile = CloudSync.getProfile(uuid, true).join();
+        } catch(Exception e) {
+            WildfireGender.LOGGER.warn("Failed to load contributor data from cloud sync", e);
+            profile = null;
+        }
+
+        if(profile != null) {
+            holder.updateFromJson(profile);
+        } else if(defaults != null) {
+            //Apply changes compared to the default configs
+            defaults.accept(holder.config());
+        }
     }
 
     private static class GUIMannequin extends ClientMannequin {

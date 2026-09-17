@@ -22,10 +22,11 @@ import com.wildfire.api.IGenderArmor;
 import com.wildfire.client.WildfireClientHelper;
 import com.wildfire.client.WildfireGenderClient;
 import com.wildfire.api.Gender;
-import com.wildfire.common.entitydata.BreastState;
-import com.wildfire.common.entitydata.EntityConfig;
-import com.wildfire.common.entitydata.EntityConfigHolder;
-import com.wildfire.common.entitydata.PlayerConfig;
+import com.wildfire.common.entities.BreastState;
+import com.wildfire.common.entities.EntityConfig;
+import com.wildfire.common.entities.EntityConfigHolder;
+import com.wildfire.common.entities.armorstands.ArmorStandConfigHolder;
+import com.wildfire.common.entities.avatars.AvatarConfig;
 import com.wildfire.api.uvs.UVLayout;
 import com.wildfire.client.physics.BreastPhysics;
 import com.wildfire.client.physics.BothBreastsPhysics;
@@ -82,13 +83,15 @@ public class GenderRenderState {
         this.bounceMultiplier = entityConfig.breasts().physics().bounceMultiplier().get();
         this.floppyMultiplier = entityConfig.breasts().physics().floppiness().get();
 
-        if (entityState instanceof AvatarRenderState avatarState) {
+        if(entityState instanceof AvatarRenderState avatarState) {
             this.hasJacketLayer = avatarState.showJacket;
+        } else if(entityConfig instanceof ArmorStandConfigHolder armorStandConfig) {
+            this.hasJacketLayer = armorStandConfig.hasJacketLayer();
         } else {
-            this.hasJacketLayer = entityConfig.config() instanceof PlayerConfig || entityConfig.hasJacketLayer();
+            this.hasJacketLayer = entityConfig.config() instanceof AvatarConfig;
         }
 
-        if (entityConfig.config() instanceof PlayerConfig playerConfig) {
+        if (entityConfig.config() instanceof AvatarConfig playerConfig) {
             this.showBreastsInArmor = playerConfig.showBreastsInArmor.get();
         } else {
             this.showBreastsInArmor = true;

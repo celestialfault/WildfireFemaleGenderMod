@@ -126,7 +126,7 @@ public interface IGenderArmor {
     /// @implNote Defaults to returning `true` if this armor [`covers the breasts`][#coversBreasts()]
     /// 		   (and [`doesn't hide them`][#alwaysHidesBreasts()]), and [`has complete physics resistance`][#physicsResistance()].
     ///
-    /// @see com.wildfire.common.entitydata.BreastDataComponent
+    /// @see com.wildfire.common.entities.BreastDataComponent
     default boolean armorStandsCopySettings() {
         return !alwaysHidesBreasts() && coversBreasts() && physicsResistance() == 1f;
     }

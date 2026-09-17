@@ -16,30 +16,27 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.wildfire.api;
+package com.wildfire.common.entities.armorstands;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import java.util.stream.IntStream;
-import net.minecraft.util.Util;
-import org.joml.Vector2i;
-import org.joml.Vector2ic;
+import com.wildfire.api.Gender;
+import com.wildfire.common.config.UVs;
+import com.wildfire.common.entities.Breasts;
+import com.wildfire.common.entities.EntityConfig;
 
-/// Common API methods for interacting with the Female Gender Mod
-public final class WildfireAPI {
-    private WildfireAPI() {
+public class ArmorStandConfig extends EntityConfig {
+    public static final Codec<ArmorStandConfig> CODEC = RecordCodecBuilder.create(instance -> codecGroup(instance)
+        .apply(instance, ArmorStandConfig::new)
+    );
+
+    protected ArmorStandConfig(final Gender gender, final Breasts breasts, final UVs uvs) {
+        super(gender, breasts, uvs);
     }
 
-    /// Mod ID for the mod
-    public static final String MODID = "female_gender_mod";
-
-    private static final Codec<Vector2ic> VEC2I_LEGACY_CODEC = RecordCodecBuilder.create(instance -> instance.group(
-        Codec.INT.fieldOf("x").forGetter(Vector2ic::x),
-        Codec.INT.fieldOf("y").forGetter(Vector2ic::y)
-    ).apply(instance, Vector2i::new));
-
-    /* package-private */ static final Codec<Vector2ic> VECTOR_2I_CODEC = Codec.withAlternative(Codec.INT_STREAM.comapFlatMap(
-        stream -> Util.fixedSize(stream, 2).map(Vector2i::new),
-        vec2i -> IntStream.of(vec2i.x(), vec2i.y())
-    ), VEC2I_LEGACY_CODEC);
+    public static ArmorStandConfig createDefault() {
+        //Note: Theoretically this can never fail so it is safe to use getOrThrow as everything in the codec has orElse(default)
+        return CODEC.parse(JsonOps.INSTANCE, JsonOps.INSTANCE.emptyMap()).getOrThrow();
+    }
 }

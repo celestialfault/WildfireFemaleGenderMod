@@ -16,41 +16,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.wildfire.common.entitydata;
+package com.wildfire.common.entities;
 
 import com.mojang.datafixers.Products.P3;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.mojang.serialization.codecs.RecordCodecBuilder.Instance;
 import com.mojang.serialization.codecs.RecordCodecBuilder.Mu;
 import com.wildfire.api.Gender;
+import com.wildfire.common.config.UVs;
 import com.wildfire.common.config.value.ConfigKey;
 import com.wildfire.common.config.value.ConfigValue;
-import com.wildfire.common.config.UVs;
-import net.minecraft.world.entity.Avatar;
-import net.minecraft.world.entity.LivingEntity;
+import com.wildfire.common.entities.avatars.AvatarConfig;
 import net.minecraft.world.entity.decoration.ArmorStand;
 
-/// A stripped down version of a [`player's config`][PlayerConfig], intended for use with non-player entities.
+/// A stripped down version of a [`player's config`][AvatarConfig], intended for use with non-player entities.
 ///
 /// Unlike players, this has very minimal configuration support.
 ///
-/// Currently only used for [`armor stands`][ArmorStand], and as a superclass for [`player configs`][PlayerConfig].
-public class EntityConfig  {
+/// Currently only used for [`armor stands`][ArmorStand], and as a superclass for [`player configs`][AvatarConfig].
+public abstract class EntityConfig  {
 
     public static final ConfigKey<Gender> GENDER = new ConfigKey<>(Gender.MALE, Gender.CODEC_OR_LEGACY, Gender.STREAM_CODEC);
-
-    /// @return `true` if the mod has support for the provided entity
-    public static boolean isSupportedEntity(LivingEntity entity) {
-        // TODO mannequins are not properly supported right now; this method only returns true to indicate that
-        //        our rendering does technically support it, despite the fact that there is no way to properly utilize
-        //        them without using janky workarounds.
-        return entity instanceof Avatar || entity instanceof ArmorStand;
-    }
-
-    public static final Codec<EntityConfig> CODEC = RecordCodecBuilder.create(instance -> codecGroup(instance)
-        .apply(instance, EntityConfig::new)
-    );
 
     protected static <CONFIG extends EntityConfig> P3<Mu<CONFIG>, Gender, Breasts, UVs> codecGroup(Instance<CONFIG> instance) {
         return instance.group(
