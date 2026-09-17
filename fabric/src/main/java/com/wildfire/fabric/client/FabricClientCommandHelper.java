@@ -29,10 +29,9 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
 
-public class FabricCommandHelper implements ClientCommandHelper<FabricClientCommandSource> {
-
+public class FabricClientCommandHelper implements ClientCommandHelper<FabricClientCommandSource> {
     @Override
-    public LiteralArgumentBuilder<FabricClientCommandSource> literalArgumentBuilder(final String key) {
+    public LiteralArgumentBuilder<FabricClientCommandSource> literal(final String key) {
         return ClientCommands.literal(key);
     }
 

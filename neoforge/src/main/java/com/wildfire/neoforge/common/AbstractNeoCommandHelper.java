@@ -16,24 +16,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.wildfire.neoforge.client;
+package com.wildfire.neoforge.common;
 
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
-import com.wildfire.client.command.ClientCommandHelper;
-import java.util.Objects;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
+import com.wildfire.common.command.CommandHelper;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.level.Level;
 
-public class NeoCommandHelper implements ClientCommandHelper<CommandSourceStack> {
-
+public abstract class AbstractNeoCommandHelper implements CommandHelper<CommandSourceStack> {
     @Override
-    public LiteralArgumentBuilder<CommandSourceStack> literalArgumentBuilder(final String key) {
+    public LiteralArgumentBuilder<CommandSourceStack> literal(final String key) {
         return Commands.literal(key);
     }
 
@@ -50,24 +45,5 @@ public class NeoCommandHelper implements ClientCommandHelper<CommandSourceStack>
     @Override
     public void sendFailure(final CommandSourceStack source, final Component message) {
         source.sendFailure(message);
-    }
-
-    @Override
-    public Level getLevel(final CommandSourceStack source) {
-        return source.getUnsidedLevel();
-    }
-
-    @Override
-    public LocalPlayer getPlayer(final CommandSourceStack source) {
-        if (source.getEntity() instanceof LocalPlayer player) {
-            //Note: This should almost always be true
-            return player;
-        }
-        return Objects.requireNonNull(getMinecraft(source).player, "No player!?");
-    }
-
-    @Override
-    public Minecraft getMinecraft(final CommandSourceStack source) {
-        return Minecraft.getInstance();
     }
 }
