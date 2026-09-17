@@ -49,6 +49,9 @@
         "essential": "*",
         "essential-loader": "*"
     },
+    "breaks": {
+        "wildfire_gender": "*"
+    },
     "custom": {
         "modmenu": {
             "links": {
