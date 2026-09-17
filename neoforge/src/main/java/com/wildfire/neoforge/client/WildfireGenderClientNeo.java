@@ -48,6 +48,7 @@ import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.core.Holder;
+import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.TriState;
 import net.minecraft.world.damagesource.DamageEffects;
@@ -83,6 +84,16 @@ public class WildfireGenderClientNeo {
     private Set<SoundEvent> hurtSounds = Collections.emptySet();
 
     public WildfireGenderClientNeo(ModContainer modContainer, IEventBus modEventBus) {
+        //? if >=26.3 {
+        modContainer.<net.neoforged.neoforge.client.gui.modlist.ModDisplayInfo>registerExtensionPoint(net.neoforged.neoforge.client.gui.modlist.ModDisplayInfo.class, () -> new net.neoforged.neoforge.client.gui.modlist.DefaultModDisplayInfo(modContainer) {
+            @Override
+            public Component displayName() {
+                //Allow translating the display name so that it can display upside down
+                return com.wildfire.common.WildfireLang.MOD_NAME.translate();
+            }
+        });
+        //? }
+
         WildfireGenderClient.tryMigrate();
         ClientConfig.INSTANCE.load(modContainer);
 
