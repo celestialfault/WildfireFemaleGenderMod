@@ -29,7 +29,7 @@ import com.wildfire.common.entities.avatars.MannequinConfigHolder;
 import com.wildfire.common.entities.players.PlayerConfigHolder;
 import java.time.Duration;
 import java.util.UUID;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.util.Util;import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.decoration.Mannequin;
 import net.minecraft.world.entity.player.Player;
@@ -40,44 +40,41 @@ public final class WildfireClientAPI {
     private WildfireClientAPI() {
     }
 
-    private static final EntityCache<PlayerConfigHolder> PLAYERS;
-    private static final EntityCache<ArmorStandConfigHolder> ARMOR_STANDS;
-    private static final EntityCache<MannequinConfigHolder> MANNEQUINS;
-
-    static {
+    private static final EntityCache<PlayerConfigHolder, Player> PLAYERS = Util.make(() -> {
         final CacheLoader<UUID, PlayerConfigHolder> playerLoader = CacheLoader.from(uuid -> {
             var holder = new PlayerConfigHolder(uuid);
             WildfireGenderClient.loadGenderInfo(holder, true, false);
             return holder;
         });
 
-        PLAYERS = new EntityCacheImpl<>(playerLoader, Duration.ofMinutes(15));
-        ARMOR_STANDS = new EntityCacheImpl<>(CacheLoader.from(ArmorStandConfigHolder::new), Duration.ofMinutes(5));
-        MANNEQUINS = new EntityCacheImpl<>(CacheLoader.from(MannequinConfigHolder::new), Duration.ofMinutes(5));
-    }
+        return new EntityCacheImpl<>(playerLoader, Duration.ofMinutes(15));
+    });
+
+    private static final EntityCache<ArmorStandConfigHolder, ArmorStand> ARMOR_STANDS = new EntityCacheImpl<>(ArmorStandConfigHolder::new, Duration.ofMinutes(5));
+    private static final EntityCache<MannequinConfigHolder, Mannequin> MANNEQUINS = new EntityCacheImpl<>(MannequinConfigHolder::new, Duration.ofMinutes(5));
 
     @Nullable
     public static EntityConfigHolder<? extends EntityConfig> getConfig(LivingEntity entity) {
         return switch(entity) {
-            case Player _ -> players().getOrCreate(entity);
-            case Mannequin _ -> mannequins().getOrCreate(entity);
-            case ArmorStand _ -> armorStands().getOrCreate(entity);
+            case Player player -> players().getOrCreate(player);
+            case Mannequin mannequin -> mannequins().getOrCreate(mannequin);
+            case ArmorStand armorStand -> armorStands().getOrCreate(armorStand);
             default -> null;
         };
     }
 
     /// Returns the [EntityCache] supplying [PlayerConfigHolder] instances for client-side player entities
-    public static EntityCache<PlayerConfigHolder> players() {
+    public static EntityCache<PlayerConfigHolder, Player> players() {
         return PLAYERS;
     }
 
     /// Returns the [EntityCache] supplying [MannequinConfigHolder] instances for client-side mannequin entities
-    public static EntityCache<MannequinConfigHolder> mannequins() {
+    public static EntityCache<MannequinConfigHolder, Mannequin> mannequins() {
         return MANNEQUINS;
     }
 
     /// Returns the [EntityCache] supplying [ArmorStandConfigHolder] instances for client-side armor stand entities
-    public static EntityCache<ArmorStandConfigHolder> armorStands() {
+    public static EntityCache<ArmorStandConfigHolder, ArmorStand> armorStands() {
         return ARMOR_STANDS;
     }
 }

@@ -30,7 +30,6 @@ import org.jspecify.annotations.Nullable;
 import java.util.Objects;
 import java.util.UUID;
 
-// TODO extract armor stand-related methods from EntityConfig(Holder) into this
 public class ArmorStandConfigHolder extends EntityConfigHolder<ArmorStandConfig> {
     protected boolean jacketLayer = true;
     protected @Nullable BreastDataComponent fromComponent;

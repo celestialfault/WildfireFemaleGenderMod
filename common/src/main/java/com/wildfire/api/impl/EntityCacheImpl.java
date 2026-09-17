@@ -18,6 +18,7 @@
 
 package com.wildfire.api.impl;
 
+import com.google.common.base.Function;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -28,11 +29,12 @@ import java.time.Duration;
 import java.util.UUID;
 import java.util.function.Predicate;
 import net.minecraft.util.Util;
+import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.Nullable;
 
 @ApiStatus.Internal
-public class EntityCacheImpl<TYPE extends EntityConfigHolder<? extends EntityConfig>> implements EntityCache<TYPE> {
+public class EntityCacheImpl<TYPE extends EntityConfigHolder<? extends EntityConfig>, ENTITY extends LivingEntity> implements EntityCache<TYPE, ENTITY> {
     private final LoadingCache<UUID, TYPE> cache;
 
     public EntityCacheImpl(final CacheLoader<UUID, TYPE> loader, final @Nullable Duration expiryTime) {
@@ -41,6 +43,10 @@ public class EntityCacheImpl<TYPE extends EntityConfigHolder<? extends EntityCon
                 builder.expireAfterAccess(expiryTime);
             }
         }).build(loader);
+    }
+
+    public EntityCacheImpl(final Function<UUID, TYPE> constructor, final @Nullable Duration expiryTime) {
+        this(CacheLoader.from(constructor), expiryTime);
     }
 
     public EntityCacheImpl(final CacheLoader<UUID, TYPE> loader) {

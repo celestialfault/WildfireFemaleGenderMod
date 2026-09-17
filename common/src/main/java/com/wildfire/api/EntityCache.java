@@ -26,12 +26,12 @@ import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.Nullable;
 
-public interface EntityCache<TYPE extends EntityConfigHolder<? extends EntityConfig>> {
-    default @Nullable TYPE get(final LivingEntity entity) {
+public interface EntityCache<TYPE extends EntityConfigHolder<? extends EntityConfig>, ENTITY extends LivingEntity> {
+    default @Nullable TYPE get(final ENTITY entity) {
         return get(entity.getUUID());
     }
 
-    default TYPE getOrCreate(final LivingEntity entity) {
+    default TYPE getOrCreate(final ENTITY entity) {
         return getOrCreate(entity.getUUID());
     }
 
@@ -39,7 +39,7 @@ public interface EntityCache<TYPE extends EntityConfigHolder<? extends EntityCon
     TYPE getOrCreate(UUID uuid);
 
     @ApiStatus.Internal
-    default void invalidate(final LivingEntity entity) {
+    default void invalidate(final ENTITY entity) {
         invalidate(entity.getUUID());
     }
 

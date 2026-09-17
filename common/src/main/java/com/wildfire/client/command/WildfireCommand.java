@@ -55,6 +55,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.permissions.Permissions;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -246,9 +247,9 @@ public class WildfireCommand {
     }
 
     private static <HOLDER extends EntityConfigHolder<? extends EntityConfig>> List<Component> dump(
-        EntityCache<HOLDER> cache, Level world, boolean ignoreEmptyConfig
+        EntityCache<HOLDER, ?> cache, Level world, boolean ignoreEmptyConfig
     ) {
-        Cache<UUID, HOLDER> underlying = ((EntityCacheImpl<HOLDER>) cache).cache();
+        Cache<UUID, HOLDER> underlying = ((EntityCacheImpl<HOLDER, ?>) cache).cache();
         List<Component> lines = new ArrayList<>();
         for (var entry : underlying.asMap().entrySet()) {
             UUID uuid = entry.getKey();
@@ -271,6 +272,7 @@ public class WildfireCommand {
 
     private static <SOURCE extends SharedSuggestionProvider> int invalidateCache(CommandContext<SOURCE> ctx, ClientCommandHelper<SOURCE> helper) {
         WildfireClientAPI.players().invalidateAll();
+        WildfireClientAPI.mannequins().invalidateAll();
         WildfireClientAPI.armorStands().invalidateAll();
 
         send(ctx, helper, WildfireLang.COMMAND_INVALIDATE_CACHE_SUCCESS.translate());
