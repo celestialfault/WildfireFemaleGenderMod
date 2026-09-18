@@ -18,18 +18,18 @@
 
 package com.wildfire.client.gui.screen;
 
-import com.wildfire.common.WildfireGender;
-import com.wildfire.common.WildfireLang;
+import com.mojang.blaze3d.platform.InputConstants;
 import com.wildfire.api.uvs.BreastTypes;
 import com.wildfire.api.uvs.UVDirection;
 import com.wildfire.api.uvs.UVLayout;
 import com.wildfire.api.uvs.UVQuad;
+import com.wildfire.common.WildfireGender;
+import com.wildfire.common.WildfireLang;
+import com.wildfire.common.entities.avatars.AbstractAvatarConfigHolder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.UUID;
-import com.wildfire.common.entities.avatars.AbstractAvatarConfigHolder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
@@ -46,7 +46,6 @@ import net.minecraft.util.CommonColors;
 import net.minecraft.util.FormattedCharSequence;
 import org.jetbrains.annotations.UnknownNullability;
 import org.joml.Vector2i;
-
 import org.jspecify.annotations.Nullable;
 
 public class WildfireBreastUVEditorScreen extends BaseWildfireScreen {
@@ -153,7 +152,6 @@ public class WildfireBreastUVEditorScreen extends BaseWildfireScreen {
                         .size(12, 12)
                         .onPress(_ -> {
                             if(selectedDirection == null || selectedUVs == null) return;
-                            final var player = Objects.requireNonNull(getPlayer(), "getPlayer()");
 
                             UVQuad quad = selectedUVs.getAllSides().get(selectedDirection);
                             assert quad != null; // TODO can this assumption ever be broken without the user meddling with the config?
@@ -326,14 +324,14 @@ public class WildfireBreastUVEditorScreen extends BaseWildfireScreen {
                 int rectY2 = (int) (uvWindowPos.y() + (quad.y2() - 1) * uvWindowScaleFactor);
 
                 if(click.x() >= rectX1 && click.x() <= rectX2 && click.y() >= rectY1 && click.y() <= rectY2) {
-                    if(click.button() == 0) {
+                    if(click.button() == InputConstants.MOUSE_BUTTON_LEFT) {
 
                         if(selectedDirection != direction) {
                             Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                             selectedDirection = direction; // store which rect was clicked
                             rebuildWidgets();
                         }
-                    } else if(click.button() == 1 && selectedDirection != null) {
+                    } else if(click.button() == InputConstants.MOUSE_BUTTON_MIDDLE && selectedDirection != null) {
                         selectedDirection = null;
                         Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                         rebuildWidgets();

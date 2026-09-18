@@ -19,8 +19,11 @@
 package com.wildfire.common.entities.avatars;
 
 import java.util.UUID;
+import com.wildfire.common.LoaderAgnostics;
+import com.wildfire.common.networking.WildfireSync;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.permissions.Permissions;
+import net.minecraft.world.entity.decoration.Mannequin;
 import org.jetbrains.annotations.ApiStatus;
 
 public class MannequinConfigHolder extends AbstractAvatarConfigHolder {
@@ -40,5 +43,19 @@ public class MannequinConfigHolder extends AbstractAvatarConfigHolder {
     public void setConfig(AvatarConfig config) {
         this.config = config;
         this.loaded = true;
+    }
+
+    /// @apiNote Only call on the logical server
+    @ApiStatus.Internal
+    public void sync(Mannequin mannequin) {
+        LoaderAgnostics.INSTANCE.writeToMannequin(mannequin, config());
+        WildfireSync.sendToAllClients(mannequin, this);
+    }
+
+    /// @apiNote Only call on the logical server
+    @ApiStatus.Internal
+    public void setConfigAndSync(Mannequin mannequin, AvatarConfig config) {
+        setConfig(config);
+        sync(mannequin);
     }
 }

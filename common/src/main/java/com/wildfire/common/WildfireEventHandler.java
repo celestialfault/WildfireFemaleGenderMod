@@ -70,6 +70,8 @@ public final class WildfireEventHandler {
 
             AvatarConfig saved = LoaderAgnostics.INSTANCE.readFromMannequin(mannequin);
             if(saved != null) {
+                // we're not using #setConfigAndSync() here as we don't need to immediately
+                // write the config we just read back to the entity
                 config.setConfig(saved);
                 // TODO is this sync necessary?
                 WildfireSync.sendToAllClients(mannequin, config);

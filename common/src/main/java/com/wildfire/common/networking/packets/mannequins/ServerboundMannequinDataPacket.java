@@ -19,15 +19,16 @@
 package com.wildfire.common.networking.packets.mannequins;
 
 import com.wildfire.api.server.WildfireServerAPI;
-import com.wildfire.common.LoaderAgnostics;
 import com.wildfire.common.WildfireGender;
 import com.wildfire.common.entities.avatars.AvatarConfig;
-import com.wildfire.common.entities.avatars.MannequinConfigHolder;import com.wildfire.common.networking.WildfireSync;import io.netty.buffer.ByteBuf;
+import com.wildfire.common.entities.avatars.MannequinConfigHolder;
+import io.netty.buffer.ByteBuf;
 import java.util.UUID;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.server.level.ServerPlayer;import net.minecraft.world.entity.Entity;import net.minecraft.world.entity.decoration.Mannequin;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.decoration.Mannequin;
 
 public record ServerboundMannequinDataPacket(UUID uuid, AvatarConfig config) implements CustomPacketPayload {
     public static final Type<ServerboundMannequinDataPacket> TYPE = WildfireGender.serverBoundPacket("mannequin_data");
@@ -56,8 +57,6 @@ public record ServerboundMannequinDataPacket(UUID uuid, AvatarConfig config) imp
             // TODO send some kind of feedback for rejected edits
             return;
         }
-        config.setConfig(config());
-        LoaderAgnostics.INSTANCE.writeToMannequin(mannequin, config());
-        WildfireSync.sendToAllClients(mannequin, config);
+        config.setConfigAndSync(mannequin, config());
     }
 }

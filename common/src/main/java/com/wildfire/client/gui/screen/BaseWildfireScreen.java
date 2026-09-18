@@ -18,25 +18,22 @@
 
 package com.wildfire.client.gui.screen;
 
-import com.wildfire.api.client.WildfireClientAPI;
 import com.wildfire.client.gui.IFancyFontRenderer;
 import com.wildfire.client.gui.WildfireButton;
 import com.wildfire.client.gui.WildfireSlider;
-import com.wildfire.common.WildfireGender;
 import com.wildfire.common.entities.avatars.AbstractAvatarConfigHolder;
 import com.wildfire.common.entities.avatars.MannequinConfigHolder;
 import com.wildfire.common.entities.players.PlayerConfigHolder;
 import com.wildfire.common.networking.WildfireSync;
+import java.util.Objects;
+import java.util.function.Consumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
-import net.minecraft.client.player.LocalPlayer;import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.network.chat.Component;
-
-import java.util.Objects;
-import java.util.UUID;
-import java.util.function.Consumer;
 import net.minecraft.util.Util;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
