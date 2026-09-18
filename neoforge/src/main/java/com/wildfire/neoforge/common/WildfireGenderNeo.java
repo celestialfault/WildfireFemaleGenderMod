@@ -23,14 +23,13 @@ import com.wildfire.common.WildfireEventHandler;
 import com.wildfire.common.command.WildfireServerCommand;
 import com.wildfire.neoforge.common.networking.NeoSync;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.LivingEntity;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent;
-import net.neoforged.neoforge.event.tick.EntityTickEvent;
 
 @Mod(WildfireAPI.MODID)
 public class WildfireGenderNeo {
@@ -47,9 +46,9 @@ public class WildfireGenderNeo {
             var command = new WildfireServerCommand<>(new NeoServerCommandHelper());
             command.register(event.getDispatcher());
         });
-        NeoForge.EVENT_BUS.addListener(EntityTickEvent.Post.class, event -> {
-            if (event.getEntity() instanceof LivingEntity living && !living.level().isClientSide()) {
-                WildfireEventHandler.onServerEntityTick(living);
+        NeoForge.EVENT_BUS.addListener(EntityJoinLevelEvent.class, event -> {
+            if (!event.getEntity().level().isClientSide()) {
+                WildfireEventHandler.onEntityLoad(event.getEntity());
             }
         });
         LoaderAgnosticsNeo.ATTACHMENT_TYPES.register(modEventBus);

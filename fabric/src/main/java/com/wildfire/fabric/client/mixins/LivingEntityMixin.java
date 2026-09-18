@@ -21,13 +21,12 @@ package com.wildfire.fabric.client.mixins;
 
 import com.wildfire.api.client.WildfireClientAPI;
 import com.wildfire.client.WildfireClientEventHandler;
-import com.wildfire.common.WildfireEventHandler;
-import com.wildfire.common.entities.players.PlayerConfigHolder;
+import com.wildfire.common.entities.avatars.AbstractAvatarConfigHolder;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -50,10 +49,10 @@ abstract class LivingEntityMixin extends Entity {
         )
     )
     public void playGenderHurtSound(DamageSource damageSource, CallbackInfo ci) {
-        if ((LivingEntity)(Object)this instanceof Player player && player.level().isClientSide()) {
-            PlayerConfigHolder genderPlayer = WildfireClientAPI.players().get(player);
-            if (genderPlayer != null) {
-                genderPlayer.tryPlayHurtSound(player);
+        if ((LivingEntity)(Object)this instanceof Avatar avatar && avatar.level().isClientSide()) {
+            var config = WildfireClientAPI.getConfig(avatar);
+            if(config instanceof AbstractAvatarConfigHolder avatarConfig) {
+                avatarConfig.tryPlayHurtSound(avatar);
             }
         }
     }
@@ -64,8 +63,6 @@ abstract class LivingEntityMixin extends Entity {
         if(level().isClientSide()) {
             //Note that this event may not be consistently invoked for every entity, such as if other mods (e.g. EntityCulling) cancel the entity tick.
             WildfireClientEventHandler.onEntityTick(self);
-        } else {
-            WildfireEventHandler.onServerEntityTick(self);
         }
     }
 }

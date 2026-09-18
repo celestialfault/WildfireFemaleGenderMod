@@ -28,8 +28,6 @@ import net.minecraft.world.entity.decoration.Mannequin;
 import org.jetbrains.annotations.ApiStatus;
 
 public class MannequinConfigHolder extends AbstractAvatarConfigHolder {
-    @ApiStatus.Internal
-    public volatile boolean loaded = false;
 
     public MannequinConfigHolder(final UUID uuid) {
         super(uuid, AvatarConfig.createDefault());
@@ -43,7 +41,6 @@ public class MannequinConfigHolder extends AbstractAvatarConfigHolder {
     @ApiStatus.Internal
     public void setConfig(AvatarConfig config) {
         this.config = config;
-        this.loaded = true;
     }
 
     /// @apiNote Only call on the logical server

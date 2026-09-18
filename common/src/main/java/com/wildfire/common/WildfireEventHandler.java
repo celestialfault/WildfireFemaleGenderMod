@@ -25,7 +25,6 @@ import com.wildfire.common.entities.players.PlayerConfigHolder;
 import com.wildfire.common.networking.WildfireSync;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.decoration.Mannequin;
 import net.minecraft.world.entity.player.Player;
 
@@ -61,23 +60,14 @@ public final class WildfireEventHandler {
         }
     }
 
-    public static void onServerEntityTick(LivingEntity entity) {
+    public static void onEntityLoad(Entity entity) {
         if(entity instanceof Mannequin mannequin) {
             var config = WildfireServerAPI.mannequins().getOrCreate(mannequin);
-            if(config.loaded) {
-                return;
-            }
-
             AvatarConfig saved = LoaderAgnostics.INSTANCE.readFromMannequin(mannequin);
             if(saved != null) {
                 // we're not using #setConfigAndSync() here as we don't need to immediately
                 // write the config we just read back to the entity
                 config.setConfig(saved);
-                // TODO is this sync necessary?
-                WildfireSync.sendToAllClients(mannequin, config);
-            } else {
-                // don't reattempt on subsequent ticks
-                config.loaded = true;
             }
         }
     }
