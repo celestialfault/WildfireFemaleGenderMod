@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.ClientAvatarEntity;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
@@ -212,18 +213,19 @@ public class WildfireBreastUVEditorScreen extends BaseWildfireScreen {
     // TODO this should be broken up into smaller methods
     @Override
     public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
-        if(minecraft.level == null || minecraft.player == null) return;
-        var player = getPlayer();
+        var entity = getEntity();
+        if(!(entity instanceof ClientAvatarEntity avatar)) {
+            return;
+        }
 
-        if(player != null && selectedUVs != null) {
-
+        if(selectedUVs != null) {
             //noinspection SuspiciousNameCombination
-            graphics.blit(RenderPipelines.GUI_TEXTURED, minecraft.player.getSkin().body().texturePath(),
+            graphics.blit(RenderPipelines.GUI_TEXTURED, avatar.getSkin().body().texturePath(),
                     uvWindowPos.x(), uvWindowPos.y(),
                     0, 0, textureDrawWidth, textureDrawWidth, textureDrawWidth, textureDrawWidth);
 
             //Other faces
-            for(UVLayout eachBreast : player.uvs()) {
+            for(UVLayout eachBreast : config.uvs()) {
                 drawFaceBorders(graphics, eachBreast, mouseX, mouseY, true);
             }
 
@@ -262,7 +264,6 @@ public class WildfireBreastUVEditorScreen extends BaseWildfireScreen {
             modelScale = 200;
         }
 
-        var entity = minecraft.player;
         InventoryScreen.extractEntityInInventoryFollowsMouse(graphics, this.width / 2 - modelScale, this.height / 2 - modelScale, this.width / 2 + modelScale,
             this.height / 2 + modelScale, modelScale, getEntityScale(entity, 0, false), mouseX, mouseY, entity);
         drawScrollingString(graphics, getTitle(), uvWindowPos.x(), 20, TextAlignment.CENTER, CommonColors.WHITE, textureDrawWidth, 2, false);

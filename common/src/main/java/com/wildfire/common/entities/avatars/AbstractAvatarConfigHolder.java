@@ -25,11 +25,11 @@ import com.wildfire.client.ClientHelper;
 import com.wildfire.common.config.value.ConfigValue;
 import com.wildfire.common.entities.EntityConfigHolder;
 import com.wildfire.common.entities.Sounds;
-import net.minecraft.core.Holder;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.world.entity.Avatar;import net.minecraft.world.entity.player.Player;
 import java.util.List;
 import java.util.UUID;
+import net.minecraft.core.Holder;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.entity.Avatar;
 
 public abstract class AbstractAvatarConfigHolder extends EntityConfigHolder<AvatarConfig> {
     protected AbstractAvatarConfigHolder(final UUID uuid, final AvatarConfig config) {

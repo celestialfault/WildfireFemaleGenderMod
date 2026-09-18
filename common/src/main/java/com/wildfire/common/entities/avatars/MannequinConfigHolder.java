@@ -18,9 +18,10 @@
 
 package com.wildfire.common.entities.avatars;
 
-import java.util.UUID;
+import com.google.common.base.Preconditions;
 import com.wildfire.common.LoaderAgnostics;
 import com.wildfire.common.networking.WildfireSync;
+import java.util.UUID;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.permissions.Permissions;
 import net.minecraft.world.entity.decoration.Mannequin;
@@ -48,6 +49,7 @@ public class MannequinConfigHolder extends AbstractAvatarConfigHolder {
     /// @apiNote Only call on the logical server
     @ApiStatus.Internal
     public void sync(Mannequin mannequin) {
+        Preconditions.checkArgument(!mannequin.level().isClientSide(), "This method can only be run on a mannequin on the logical server");
         LoaderAgnostics.INSTANCE.writeToMannequin(mannequin, config());
         WildfireSync.sendToAllClients(mannequin, this);
     }
@@ -55,6 +57,7 @@ public class MannequinConfigHolder extends AbstractAvatarConfigHolder {
     /// @apiNote Only call on the logical server
     @ApiStatus.Internal
     public void setConfigAndSync(Mannequin mannequin, AvatarConfig config) {
+        Preconditions.checkArgument(!mannequin.level().isClientSide(), "This method can only be run on a mannequin on the logical server");
         setConfig(config);
         sync(mannequin);
     }
