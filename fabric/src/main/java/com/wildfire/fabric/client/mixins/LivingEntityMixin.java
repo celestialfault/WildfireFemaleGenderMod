@@ -21,6 +21,7 @@ package com.wildfire.fabric.client.mixins;
 
 import com.wildfire.api.client.WildfireClientAPI;
 import com.wildfire.client.WildfireClientEventHandler;
+import com.wildfire.client.config.ClientConfig;
 import com.wildfire.common.entities.avatars.AbstractAvatarConfigHolder;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Avatar;
@@ -49,6 +50,10 @@ abstract class LivingEntityMixin extends Entity {
         )
     )
     public void playGenderHurtSound(DamageSource damageSource, CallbackInfo ci) {
+        if(ClientConfig.config().overrides().disableSoundReplacement().get()) {
+            return;
+        }
+
         if ((LivingEntity)(Object)this instanceof Avatar avatar && avatar.level().isClientSide()) {
             var config = WildfireClientAPI.getConfig(avatar);
             if(config instanceof AbstractAvatarConfigHolder avatarConfig) {

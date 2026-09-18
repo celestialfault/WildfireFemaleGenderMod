@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.UUID;
 import net.minecraft.core.Holder;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Avatar;
 
 public abstract class AbstractAvatarConfigHolder extends EntityConfigHolder<AvatarConfig> {
@@ -56,7 +57,8 @@ public abstract class AbstractAvatarConfigHolder extends EntityConfigHolder<Avat
             Holder<SoundEvent> hurtSound = ClientHelper.INSTANCE.hurtSound(gender().get());
             if (hurtSound != null) {
                 float pitchVariation = (player.getRandom().nextFloat() - player.getRandom().nextFloat()) * 0.2F;
-                player.playSound(hurtSound.value(), 1f, pitchVariation + sounds().voicePitch().get());
+                player.level().playLocalSound(player.getX(), player.getY(), player.getZ(), hurtSound.value(),
+                    SoundSource.PLAYERS, 1f, pitchVariation + sounds().voicePitch().get(), false);
             }
         }
     }
