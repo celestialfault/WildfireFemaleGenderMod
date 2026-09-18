@@ -141,19 +141,6 @@ public class PlayerConfigHolder extends AbstractAvatarConfigHolder {
         this.syncStatus = SyncStatus.SYNCED;
     }
 
-    /// Play the relevant mod hurt sound when a player takes damage
-    ///
-    /// @apiNote Only call this on the client side as sounds are only registered on the client.
-    public void tryPlayHurtSound(Player player) {
-        if (sounds().hurt().get()) {
-            Holder<SoundEvent> hurtSound = ClientHelper.INSTANCE.hurtSound(gender().get());
-            if (hurtSound != null) {
-                float pitchVariation = (player.getRandom().nextFloat() - player.getRandom().nextFloat()) * 0.2F;
-                player.playSound(hurtSound.value(), 1f, pitchVariation + sounds().voicePitch().get());
-            }
-        }
-    }
-
     @Override
     public List<String> getDebugInfo() {
         List<String> lines = super.getDebugInfo();

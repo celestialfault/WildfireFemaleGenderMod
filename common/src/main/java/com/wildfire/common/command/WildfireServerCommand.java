@@ -21,21 +21,27 @@ package com.wildfire.common.command;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.wildfire.api.server.WildfireServerAPI;
 import com.wildfire.common.WildfireGender;
 import com.wildfire.common.WildfireLang;
 import com.wildfire.common.entities.BreastDataComponent;
+import com.wildfire.common.networking.WildfireNetworking;
+import com.wildfire.common.networking.packets.mannequins.ClientboundEditMannequinPacket;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextColor;
-import net.minecraft.server.permissions.Permission;
-import net.minecraft.server.permissions.Permissions;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.world.entity.decoration.Mannequin;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.equipment.trim.ArmorTrim;
@@ -48,27 +54,31 @@ public final class WildfireServerCommand<S extends SharedSuggestionProvider> ext
     }
 
     public void register(CommandDispatcher<S> dispatcher) {
+        var mannequin = new MannequinCommands<>(helper);
         dispatcher.register(helper.literal("fgmserver")
             .requires(helper::hasCommandPermission)
             .executes(this::syncStats)
-            //<editor-fold desc="Debug">
-            .then(helper.literal("debug")
-                .requires(helper::hasDebugCommandPermission)
-                .executes(ctx -> {
-                    sendHelp(ctx, WildfireLang.DEBUG_COMMAND,
-                        WildfireLang.COMMAND_TRIM,
-                        WildfireLang.COMMAND_ARMOR_STAND
-                    );
-                    return Command.SINGLE_SUCCESS;
-                })
-                .then(helper.literal("trim")
-                    .then(helper.argument("glint", BoolArgumentType.bool())
-                        .executes(this::equipTrimmedChestplate))
-                    .executes(this::equipTrimmedChestplate))
-                .then(helper.literal("armorstand")
-                    .executes(this::spawnArmorStand)))
-            //</editor-fold>
+            .then(mannequin.createNode())
+            .then(createDebugNode())
         );
+    }
+
+    private LiteralArgumentBuilder<S> createDebugNode() {
+        return helper.literal("debug")
+            .requires(helper::hasDebugCommandPermission)
+            .executes(ctx -> {
+                sendHelp(ctx, WildfireLang.DEBUG_COMMAND,
+                    WildfireLang.COMMAND_TRIM,
+                    WildfireLang.COMMAND_ARMOR_STAND
+                );
+                return Command.SINGLE_SUCCESS;
+            })
+            .then(helper.literal("trim")
+                .then(helper.argument("glint", BoolArgumentType.bool())
+                    .executes(this::equipTrimmedChestplate))
+                .executes(this::equipTrimmedChestplate))
+            .then(helper.literal("armorstand")
+                .executes(this::spawnArmorStand));
     }
 
     private int syncStats(CommandContext<S> ctx) {

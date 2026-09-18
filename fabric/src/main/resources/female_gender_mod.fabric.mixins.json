@@ -7,8 +7,10 @@
         "AvatarRendererMixin",
         "EntityRendererMixin",
         "ItemStackMixin",
-        "LivingEntityMixin",
         "accessors.SessionServiceAccessor"
+    ],
+    "mixins": [
+      "LivingEntityMixin"
     ],
     "injectors": {
         "defaultRequire": 1

@@ -19,9 +19,26 @@
 package com.wildfire.common.entities.avatars;
 
 import java.util.UUID;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.permissions.Permissions;
+import org.jetbrains.annotations.ApiStatus;
 
 public class MannequinConfigHolder extends AbstractAvatarConfigHolder {
+    @ApiStatus.Internal
+    public volatile boolean loaded = false;
+
     public MannequinConfigHolder(final UUID uuid) {
         super(uuid, AvatarConfig.createDefault());
+    }
+
+    public boolean canEdit(ServerPlayer player) {
+        // TODO extend this to allow for some kind of proper permission API?
+        return player.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER);
+    }
+
+    @ApiStatus.Internal
+    public void setConfig(AvatarConfig config) {
+        this.config = config;
+        this.loaded = true;
     }
 }

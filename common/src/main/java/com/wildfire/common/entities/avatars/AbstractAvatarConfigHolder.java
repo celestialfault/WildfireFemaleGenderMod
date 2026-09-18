@@ -21,9 +21,13 @@ package com.wildfire.common.entities.avatars;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.JsonOps;
+import com.wildfire.client.ClientHelper;
 import com.wildfire.common.config.value.ConfigValue;
 import com.wildfire.common.entities.EntityConfigHolder;
 import com.wildfire.common.entities.Sounds;
+import net.minecraft.core.Holder;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.entity.Avatar;import net.minecraft.world.entity.player.Player;
 import java.util.List;
 import java.util.UUID;
 
@@ -42,6 +46,19 @@ public abstract class AbstractAvatarConfigHolder extends EntityConfigHolder<Avat
 
     public void updateFromPacket(AvatarConfig config) {
         this.config = config;
+    }
+
+    /// Play the relevant mod hurt sound when a player takes damage
+    ///
+    /// @apiNote Only call this on the client side as sounds are only registered on the client.
+    public void tryPlayHurtSound(Avatar player) {
+        if (sounds().hurt().get()) {
+            Holder<SoundEvent> hurtSound = ClientHelper.INSTANCE.hurtSound(gender().get());
+            if (hurtSound != null) {
+                float pitchVariation = (player.getRandom().nextFloat() - player.getRandom().nextFloat()) * 0.2F;
+                player.playSound(hurtSound.value(), 1f, pitchVariation + sounds().voicePitch().get());
+            }
+        }
     }
 
     @Override

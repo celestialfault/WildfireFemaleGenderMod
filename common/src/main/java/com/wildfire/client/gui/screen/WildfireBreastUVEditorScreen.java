@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import com.wildfire.common.entities.avatars.AbstractAvatarConfigHolder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
@@ -65,8 +66,8 @@ public class WildfireBreastUVEditorScreen extends BaseWildfireScreen {
     private static final int textureSourceWidth = 64;
     private static final float uvWindowScaleFactor = textureDrawWidth / (float) textureSourceWidth;
 
-    public WildfireBreastUVEditorScreen(Screen parent, UUID uuid) {
-        super(WildfireLang.UV_EDITOR.translate(), parent, uuid);
+    public WildfireBreastUVEditorScreen(Screen parent, AbstractAvatarConfigHolder config) {
+        super(WildfireLang.UV_EDITOR.translate(), parent, config);
     }
 
     @Override
@@ -85,7 +86,7 @@ public class WildfireBreastUVEditorScreen extends BaseWildfireScreen {
                 .onPress(_ -> {
                     var player = Objects.requireNonNull(getPlayer(), "getPlayer()");
                     if (player.uvs().reset()) {
-                        player.save();
+                        save();
                     }
                 }));
 
@@ -167,7 +168,7 @@ public class WildfireBreastUVEditorScreen extends BaseWildfireScreen {
                             };
 
                             selectedUVs.put(selectedDirection, quad);
-                            player.save();
+                            save();
                         })
                 );
             }
