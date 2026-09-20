@@ -19,19 +19,33 @@
 package com.wildfire.common.networking.packets.mannequins;
 
 import com.wildfire.api.client.WildfireClientAPI;
+import com.wildfire.api.server.WildfireServerAPI;
 import com.wildfire.client.gui.screen.WardrobeBrowserScreen;
 import com.wildfire.common.WildfireGender;
+import com.wildfire.common.entities.avatars.AvatarConfig;
+import com.wildfire.common.entities.avatars.MannequinConfigHolder;
 import io.netty.buffer.ByteBuf;
 import java.util.UUID;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.world.entity.decoration.Mannequin;
 
-public record ClientboundEditMannequinPacket(UUID uuid) implements CustomPacketPayload {
+public record ClientboundEditMannequinPacket(UUID uuid, AvatarConfig config) implements CustomPacketPayload {
     public static final Type<ClientboundEditMannequinPacket> TYPE = WildfireGender.clientBoundPacket("edit_mannequin");
-    public static final StreamCodec<ByteBuf, ClientboundEditMannequinPacket> STREAM_CODEC = UUIDUtil.STREAM_CODEC
-        .map(ClientboundEditMannequinPacket::new, ClientboundEditMannequinPacket::uuid);
+    public static final StreamCodec<ByteBuf, ClientboundEditMannequinPacket> STREAM_CODEC = StreamCodec.composite(
+        UUIDUtil.STREAM_CODEC, ClientboundEditMannequinPacket::uuid,
+        // always include the config in case the player is (for whatever reason) editing the mannequin
+        // while they haven't been render distance of it
+        AvatarConfig.STREAM_CODEC, ClientboundEditMannequinPacket::config,
+        ClientboundEditMannequinPacket::new
+    );
+
+    public ClientboundEditMannequinPacket(Mannequin mannequin) {
+        MannequinConfigHolder config = WildfireServerAPI.mannequins().getOrCreate(mannequin);
+        this(mannequin.getUUID(), config.config());
+    }
 
     @Override
     public Type<? extends CustomPacketPayload> type() {
@@ -41,6 +55,7 @@ public record ClientboundEditMannequinPacket(UUID uuid) implements CustomPacketP
     /// @apiNote Only call on the client
     public void handle() {
         var config = WildfireClientAPI.mannequins().getOrCreate(uuid());
+        config.setConfig(config());
         WardrobeBrowserScreen.open(Minecraft.getInstance(), config);
     }
 }

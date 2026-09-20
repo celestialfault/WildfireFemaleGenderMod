@@ -33,8 +33,14 @@ import net.minecraft.world.entity.decoration.Mannequin;
 public record ServerboundMannequinDataPacket(UUID uuid, AvatarConfig config) implements CustomPacketPayload {
     public static final Type<ServerboundMannequinDataPacket> TYPE = WildfireGender.serverBoundPacket("mannequin_data");
     public static final StreamCodec<ByteBuf, ServerboundMannequinDataPacket> STREAM_CODEC = StreamCodec.composite(
-        UUIDUtil.STREAM_CODEC, p -> p.uuid,
-        AvatarConfig.COMPACT_STREAM_CODEC, p -> p.config,
+        UUIDUtil.STREAM_CODEC, ServerboundMannequinDataPacket::uuid,
+        // note that this is intentionally using the full avatar codec over using the compact codec;
+        // this is because if the player sets the mannequin's gender to male through the GUI (e.g. to cycle from female to other),
+        // the mannequin's config will be fully cleared when the server syncs their changes back to them.
+        // this would ideally be fixed by just updating individual components for a mannequin, but doing so would
+        // also require additional work to support this in the GUI. so, in the meantime, just be a little
+        // less efficient and send the full config.
+        AvatarConfig.STREAM_CODEC, ServerboundMannequinDataPacket::config,
         ServerboundMannequinDataPacket::new
     );
 
@@ -57,6 +63,6 @@ public record ServerboundMannequinDataPacket(UUID uuid, AvatarConfig config) imp
             // TODO send some kind of feedback for rejected edits
             return;
         }
-        config.setConfigAndSync(mannequin, config());
+        config.setConfigAndSync(mannequin, config(), player);
     }
 }

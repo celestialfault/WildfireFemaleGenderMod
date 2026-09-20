@@ -29,8 +29,10 @@ import com.wildfire.common.networking.packets.sync.ServerboundSyncPacket;
 import net.minecraft.network.Connection;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.decoration.Mannequin;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
+import java.util.Objects;
 
 public final class WildfireSync {
 
@@ -40,6 +42,7 @@ public final class WildfireSync {
         throw new UnsupportedOperationException();
     }
 
+    // TODO combine these player & mannequin methods using Avatar / AbstractAvatarConfigHolder parameters
     /// Sync a player's configuration to all nearby connected players
     ///
     /// @param toSync       The [`player`][ServerPlayer] to sync
@@ -53,20 +56,25 @@ public final class WildfireSync {
             }
         }
         if (sent > 0) {
-            WildfireGender.LOGGER.debug(MARKER, "Sent sync packet for {} to {} connected player(s)", toSync, sent);
+            WildfireGender.LOGGER.debug(MARKER, "Sent sync packet for player {} to {} connected player(s)", toSync, sent);
         }
     }
 
-    public static void sendToAllClients(Mannequin toSync, MannequinConfigHolder config) {
+    public static void sendToAllClients(Mannequin toSync, MannequinConfigHolder config, @Nullable ServerPlayer except) {
         int sent = 0;
         for (ServerPlayer player : WildfireNetworking.INSTANCE.playersTracking(toSync)) {
+            if(Objects.equals(player, except)) {
+                WildfireGender.LOGGER.debug(MARKER, "Skipping sending mannequin sync packet to {}", player);
+                continue;
+            }
+
             if (WildfireNetworking.INSTANCE.canSendToPlayer(player, ClientboundMannequinDataPacket.TYPE)) {
                 sent++;
                 WildfireNetworking.INSTANCE.sendToClient(player, new ClientboundMannequinDataPacket(config));
             }
         }
         if (sent > 0) {
-            WildfireGender.LOGGER.debug(MARKER, "Sent sync packet for {} to {} connected player(s)", toSync, sent);
+            WildfireGender.LOGGER.debug(MARKER, "Sent sync packet for mannequin {} to {} connected player(s)", toSync, sent);
         }
     }
 

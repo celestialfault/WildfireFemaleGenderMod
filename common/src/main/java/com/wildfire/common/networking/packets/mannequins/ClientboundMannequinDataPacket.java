@@ -31,8 +31,9 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 public record ClientboundMannequinDataPacket(UUID uuid, AvatarConfig config) implements CustomPacketPayload {
     public static final Type<ClientboundMannequinDataPacket> TYPE = WildfireGender.clientBoundPacket("mannequin_data");
     public static final StreamCodec<ByteBuf, ClientboundMannequinDataPacket> STREAM_CODEC = StreamCodec.composite(
-        UUIDUtil.STREAM_CODEC, p -> p.uuid,
-        AvatarConfig.COMPACT_STREAM_CODEC, p -> p.config,
+        UUIDUtil.STREAM_CODEC, ClientboundMannequinDataPacket::uuid,
+        // see the serverbound component to see why this is using the full codec over the compact codec
+        AvatarConfig.STREAM_CODEC, ClientboundMannequinDataPacket::config,
         ClientboundMannequinDataPacket::new
     );
 
@@ -47,6 +48,7 @@ public record ClientboundMannequinDataPacket(UUID uuid, AvatarConfig config) imp
 
     /// @apiNote Only call on the client
     public void handle() {
+        // TODO update gui if another player edits the same mannequin we already have the gui open for?
         var config = WildfireClientAPI.mannequins().getOrCreate(uuid());
         config.updateFromPacket(config());
     }

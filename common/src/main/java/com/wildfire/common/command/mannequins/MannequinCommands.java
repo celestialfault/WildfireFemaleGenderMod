@@ -87,11 +87,11 @@ public final class MannequinCommands extends AbstractWildfireCommand<ServerComma
     }
 
     private int editMannequin(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
-        ServerPlayer player = helper.getPlayer(ctx.getSource());
+        ServerPlayer player = ctx.getSource().getPlayerOrException();
         Mannequin mannequin = getMannequin(ctx);
 
         if(WildfireNetworking.INSTANCE.canSendToPlayer(player, ClientboundEditMannequinPacket.TYPE)) {
-            WildfireNetworking.INSTANCE.sendToClient(player, new ClientboundEditMannequinPacket(mannequin.getUUID()));
+            WildfireNetworking.INSTANCE.sendToClient(player, new ClientboundEditMannequinPacket(mannequin));
         } else {
             helper.sendFailure(ctx.getSource(), WildfireLang.COMMAND_SERVER_NO_MOD_ON_CLIENT.translateColored(TextColor.RED));
         }
@@ -122,7 +122,7 @@ public final class MannequinCommands extends AbstractWildfireCommand<ServerComma
             ).result().orElseGet(AvatarConfig::createDefault)
         ).getOrThrow().getFirst();
 
-        config.setConfigAndSync(mannequin, copy);
+        config.setConfigAndSync(mannequin, copy, null);
         helper.sendSystemMessage(ctx.getSource(), WildfireLang.COMMAND_MANNEQUIN_COPIED_DATA.translate(
             mannequin.getDisplayName(), fromLiving.getDisplayName()));
 
@@ -137,7 +137,7 @@ public final class MannequinCommands extends AbstractWildfireCommand<ServerComma
                     MannequinConfigHolder config = WildfireServerAPI.mannequins().getOrCreate(mannequin);
                     // TODO add feedback
                     if(component.update(config, ctx, "value")) {
-                        config.sync(mannequin);
+                        config.sync(mannequin, null);
                         return Command.SINGLE_SUCCESS;
                     }
                     return 0;

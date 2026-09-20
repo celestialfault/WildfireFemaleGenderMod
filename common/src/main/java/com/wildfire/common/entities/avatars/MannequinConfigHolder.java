@@ -26,6 +26,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.permissions.Permissions;
 import net.minecraft.world.entity.decoration.Mannequin;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
 public class MannequinConfigHolder extends AbstractAvatarConfigHolder {
 
@@ -45,17 +46,17 @@ public class MannequinConfigHolder extends AbstractAvatarConfigHolder {
 
     /// @apiNote Only call on the logical server
     @ApiStatus.Internal
-    public void sync(Mannequin mannequin) {
+    public void sync(Mannequin mannequin, @Nullable ServerPlayer except) {
         Preconditions.checkArgument(!mannequin.level().isClientSide(), "This method can only be run on a mannequin on the logical server");
         LoaderAgnostics.INSTANCE.writeToMannequin(mannequin, config());
-        WildfireSync.sendToAllClients(mannequin, this);
+        WildfireSync.sendToAllClients(mannequin, this, except);
     }
 
     /// @apiNote Only call on the logical server
     @ApiStatus.Internal
-    public void setConfigAndSync(Mannequin mannequin, AvatarConfig config) {
+    public void setConfigAndSync(Mannequin mannequin, AvatarConfig config, @Nullable ServerPlayer except) {
         Preconditions.checkArgument(!mannequin.level().isClientSide(), "This method can only be run on a mannequin on the logical server");
         setConfig(config);
-        sync(mannequin);
+        sync(mannequin, except);
     }
 }
