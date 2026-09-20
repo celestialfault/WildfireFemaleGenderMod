@@ -37,13 +37,12 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.Util;
 import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.decoration.Mannequin;
 
 public final class MannequinCommands extends AbstractWildfireCommand<ServerCommandHelper, CommandSourceStack> {
-    private static final SimpleCommandExceptionType NOT_A_MANNEQUIN = new SimpleCommandExceptionType(WildfireLang.COMMAND_ENTITY_MUST_BE_MANNEQUIN.translate());
+    private static final SimpleCommandExceptionType NOT_A_MANNEQUIN = WildfireLang.COMMAND_ENTITY_MUST_BE_MANNEQUIN.simpleCommandException();
 
     public MannequinCommands(final ServerCommandHelper helper) {
         super(helper);
@@ -51,32 +50,36 @@ public final class MannequinCommands extends AbstractWildfireCommand<ServerComma
 
     public LiteralArgumentBuilder<CommandSourceStack> createNode() {
         return helper.literal("mannequin")
-            .then(helper.argument("entity", EntityArgument.entity())
-                .executes(this::editMannequin)
-                .then(helper.literal("gui")
-                    .executes(this::editMannequin))
-                .then(helper.literal("copy")
+            .then(helper.literal("gui")
+                .then(helper.argument("mannequin", EntityArgument.entity())
+                    .executes(this::editMannequin)))
+            .then(helper.literal("copy")
+                .then(helper.argument("mannequin", EntityArgument.entity())
                     .then(helper.argument("from", EntityArgument.entity())
-                        .executes(this::copyOntoMannequin)))
-                .then(helper.literal("set")
+                        .executes(this::copyOntoMannequin))))
+            .then(helper.literal("set")
+                .then(helper.argument("mannequin", EntityArgument.entity())
                     .then(setter("gender", MannequinComponent.GENDER))
-                    .then(setter("size", MannequinComponent.BREAST_SIZE))
-                    .then(setter("cleavage", MannequinComponent.BREAST_CLEAVAGE))
+                    .then(helper.literal("breast")
+                        .then(setter("size", MannequinComponent.BREAST_SIZE))
+                        .then(setter("cleavage", MannequinComponent.BREAST_CLEAVAGE))
+                        .then(helper.literal("physics")
+                            .then(setter("enabled", MannequinComponent.PHYSICS))
+                            .then(setter("intensity", MannequinComponent.PHYSICS_BOUNCE))
+                            .then(setter("momentum", MannequinComponent.PHYSICS_FLOPPY))
+                            .then(setter("uniboob", MannequinComponent.PHYSICS_UNIBOOB)))
+                        .then(setter("separation", MannequinComponent.BREAST_OFFSET_X))
+                        .then(setter("height", MannequinComponent.BREAST_OFFSET_Y))
+                        .then(setter("depth", MannequinComponent.BREAST_OFFSET_Z)))
                     .then(setter("show_in_armor", MannequinComponent.SHOW_IN_ARMOR))
-                    .then(helper.literal("physics")
-                        .then(setter("enabled", MannequinComponent.PHYSICS))
-                        .then(setter("intensity", MannequinComponent.PHYSICS_BOUNCE))
-                        .then(setter("momentum", MannequinComponent.PHYSICS_FLOPPY))
-                        .then(setter("uniboob", MannequinComponent.PHYSICS_UNIBOOB)))
-                    .then(helper.literal("offset")
-                        .then(setter("x", MannequinComponent.BREAST_OFFSET_X))
-                        .then(setter("y", MannequinComponent.BREAST_OFFSET_Y))
-                        .then(setter("z", MannequinComponent.BREAST_OFFSET_Z)))
-                ));
+                    .then(helper.literal("sounds")
+                        .then(setter("enabled", MannequinComponent.HURT_SOUNDS))
+                        .then(setter("pitch", MannequinComponent.VOICE_PITCH))))
+            );
     }
 
     private Mannequin getMannequin(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
-        Entity entity = EntityArgument.getEntity(ctx, "entity");
+        Entity entity = EntityArgument.getEntity(ctx, "mannequin");
         if(!(entity instanceof Mannequin mannequin)) {
             throw NOT_A_MANNEQUIN.create();
         }
@@ -126,22 +129,18 @@ public final class MannequinCommands extends AbstractWildfireCommand<ServerComma
         return Command.SINGLE_SUCCESS;
     }
 
-    private <A, T> LiteralArgumentBuilder<CommandSourceStack> setter(final String name, final MannequinComponent<A, T> component) {
+    private <T> LiteralArgumentBuilder<CommandSourceStack> setter(final String name, final MannequinComponent<T> component) {
         return helper.literal(name)
-            .then(Util.make(helper.argument("value", component.argument()), builder -> {
-                var suggestionProvider = component.suggestionProvider();
-                if(suggestionProvider != null) {
-                    builder.suggests(suggestionProvider);
-                }
-
-                builder.executes(ctx -> {
+            .then(component.argument(helper, "value")
+                .executes(ctx -> {
                     Mannequin mannequin = getMannequin(ctx);
                     MannequinConfigHolder config = WildfireServerAPI.mannequins().getOrCreate(mannequin);
-                    T value = component.parse(ctx, "value", helper);
-                    component.update(config, value);
-                    config.sync(mannequin);
-                    return Command.SINGLE_SUCCESS;
-                });
-            }));
+                    // TODO add feedback
+                    if(component.update(config, ctx, "value")) {
+                        config.sync(mannequin);
+                        return Command.SINGLE_SUCCESS;
+                    }
+                    return 0;
+                }));
     }
 }

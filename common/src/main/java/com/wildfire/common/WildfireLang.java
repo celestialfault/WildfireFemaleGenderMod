@@ -18,6 +18,8 @@
 
 package com.wildfire.common;
 
+import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
+import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.wildfire.api.WildfireAPI;
 import java.util.Arrays;
 import net.minecraft.network.chat.Component;
@@ -308,5 +310,13 @@ public enum WildfireLang {
 
     public MutableComponent translateDescription() {
         return Component.translatable(translationKey + ".description");
+    }
+
+    public SimpleCommandExceptionType simpleCommandException() {
+        return new SimpleCommandExceptionType(translate());
+    }
+
+    public DynamicCommandExceptionType dynamicCommandException() {
+        return new DynamicCommandExceptionType(this::translate);
     }
 }
