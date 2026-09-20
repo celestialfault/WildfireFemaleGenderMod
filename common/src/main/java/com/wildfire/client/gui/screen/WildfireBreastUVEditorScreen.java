@@ -331,7 +331,7 @@ public class WildfireBreastUVEditorScreen extends BaseWildfireScreen {
                             selectedDirection = direction; // store which rect was clicked
                             rebuildWidgets();
                         }
-                    } else if(click.button() == InputConstants.MOUSE_BUTTON_MIDDLE && selectedDirection != null) {
+                    } else if(click.button() == InputConstants.MOUSE_BUTTON_RIGHT && selectedDirection != null) {
                         selectedDirection = null;
                         Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                         rebuildWidgets();

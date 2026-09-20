@@ -56,6 +56,9 @@ public record ClientboundEditMannequinPacket(UUID uuid, AvatarConfig config) imp
     public void handle() {
         var config = WildfireClientAPI.mannequins().getOrCreate(uuid());
         config.setConfig(config());
-        WardrobeBrowserScreen.open(Minecraft.getInstance(), config);
+        // TODO does Fabric/Neo invoke packet receivers on the networking thread?
+        // probably safest to make sure we're running on the client thread to open this screen anyway...
+        Minecraft.getInstance().execute(() ->
+            WardrobeBrowserScreen.open(Minecraft.getInstance(), config));
     }
 }

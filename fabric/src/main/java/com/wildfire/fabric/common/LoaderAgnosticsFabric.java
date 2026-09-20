@@ -32,7 +32,7 @@ import org.jspecify.annotations.Nullable;
 
 public class LoaderAgnosticsFabric implements LoaderAgnostics {
     final AttachmentType<AvatarConfig> AVATAR_ATTACHMENT = AttachmentRegistry.create(WildfireGender.id("gender_data"),
-        builder -> builder.persistent(AvatarConfig.CODEC).copyOnDeath());
+        builder -> builder.persistent(AvatarConfig.CODEC));
 
     @Override
     public String name() {

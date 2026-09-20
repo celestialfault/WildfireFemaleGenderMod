@@ -35,7 +35,7 @@ public record ServerboundMannequinDataPacket(UUID uuid, AvatarConfig config) imp
     public static final StreamCodec<ByteBuf, ServerboundMannequinDataPacket> STREAM_CODEC = StreamCodec.composite(
         UUIDUtil.STREAM_CODEC, ServerboundMannequinDataPacket::uuid,
         // note that this is intentionally using the full avatar codec over using the compact codec;
-        // this is because if the player sets the mannequin's gender to male through the GUI (e.g. to cycle from female to other),
+        // this is because if the player sets the mannequin's gender to male through the GUI (e.g. to cycle from other to female),
         // the mannequin's config will be fully cleared when the server syncs their changes back to them.
         // this would ideally be fixed by just updating individual components for a mannequin, but doing so would
         // also require additional work to support this in the GUI. so, in the meantime, just be a little

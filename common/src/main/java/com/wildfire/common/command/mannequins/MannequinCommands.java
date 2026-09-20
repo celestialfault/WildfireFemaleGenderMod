@@ -116,13 +116,9 @@ public final class MannequinCommands extends AbstractWildfireCommand<ServerComma
         }
 
         MannequinConfigHolder config = WildfireServerAPI.mannequins().getOrCreate(mannequin);
-        AvatarConfig copy = AvatarConfig.CODEC.decode(
-            JavaOps.INSTANCE,
-            AvatarConfig.CODEC.encodeStart(
-                JavaOps.INSTANCE,
-                fromAvatarConfig.config()
-            ).result().orElseGet(AvatarConfig::createDefault)
-        ).getOrThrow().getFirst();
+        AvatarConfig copy = AvatarConfig.CODEC.encodeStart(JavaOps.INSTANCE, fromAvatarConfig.config())
+            .flatMap(encoded -> AvatarConfig.CODEC.decode(JavaOps.INSTANCE, encoded))
+            .result().orElseThrow().getFirst();
 
         config.setConfigAndSync(mannequin, copy, null);
         ctx.getSource().sendSuccess(() ->
@@ -139,15 +135,14 @@ public final class MannequinCommands extends AbstractWildfireCommand<ServerComma
                     Mannequin mannequin = getMannequin(ctx);
                     MannequinConfigHolder config = WildfireServerAPI.mannequins().getOrCreate(mannequin);
                     if(component.update(config, ctx, "value")) {
-                        ctx.getSource().sendSuccess(() -> WildfireLang.COMMAND_MANNEQUIN_SET_VALUE.translate(
-                            mannequin.getDisplayName(), component.name(), component.value(config)
-                        ), true);
+                        ctx.getSource().sendSuccess(
+                            () -> WildfireLang.COMMAND_MANNEQUIN_SET_VALUE.translate(mannequin, component.name(), component.value(config)),
+                            true);
                         config.sync(mannequin, null);
                         return Command.SINGLE_SUCCESS;
                     }
 
-                    ctx.getSource().sendFailure(WildfireLang.COMMAND_MANNEQUIN_SET_VALUE_FAILED.translate(
-                        component.name(), mannequin.getDisplayName()));
+                    ctx.getSource().sendFailure(WildfireLang.COMMAND_MANNEQUIN_SET_VALUE_FAILED.translate(component.name(), mannequin));
                     return 0;
                 }));
     }

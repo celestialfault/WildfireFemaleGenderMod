@@ -202,7 +202,7 @@ public class WildfireLangData {
         add(builder, WildfireLang.CHAR_SETTINGS_HURT_SOUNDS_TOOLTIP, "Your character will play a female hurt sound when taking damage if your gender is set to either Female or Other");
         add(builder, WildfireLang.CHAR_SETTINGS_OVERRIDE_PHYSICS, "Armor Physics: %1$s");
 
-        addFromFallback(builder, WildfireLang.LABEL_GENDER);
+        add(builder, WildfireLang.LABEL_GENDER, "Gender");
         addFromFallback(builder, WildfireLang.LABEL_FEMALE);
         addFromFallback(builder, WildfireLang.LABEL_MALE);
         addFromFallback(builder, WildfireLang.LABEL_OTHER);
@@ -231,6 +231,7 @@ public class WildfireLangData {
         add(builder, WildfireLang.CLOUD_TOOLTIP, "Cloud Sync");
         add(builder, WildfireLang.CLOUD_UNAVAILABLE_INVALID_ACC, "Cloud syncing is unavailable as you aren't currently logged into a valid Minecraft account");
         add(builder, WildfireLang.CLOUD_UNAVAILABLE_OFFLINE_SERVER, "Cloud syncing is unavailable as the server you're connected to is in offline mode");
+        add(builder, WildfireLang.CLOUD_UNAVAILABLE_EDITING_MANNEQUIN, "Not applicable while editing a mannequin");
         add(builder, WildfireLang.CLOUD_STATUS, "Cloud Sync: %1$s");
         add(builder, WildfireLang.CLOUD_AUTOMATIC, "Automatic Sync: %1$s");
         add(builder, WildfireLang.CLOUD_AUTOMATIC_TOOLTIP,

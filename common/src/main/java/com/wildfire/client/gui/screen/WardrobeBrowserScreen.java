@@ -140,6 +140,7 @@ public class WardrobeBrowserScreen extends BaseWildfireScreen {
                 client.gui.setScreen(new WildfireCloudSyncScreen(this, (PlayerConfigHolder) config))
             );
             if(!(config instanceof PlayerConfigHolder)) {
+                builder.tooltip(Tooltip.create(WildfireLang.CLOUD_UNAVAILABLE_EDITING_MANNEQUIN.translate()));
                 builder.active(false);
             } else {
                 var cloudUnavailable = CloudSync.unavailableReason();

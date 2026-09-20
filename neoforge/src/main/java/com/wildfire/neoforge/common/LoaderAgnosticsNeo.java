@@ -84,7 +84,7 @@ public class LoaderAgnosticsNeo implements LoaderAgnostics {
 
     @Override
     public @Nullable AvatarConfig readFromMannequin(final Mannequin mannequin) {
-        return mannequin.getData(AVATAR_ATTACHMENT);
+        return mannequin.getExistingDataOrNull(AVATAR_ATTACHMENT);
     }
 
     @Override

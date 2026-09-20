@@ -64,9 +64,10 @@ abstract class LivingEntityMixin extends Entity {
 
     @Inject(method = "tick", at = @At("TAIL"))
     public void onTick(CallbackInfo ci) {
-        LivingEntity self = (LivingEntity)(Object)this;
+        // Note that this event may not be consistently invoked for every entity, such as if other
+        // mods (e.g. EntityCulling) cancel the entity tick
         if(level().isClientSide()) {
-            //Note that this event may not be consistently invoked for every entity, such as if other mods (e.g. EntityCulling) cancel the entity tick.
+            LivingEntity self = (LivingEntity)(Object)this;
             WildfireClientEventHandler.onEntityTick(self);
         }
     }

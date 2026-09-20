@@ -110,9 +110,7 @@ public enum WildfireLang {
     CHAR_SETTINGS_HURT_SOUNDS_TOOLTIP("tooltip.hurt_sounds"),
     CHAR_SETTINGS_OVERRIDE_PHYSICS("char_settings.override_armor_physics"),
 
-    LABEL_GENDER("label.gender") {{
-        setFallbackString("Gender");
-    }},
+    LABEL_GENDER("label.gender"),
     LABEL_FEMALE("label.female") {{
         setFallbackString("Female");
     }},
@@ -144,6 +142,7 @@ public enum WildfireLang {
     CLOUD_TOOLTIP("cloud.tooltip"),
     CLOUD_UNAVAILABLE_INVALID_ACC("cloud.unavailable.invalid_account"),
     CLOUD_UNAVAILABLE_OFFLINE_SERVER("cloud.unavailable.offline_server"),
+    CLOUD_UNAVAILABLE_EDITING_MANNEQUIN("cloud.unavailable.editing_mannequin"),
     CLOUD_STATUS("cloud.status"),
     CLOUD_AUTOMATIC("cloud.automatic"),
     CLOUD_AUTOMATIC_TOOLTIP("cloud.automatic.tooltip"),
@@ -248,7 +247,7 @@ public enum WildfireLang {
         setFallbackString("Copied breast data from %1$s onto %2$s");
     }},
     COMMAND_SERVER_INVALID_GENDER("command.server.invalid_gender") {{
-        setFallbackString("%1$s is not a valid gender");
+        setFallbackString("%1$s is not a recognized gender");
     }},
 
     COMMAND_MANNEQUIN_SET_VALUE("command.server.mannequin.set") {{
