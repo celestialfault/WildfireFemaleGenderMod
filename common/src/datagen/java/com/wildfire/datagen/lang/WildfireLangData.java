@@ -18,7 +18,7 @@
 
 package com.wildfire.datagen.lang;
 
-import com.wildfire.api.Gender;
+import com.google.common.base.Preconditions;
 import com.wildfire.api.uvs.FaceDirection;
 import com.wildfire.api.uvs.UVDirection;
 import com.wildfire.common.WildfireGender;
@@ -29,7 +29,6 @@ import com.wildfire.common.config.GenderConfigTranslations;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import net.minecraft.data.CachedOutput;
@@ -97,7 +96,9 @@ public class WildfireLangData {
     }
 
     private void addFromFallback(BiConsumer<String, String> builder, WildfireLang lang) {
-        add(builder, lang, Objects.requireNonNull(lang.getFallbackString(), "Fallback string is null"));
+        String message = lang.getFallbackString();
+        Preconditions.checkNotNull(message, "Fallback string for %s is null", lang);
+        add(builder, lang, message);
     }
 
     private void add(BiConsumer<String, String> builder, WildfireLang lang, String... translations) {
@@ -201,10 +202,10 @@ public class WildfireLangData {
         add(builder, WildfireLang.CHAR_SETTINGS_HURT_SOUNDS_TOOLTIP, "Your character will play a female hurt sound when taking damage if your gender is set to either Female or Other");
         add(builder, WildfireLang.CHAR_SETTINGS_OVERRIDE_PHYSICS, "Armor Physics: %1$s");
 
-        add(builder, WildfireLang.LABEL_GENDER, "Gender");
-        add(builder, Gender.FEMALE.getTranslationKey(), "Female");
-        add(builder, Gender.MALE.getTranslationKey(), "Male");
-        add(builder, Gender.OTHER.getTranslationKey(), "Other");
+        addFromFallback(builder, WildfireLang.LABEL_GENDER);
+        addFromFallback(builder, WildfireLang.LABEL_FEMALE);
+        addFromFallback(builder, WildfireLang.LABEL_MALE);
+        addFromFallback(builder, WildfireLang.LABEL_OTHER);
 
         add(builder, WildfireLang.LABEL_ENABLED, "Enabled");
         add(builder, WildfireLang.LABEL_DISABLED, "Disabled");

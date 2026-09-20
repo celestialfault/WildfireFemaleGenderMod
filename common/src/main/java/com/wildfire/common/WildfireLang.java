@@ -20,11 +20,13 @@ package com.wildfire.common;
 
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+import com.wildfire.api.NamedEnum;
 import com.wildfire.api.WildfireAPI;
 import java.util.Arrays;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextColor;
+import net.minecraft.world.Nameable;
 import org.jspecify.annotations.Nullable;
 
 public enum WildfireLang {
@@ -108,7 +110,19 @@ public enum WildfireLang {
     CHAR_SETTINGS_HURT_SOUNDS_TOOLTIP("tooltip.hurt_sounds"),
     CHAR_SETTINGS_OVERRIDE_PHYSICS("char_settings.override_armor_physics"),
 
-    LABEL_GENDER("label.gender"),
+    LABEL_GENDER("label.gender") {{
+        setFallbackString("Gender");
+    }},
+    LABEL_FEMALE("label.female") {{
+        setFallbackString("Female");
+    }},
+    LABEL_MALE("label.male") {{
+        setFallbackString("Male");
+    }},
+    LABEL_OTHER("label.other") {{
+        setFallbackString("Other");
+    }},
+
     LABEL_ENABLED("label.enabled"),
     LABEL_DISABLED("label.disabled"),
     LABEL_ON("label.on"),
@@ -228,13 +242,60 @@ public enum WildfireLang {
         setFallbackString("Provided entity must be a player or mannequin");
     }},
     COMMAND_SERVER_NO_MOD_ON_CLIENT("command.server.no_mod") {{
-        setFallbackString("You must have a compatible version of Female Gender Mod installed on your client to use this command");
+        setFallbackString("This command requires a compatible version of Female Gender Mod to use");
     }},
     COMMAND_MANNEQUIN_COPIED_DATA("command.server.mannequin.copied") {{
-        setFallbackString("%1$s is now using breast data from %2$s");
+        setFallbackString("Copied breast data from %1$s onto %2$s");
     }},
     COMMAND_SERVER_INVALID_GENDER("command.server.invalid_gender") {{
         setFallbackString("%1$s is not a valid gender");
+    }},
+
+    COMMAND_MANNEQUIN_SET_VALUE("command.server.mannequin.set") {{
+        setFallbackString("Set %1$s %2$s to %3$s");
+    }},
+    COMMAND_MANNEQUIN_SET_VALUE_FAILED("command.server.mannequin.set_failure") {{
+        setFallbackString("Failed to update %1$s for %2$s");
+    }},
+
+    COMMAND_MANNEQUIN_DATA_GENDER("command.server.mannequin.data.gender") {{
+        setFallbackString("gender");
+    }},
+    COMMAND_MANNEQUIN_DATA_BREAST_SIZE("command.server.mannequin.data.breast_size") {{
+        setFallbackString("breast size");
+    }},
+    COMMAND_MANNEQUIN_DATA_X_OFFSET("command.server.mannequin.data.xOffset") {{
+        setFallbackString("breast separation");
+    }},
+    COMMAND_MANNEQUIN_DATA_Y_OFFSET("command.server.mannequin.data.yOffset") {{
+        setFallbackString("breast height");
+    }},
+    COMMAND_MANNEQUIN_DATA_Z_OFFSET("command.server.mannequin.data.zOffset") {{
+        setFallbackString("breast depth");
+    }},
+    COMMAND_MANNEQUIN_DATA_CLEAVAGE("command.server.mannequin.data.cleavage") {{
+        setFallbackString("breast rotation");
+    }},
+    COMMAND_MANNEQUIN_DATA_SHOW_IN_ARMOR("command.server.mannequin.data.show_in_armor") {{
+        setFallbackString("show breasts in armor");
+    }},
+    COMMAND_MANNEQUIN_DATA_PHYSICS("command.server.mannequin.data.physics") {{
+        setFallbackString("breast physics enabled");
+    }},
+    COMMAND_MANNEQUIN_DATA_PHYSICS_BOUNCE("command.server.mannequin.data.physics_bounce") {{
+        setFallbackString("breast physics intensity");
+    }},
+    COMMAND_MANNEQUIN_DATA_PHYSICS_FLOPPY("command.server.mannequin.data.physics_floppy") {{
+        setFallbackString("breast physics momentum");
+    }},
+    COMMAND_MANNEQUIN_DATA_PHYSICS_UNIBOOB("command.server.mannequin.data.physics_uniboob") {{
+        setFallbackString("separate breast physics");
+    }},
+    COMMAND_MANNEQUIN_DATA_HURT_SOUNDS("command.server.mannequin.data.hurt_sounds") {{
+        setFallbackString("female hurt sounds");
+    }},
+    COMMAND_MANNEQUIN_DATA_HURT_PITCH("command.server.mannequin.data.hurt_pitch") {{
+        setFallbackString("hurt sound pitch");
     }},
 
     ;
@@ -291,8 +352,7 @@ public enum WildfireLang {
     }
 
     public MutableComponent translate(Object... args) {
-        //Simple filter to auto translate any sub lang entries
-        Object[] arguments = Arrays.stream(args).map(arg -> arg instanceof WildfireLang lang ? lang.translate() : arg).toArray();
+        Object[] arguments = Arrays.stream(args).map(WildfireLang::parse).toArray();
         if(fallbackString == null) {
             return Component.translatable(translationKey, arguments);
         } else {
@@ -318,5 +378,14 @@ public enum WildfireLang {
 
     public DynamicCommandExceptionType dynamicCommandException() {
         return new DynamicCommandExceptionType(this::translate);
+    }
+
+    private static Object parse(Object other) {
+        return switch(other) {
+            case Nameable nameable -> nameable.getDisplayName();
+            case NamedEnum named -> named.getDisplayName();
+            case WildfireLang lang -> lang.translate();
+            default -> other;
+        };
     }
 }

@@ -59,22 +59,22 @@ public final class MannequinCommands extends AbstractWildfireCommand<ServerComma
                         .executes(this::copyOntoMannequin))))
             .then(helper.literal("set")
                 .then(helper.argument("mannequin", EntityArgument.entity())
-                    .then(setter("gender", MannequinComponent.GENDER))
+                    .then(setter("gender", MannequinComponents.GENDER))
                     .then(helper.literal("breast")
-                        .then(setter("size", MannequinComponent.BREAST_SIZE))
-                        .then(setter("cleavage", MannequinComponent.BREAST_CLEAVAGE))
+                        .then(setter("size", MannequinComponents.BREAST_SIZE))
+                        .then(setter("rotation", MannequinComponents.BREAST_CLEAVAGE))
                         .then(helper.literal("physics")
-                            .then(setter("enabled", MannequinComponent.PHYSICS))
-                            .then(setter("intensity", MannequinComponent.PHYSICS_BOUNCE))
-                            .then(setter("momentum", MannequinComponent.PHYSICS_FLOPPY))
-                            .then(setter("uniboob", MannequinComponent.PHYSICS_UNIBOOB)))
-                        .then(setter("separation", MannequinComponent.BREAST_OFFSET_X))
-                        .then(setter("height", MannequinComponent.BREAST_OFFSET_Y))
-                        .then(setter("depth", MannequinComponent.BREAST_OFFSET_Z)))
-                    .then(setter("show_in_armor", MannequinComponent.SHOW_IN_ARMOR))
+                            .then(setter("enabled", MannequinComponents.PHYSICS))
+                            .then(setter("intensity", MannequinComponents.PHYSICS_BOUNCE))
+                            .then(setter("momentum", MannequinComponents.PHYSICS_FLOPPY))
+                            .then(setter("uniboob", MannequinComponents.PHYSICS_UNIBOOB)))
+                        .then(setter("separation", MannequinComponents.BREAST_OFFSET_X))
+                        .then(setter("height", MannequinComponents.BREAST_OFFSET_Y))
+                        .then(setter("depth", MannequinComponents.BREAST_OFFSET_Z)))
+                    .then(setter("show_in_armor", MannequinComponents.SHOW_IN_ARMOR))
                     .then(helper.literal("sounds")
-                        .then(setter("enabled", MannequinComponent.HURT_SOUNDS))
-                        .then(setter("pitch", MannequinComponent.VOICE_PITCH))))
+                        .then(setter("enabled", MannequinComponents.HURT_SOUNDS))
+                        .then(setter("pitch", MannequinComponents.VOICE_PITCH))))
             );
     }
 
@@ -91,9 +91,11 @@ public final class MannequinCommands extends AbstractWildfireCommand<ServerComma
         Mannequin mannequin = getMannequin(ctx);
 
         if(WildfireNetworking.INSTANCE.canSendToPlayer(player, ClientboundEditMannequinPacket.TYPE)) {
+            // does it make sense to send a feedback message here? I feel like the GUI opening
+            // would be feedback enough in most cases
             WildfireNetworking.INSTANCE.sendToClient(player, new ClientboundEditMannequinPacket(mannequin));
         } else {
-            helper.sendFailure(ctx.getSource(), WildfireLang.COMMAND_SERVER_NO_MOD_ON_CLIENT.translateColored(TextColor.RED));
+            ctx.getSource().sendFailure(WildfireLang.COMMAND_SERVER_NO_MOD_ON_CLIENT.translateColored(TextColor.RED));
         }
 
         return Command.SINGLE_SUCCESS;
@@ -104,12 +106,12 @@ public final class MannequinCommands extends AbstractWildfireCommand<ServerComma
 
         Entity from = EntityArgument.getEntity(ctx, "from");
         if(!(from instanceof Avatar fromLiving)) {
-            helper.sendFailure(ctx.getSource(), WildfireLang.COMMAND_ENTITY_MUST_BE_AVATAR_LIKE.translateColored(TextColor.RED));
+            ctx.getSource().sendFailure(WildfireLang.COMMAND_ENTITY_MUST_BE_AVATAR_LIKE.translate());
             return 0;
         }
         var fromConfig = WildfireServerAPI.getConfig(fromLiving);
         if(!(fromConfig instanceof AbstractAvatarConfigHolder fromAvatarConfig)) {
-            helper.sendFailure(ctx.getSource(), WildfireLang.COMMAND_ENTITY_MUST_BE_AVATAR_LIKE.translateColored(TextColor.RED));
+            ctx.getSource().sendFailure(WildfireLang.COMMAND_ENTITY_MUST_BE_AVATAR_LIKE.translate());
             return 0;
         }
 
@@ -123,8 +125,9 @@ public final class MannequinCommands extends AbstractWildfireCommand<ServerComma
         ).getOrThrow().getFirst();
 
         config.setConfigAndSync(mannequin, copy, null);
-        helper.sendSystemMessage(ctx.getSource(), WildfireLang.COMMAND_MANNEQUIN_COPIED_DATA.translate(
-            mannequin.getDisplayName(), fromLiving.getDisplayName()));
+        ctx.getSource().sendSuccess(() ->
+            WildfireLang.COMMAND_MANNEQUIN_COPIED_DATA.translate(fromLiving.getDisplayName(), mannequin.getDisplayName()),
+            true);
 
         return Command.SINGLE_SUCCESS;
     }
@@ -135,11 +138,16 @@ public final class MannequinCommands extends AbstractWildfireCommand<ServerComma
                 .executes(ctx -> {
                     Mannequin mannequin = getMannequin(ctx);
                     MannequinConfigHolder config = WildfireServerAPI.mannequins().getOrCreate(mannequin);
-                    // TODO add feedback
                     if(component.update(config, ctx, "value")) {
+                        ctx.getSource().sendSuccess(() -> WildfireLang.COMMAND_MANNEQUIN_SET_VALUE.translate(
+                            mannequin.getDisplayName(), component.name(), component.value(config)
+                        ), true);
                         config.sync(mannequin, null);
                         return Command.SINGLE_SUCCESS;
                     }
+
+                    ctx.getSource().sendFailure(WildfireLang.COMMAND_MANNEQUIN_SET_VALUE_FAILED.translate(
+                        component.name(), mannequin.getDisplayName()));
                     return 0;
                 }));
     }
