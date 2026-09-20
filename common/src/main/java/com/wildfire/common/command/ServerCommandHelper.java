@@ -26,17 +26,16 @@ import net.minecraft.server.permissions.Permission;
 import net.minecraft.server.permissions.Permissions;
 
 public interface ServerCommandHelper extends CommandHelper<CommandSourceStack> {
-    Permission SERVER_COMMAND = Permissions.COMMANDS_GAMEMASTER;
-    Permission DEBUG_COMMANDS = Permissions.COMMANDS_GAMEMASTER;
+    CommandPermission COMMAND_PERMISSION = new CommandPermission("command", Permissions.COMMANDS_GAMEMASTER);
+    CommandPermission DEBUG_PERMISSION = new CommandPermission("command.debug", Permissions.COMMANDS_GAMEMASTER);
 
     MinecraftServer getServer(CommandSourceStack source);
     ServerPlayer getPlayer(CommandSourceStack source) throws CommandSyntaxException;
 
-    default boolean hasCommandPermission(CommandSourceStack source) {
-        return source.permissions().hasPermission(SERVER_COMMAND);
+    default boolean hasPermission(CommandSourceStack source, CommandPermission permission) {
+        return source.permissions().hasPermission(permission.vanilla());
     }
 
-    default boolean hasDebugCommandPermission(CommandSourceStack source) {
-        return source.permissions().hasPermission(DEBUG_COMMANDS);
+    record CommandPermission(String key, Permission vanilla) {
     }
 }

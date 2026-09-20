@@ -50,7 +50,7 @@ public final class WildfireServerCommand extends AbstractWildfireCommand<ServerC
     public void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         var mannequin = new MannequinCommands(helper);
         dispatcher.register(helper.literal("fgmserver")
-            .requires(helper::hasCommandPermission)
+            .requires(source -> helper.hasPermission(source, ServerCommandHelper.COMMAND_PERMISSION))
             .executes(this::syncStats)
             .then(mannequin.createNode())
             .then(createDebugNode())
@@ -59,7 +59,7 @@ public final class WildfireServerCommand extends AbstractWildfireCommand<ServerC
 
     private LiteralArgumentBuilder<CommandSourceStack> createDebugNode() {
         return helper.literal("debug")
-            .requires(helper::hasDebugCommandPermission)
+            .requires(source -> helper.hasPermission(source, ServerCommandHelper.DEBUG_PERMISSION))
             .executes(ctx -> {
                 sendHelp(ctx, WildfireLang.DEBUG_COMMAND,
                     WildfireLang.COMMAND_TRIM,
