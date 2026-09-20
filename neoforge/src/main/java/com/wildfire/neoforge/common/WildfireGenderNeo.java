@@ -18,21 +18,32 @@
 
 package com.wildfire.neoforge.common;
 
+import com.mojang.serialization.MapCodec;
 import com.wildfire.api.WildfireAPI;
 import com.wildfire.common.WildfireEventHandler;
 import com.wildfire.common.command.WildfireServerCommand;
+import com.wildfire.common.entities.avatars.AvatarConfig;
 import com.wildfire.neoforge.common.networking.NeoSync;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent;
+import net.neoforged.neoforge.registries.DeferredRegister;
+import net.neoforged.neoforge.registries.NeoForgeRegistries;
+import org.jetbrains.annotations.ApiStatus;
+import java.util.function.Supplier;
 
 @Mod(WildfireAPI.MODID)
 public class WildfireGenderNeo {
+    private static final DeferredRegister<AttachmentType<?>> ATTACHMENT_TYPES = DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, WildfireAPI.MODID);
+
+    public static final Supplier<AttachmentType<AvatarConfig>> AVATAR_ATTACHMENT = ATTACHMENT_TYPES.register("gender_data", () ->
+        AttachmentType.builder(AvatarConfig::createDefault).serialize(MapCodec.assumeMapUnsafe(AvatarConfig.CODEC)).build());
 
     public WildfireGenderNeo(IEventBus modEventBus) {
         NeoSync.register(modEventBus);
@@ -51,6 +62,6 @@ public class WildfireGenderNeo {
                 WildfireEventHandler.onEntityLoad(event.getEntity());
             }
         });
-        LoaderAgnosticsNeo.ATTACHMENT_TYPES.register(modEventBus);
+        ATTACHMENT_TYPES.register(modEventBus);
     }
 }

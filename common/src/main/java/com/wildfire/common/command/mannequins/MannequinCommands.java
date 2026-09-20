@@ -67,7 +67,8 @@ public final class MannequinCommands extends AbstractWildfireCommand<ServerComma
                             .then(setter("enabled", MannequinComponents.PHYSICS))
                             .then(setter("intensity", MannequinComponents.PHYSICS_BOUNCE))
                             .then(setter("momentum", MannequinComponents.PHYSICS_FLOPPY))
-                            .then(setter("uniboob", MannequinComponents.PHYSICS_UNIBOOB)))
+                            // TODO does dual_physics or similar make more sense here?
+                            .then(setter("separate", MannequinComponents.PHYSICS_UNIBOOB)))
                         .then(setter("separation", MannequinComponents.BREAST_OFFSET_X))
                         .then(setter("height", MannequinComponents.BREAST_OFFSET_Y))
                         .then(setter("depth", MannequinComponents.BREAST_OFFSET_Z)))
