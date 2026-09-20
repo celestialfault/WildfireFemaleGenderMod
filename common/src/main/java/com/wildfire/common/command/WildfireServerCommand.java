@@ -29,7 +29,7 @@ import com.wildfire.common.WildfireGender;
 import com.wildfire.common.WildfireLang;
 import com.wildfire.common.command.mannequins.MannequinCommands;
 import com.wildfire.common.entities.BreastDataComponent;
-import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -42,13 +42,13 @@ import net.minecraft.world.item.equipment.trim.ArmorTrim;
 import net.minecraft.world.item.equipment.trim.TrimMaterials;
 import net.minecraft.world.item.equipment.trim.TrimPatterns;
 
-public final class WildfireServerCommand<S extends SharedSuggestionProvider> extends AbstractWildfireCommand<ServerCommandHelper<S>, S> {
-    public WildfireServerCommand(final ServerCommandHelper<S> helper) {
+public final class WildfireServerCommand extends AbstractWildfireCommand<ServerCommandHelper, CommandSourceStack> {
+    public WildfireServerCommand(final ServerCommandHelper helper) {
         super(helper);
     }
 
-    public void register(CommandDispatcher<S> dispatcher) {
-        var mannequin = new MannequinCommands<>(helper);
+    public void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+        var mannequin = new MannequinCommands(helper);
         dispatcher.register(helper.literal("fgmserver")
             .requires(helper::hasCommandPermission)
             .executes(this::syncStats)
@@ -57,7 +57,7 @@ public final class WildfireServerCommand<S extends SharedSuggestionProvider> ext
         );
     }
 
-    private LiteralArgumentBuilder<S> createDebugNode() {
+    private LiteralArgumentBuilder<CommandSourceStack> createDebugNode() {
         return helper.literal("debug")
             .requires(helper::hasDebugCommandPermission)
             .executes(ctx -> {
@@ -75,7 +75,7 @@ public final class WildfireServerCommand<S extends SharedSuggestionProvider> ext
                 .executes(this::spawnArmorStand));
     }
 
-    private int syncStats(CommandContext<S> ctx) {
+    private int syncStats(CommandContext<CommandSourceStack> ctx) {
         helper.sendSystemMessage(ctx.getSource(), WildfireLang.GENERIC_COMMA.translateColored(TextColor.GRAY,
             WildfireLang.MOD_NAME.translateColored(TextColor.LIGHT_PURPLE),
             WildfireLang.COMMAND_VERSION_INFO.translateColored(TextColor.GRAY,
@@ -97,8 +97,8 @@ public final class WildfireServerCommand<S extends SharedSuggestionProvider> ext
         return Command.SINGLE_SUCCESS;
     }
 
-    private int equipTrimmedChestplate(CommandContext<S> ctx) throws CommandSyntaxException {
-        var player = helper.getPlayer(ctx.getSource());
+    private int equipTrimmedChestplate(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        var player = ctx.getSource().getPlayerOrException();
         var item = new ItemStack(Items.IRON_CHESTPLATE);
         var glint = getOrDefault(ctx, "glint", null, Boolean.class);
 
@@ -113,8 +113,8 @@ public final class WildfireServerCommand<S extends SharedSuggestionProvider> ext
         return Command.SINGLE_SUCCESS;
     }
 
-    private int spawnArmorStand(CommandContext<S> ctx) throws CommandSyntaxException {
-        var player = helper.getPlayer(ctx.getSource());
+    private int spawnArmorStand(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        var player = ctx.getSource().getPlayerOrException();
         var world = player.level();
 
         var item = new ItemStack(Items.IRON_CHESTPLATE);

@@ -33,7 +33,7 @@ import com.wildfire.common.entities.avatars.AvatarConfig;
 import com.wildfire.common.entities.avatars.MannequinConfigHolder;
 import com.wildfire.common.networking.WildfireNetworking;
 import com.wildfire.common.networking.packets.mannequins.ClientboundEditMannequinPacket;
-import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.server.level.ServerPlayer;
@@ -42,14 +42,14 @@ import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.decoration.Mannequin;
 
-public final class MannequinCommands<S extends SharedSuggestionProvider> extends AbstractWildfireCommand<ServerCommandHelper<S>, S> {
+public final class MannequinCommands extends AbstractWildfireCommand<ServerCommandHelper, CommandSourceStack> {
     private static final SimpleCommandExceptionType NOT_A_MANNEQUIN = new SimpleCommandExceptionType(WildfireLang.COMMAND_ENTITY_MUST_BE_MANNEQUIN.translate());
 
-    public MannequinCommands(final ServerCommandHelper<S> helper) {
+    public MannequinCommands(final ServerCommandHelper helper) {
         super(helper);
     }
 
-    public LiteralArgumentBuilder<S> createNode() {
+    public LiteralArgumentBuilder<CommandSourceStack> createNode() {
         return helper.literal("mannequin")
             .then(helper.argument("entity", EntityArgument.entity())
                 .executes(this::editMannequin)
@@ -75,15 +75,15 @@ public final class MannequinCommands<S extends SharedSuggestionProvider> extends
                 ));
     }
 
-    private Mannequin getMannequin(CommandContext<S> ctx) throws CommandSyntaxException {
-        Entity entity = helper.resolveSingleEntityArgument(ctx, "entity");
+    private Mannequin getMannequin(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        Entity entity = EntityArgument.getEntity(ctx, "entity");
         if(!(entity instanceof Mannequin mannequin)) {
             throw NOT_A_MANNEQUIN.create();
         }
         return mannequin;
     }
 
-    private int editMannequin(CommandContext<S> ctx) throws CommandSyntaxException {
+    private int editMannequin(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         ServerPlayer player = helper.getPlayer(ctx.getSource());
         Mannequin mannequin = getMannequin(ctx);
 
@@ -96,10 +96,10 @@ public final class MannequinCommands<S extends SharedSuggestionProvider> extends
         return Command.SINGLE_SUCCESS;
     }
 
-    private int copyOntoMannequin(CommandContext<S> ctx) throws CommandSyntaxException {
+    private int copyOntoMannequin(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         Mannequin mannequin = getMannequin(ctx);
 
-        Entity from = helper.resolveSingleEntityArgument(ctx, "from");
+        Entity from = EntityArgument.getEntity(ctx, "from");
         if(!(from instanceof Avatar fromLiving)) {
             helper.sendFailure(ctx.getSource(), WildfireLang.COMMAND_ENTITY_MUST_BE_AVATAR_LIKE.translateColored(TextColor.RED));
             return 0;
@@ -126,10 +126,10 @@ public final class MannequinCommands<S extends SharedSuggestionProvider> extends
         return Command.SINGLE_SUCCESS;
     }
 
-    private <A, T> LiteralArgumentBuilder<S> setter(final String name, final MannequinComponent<A, T> component) {
+    private <A, T> LiteralArgumentBuilder<CommandSourceStack> setter(final String name, final MannequinComponent<A, T> component) {
         return helper.literal(name)
             .then(Util.make(helper.argument("value", component.argument()), builder -> {
-                var suggestionProvider = component.<S>suggestionProvider();
+                var suggestionProvider = component.suggestionProvider();
                 if(suggestionProvider != null) {
                     builder.suggests(suggestionProvider);
                 }

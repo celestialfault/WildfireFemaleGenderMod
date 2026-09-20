@@ -43,7 +43,7 @@ public class WildfireGenderNeo {
             }
         });
         NeoForge.EVENT_BUS.addListener(RegisterCommandsEvent.class, event -> {
-            var command = new WildfireServerCommand<>(new NeoServerCommandHelper());
+            var command = new WildfireServerCommand(new NeoServerCommandHelper());
             command.register(event.getDispatcher());
         });
         NeoForge.EVENT_BUS.addListener(EntityJoinLevelEvent.class, event -> {

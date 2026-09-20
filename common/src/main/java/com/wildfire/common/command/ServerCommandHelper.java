@@ -18,29 +18,25 @@
 
 package com.wildfire.common.command;
 
-import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.permissions.Permission;
 import net.minecraft.server.permissions.Permissions;
-import net.minecraft.world.entity.Entity;
 
-public interface ServerCommandHelper<SOURCE extends SharedSuggestionProvider> extends CommandHelper<SOURCE> {
+public interface ServerCommandHelper extends CommandHelper<CommandSourceStack> {
     Permission SERVER_COMMAND = Permissions.COMMANDS_GAMEMASTER;
     Permission DEBUG_COMMANDS = Permissions.COMMANDS_GAMEMASTER;
 
-    MinecraftServer getServer(SOURCE source);
-    ServerPlayer getPlayer(SOURCE source) throws CommandSyntaxException;
+    MinecraftServer getServer(CommandSourceStack source);
+    ServerPlayer getPlayer(CommandSourceStack source) throws CommandSyntaxException;
 
-    default boolean hasCommandPermission(SOURCE source) {
+    default boolean hasCommandPermission(CommandSourceStack source) {
         return source.permissions().hasPermission(SERVER_COMMAND);
     }
 
-    default boolean hasDebugCommandPermission(SOURCE source) {
+    default boolean hasDebugCommandPermission(CommandSourceStack source) {
         return source.permissions().hasPermission(DEBUG_COMMANDS);
     }
-
-    Entity resolveSingleEntityArgument(CommandContext<SOURCE> ctx, String name) throws CommandSyntaxException;
 }

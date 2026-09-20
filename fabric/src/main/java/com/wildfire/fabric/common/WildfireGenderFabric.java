@@ -34,7 +34,7 @@ public class WildfireGenderFabric implements ModInitializer {
         EntityTrackingEvents.START_TRACKING.register(WildfireEventHandler::onBeginTracking);
         ServerPlayConnectionEvents.DISCONNECT.register((handler, _) -> WildfireEventHandler.playerDisconnected(handler.getPlayer()));
         CommandRegistrationCallback.EVENT.register((dispatcher, _, _) -> {
-            var command = new WildfireServerCommand<>(new FabricServerCommandHelper());
+            var command = new WildfireServerCommand(new FabricServerCommandHelper());
             command.register(dispatcher);
         });
         ServerEntityEvents.ENTITY_LOAD.register((entity, _) -> WildfireEventHandler.onEntityLoad(entity));

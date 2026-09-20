@@ -37,7 +37,7 @@ import com.wildfire.common.entities.avatars.AbstractAvatarConfigHolder;
 import com.wildfire.common.entities.avatars.MannequinConfigHolder;
 import java.util.Locale;
 import java.util.function.Function;
-import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.commands.CommandSourceStack;
 import org.jspecify.annotations.Nullable;
 
 public interface MannequinComponent<A, T> {
@@ -56,11 +56,11 @@ public interface MannequinComponent<A, T> {
     BoolComponent PHYSICS_UNIBOOB = new BoolComponent(config -> config.breasts().physics().uniboob());
 
     ArgumentType<A> argument();
-    <S extends SharedSuggestionProvider> T parse(CommandContext<S> ctx, String name, ServerCommandHelper<S> helper) throws CommandSyntaxException;
+    T parse(CommandContext<CommandSourceStack> ctx, String name, ServerCommandHelper helper) throws CommandSyntaxException;
 
     void update(MannequinConfigHolder config, T value);
 
-    default <S extends SharedSuggestionProvider> @Nullable SuggestionProvider<S> suggestionProvider() {
+    default @Nullable SuggestionProvider<CommandSourceStack> suggestionProvider() {
         return null;
     }
 
@@ -74,7 +74,7 @@ public interface MannequinComponent<A, T> {
         }
 
         @Override
-        public <S extends SharedSuggestionProvider> Gender parse(final CommandContext<S> ctx, final String name, final ServerCommandHelper<S> helper) throws CommandSyntaxException {
+        public Gender parse(final CommandContext<CommandSourceStack> ctx, final String name, final ServerCommandHelper helper) throws CommandSyntaxException {
             String input = StringArgumentType.getString(ctx, name);
             try {
                 return Gender.valueOf(input.toUpperCase(Locale.ROOT));
@@ -89,7 +89,7 @@ public interface MannequinComponent<A, T> {
         }
 
         @Override
-        public <S extends SharedSuggestionProvider> SuggestionProvider<S> suggestionProvider() {
+        public SuggestionProvider<CommandSourceStack> suggestionProvider() {
             return new GenderSuggestionProvider<>();
         }
     }
@@ -113,7 +113,7 @@ public interface MannequinComponent<A, T> {
         }
 
         @Override
-        public <S extends SharedSuggestionProvider> Float parse(final CommandContext<S> ctx, final String name, final ServerCommandHelper<S> helper) {
+        public Float parse(final CommandContext<CommandSourceStack> ctx, final String name, final ServerCommandHelper helper) {
             return FloatArgumentType.getFloat(ctx, name);
         }
 
@@ -136,7 +136,7 @@ public interface MannequinComponent<A, T> {
         }
 
         @Override
-        public <S extends SharedSuggestionProvider> Boolean parse(final CommandContext<S> ctx, final String name, final ServerCommandHelper<S> helper) {
+        public Boolean parse(final CommandContext<CommandSourceStack> ctx, final String name, final ServerCommandHelper helper) {
             return BoolArgumentType.getBool(ctx, name);
         }
 
