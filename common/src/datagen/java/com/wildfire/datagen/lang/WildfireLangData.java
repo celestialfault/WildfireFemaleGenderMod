@@ -319,6 +319,28 @@ public class WildfireLangData {
 
         addFromFallback(builder, WildfireLang.COMMAND_VERSION_INFO);
         addFromFallback(builder, WildfireLang.COMMAND_SYNCED_PLAYER_COUNT);
+        addFromFallback(builder, WildfireLang.COMMAND_ENTITY_MUST_BE_MANNEQUIN);
+        addFromFallback(builder, WildfireLang.COMMAND_ENTITY_MUST_BE_AVATAR_LIKE);
+        addFromFallback(builder, WildfireLang.COMMAND_SERVER_NO_MOD_ON_CLIENT);
+        addFromFallback(builder, WildfireLang.COMMAND_MANNEQUIN_COPIED_DATA);
+        addFromFallback(builder, WildfireLang.COMMAND_SERVER_INVALID_GENDER);
+
+        addFromFallback(builder, WildfireLang.COMMAND_MANNEQUIN_SET_VALUE);
+        addFromFallback(builder, WildfireLang.COMMAND_MANNEQUIN_SET_VALUE_FAILED);
+
+        addFromFallback(builder, WildfireLang.COMMAND_MANNEQUIN_DATA_GENDER);
+        addFromFallback(builder, WildfireLang.COMMAND_MANNEQUIN_DATA_BREAST_SIZE);
+        addFromFallback(builder, WildfireLang.COMMAND_MANNEQUIN_DATA_X_OFFSET);
+        addFromFallback(builder, WildfireLang.COMMAND_MANNEQUIN_DATA_Y_OFFSET);
+        addFromFallback(builder, WildfireLang.COMMAND_MANNEQUIN_DATA_Z_OFFSET);
+        addFromFallback(builder, WildfireLang.COMMAND_MANNEQUIN_DATA_CLEAVAGE);
+        addFromFallback(builder, WildfireLang.COMMAND_MANNEQUIN_DATA_SHOW_IN_ARMOR);
+        addFromFallback(builder, WildfireLang.COMMAND_MANNEQUIN_DATA_PHYSICS);
+        addFromFallback(builder, WildfireLang.COMMAND_MANNEQUIN_DATA_PHYSICS_BOUNCE);
+        addFromFallback(builder, WildfireLang.COMMAND_MANNEQUIN_DATA_PHYSICS_FLOPPY);
+        addFromFallback(builder, WildfireLang.COMMAND_MANNEQUIN_DATA_PHYSICS_UNIBOOB);
+        addFromFallback(builder, WildfireLang.COMMAND_MANNEQUIN_DATA_HURT_SOUNDS);
+        addFromFallback(builder, WildfireLang.COMMAND_MANNEQUIN_DATA_HURT_PITCH);
 
         add(builder, WildfireLang.DEBUG_COMMAND_LOOKING_AT, "Looking at: %1$s");
         add(builder, WildfireLang.DEBUG_COMMAND_LOOKING_AT_NONE, "No entity in sight.");
