@@ -90,11 +90,14 @@ public class WildfireFirstTimeSetupScreen extends BaseWildfireScreen {
                     button.setMessage(CommonComponents.ELLIPSIS);
                     ref.no.setActive(false);
 
-                    final var nextScreen = WardrobeBrowserScreen.create(minecraft.player, null);
                     doInitialSync().thenRun(() ->
-                        minecraft.execute(() ->
-                            minecraft.gui.setScreen(nextScreen)
-                        )
+                        minecraft.execute(() -> {
+                            // note that we intentionally ignore the config provided to this screen,
+                            // as it's possible that #doInitialSync() has invalidated our current config,
+                            // which would lead to changes made in the opened screen being effectively discarded
+                            assert minecraft.player != null;
+                            WardrobeBrowserScreen.open(minecraft, minecraft.player);
+                        })
                     );
                 })
                 .tooltip(Tooltip.create(WildfireLang.FIRST_TIME_ENABLE_TOOLTIP.line(1)

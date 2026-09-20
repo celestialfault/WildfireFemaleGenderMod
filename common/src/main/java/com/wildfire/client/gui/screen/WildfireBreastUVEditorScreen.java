@@ -45,6 +45,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.CommonColors;
 import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.UnknownNullability;
 import org.joml.Vector2i;
 import org.jspecify.annotations.Nullable;
@@ -59,7 +60,8 @@ public class WildfireBreastUVEditorScreen extends BaseWildfireScreen {
     private @Nullable UVDirection selectedDirection = null;
 
     //Positions & Widths
-    private @UnknownNullability Vector2i winElementPos, uvWindowPos;
+    @UnknownNullability("null until #init() is run")
+    private Vector2i winElementPos, uvWindowPos;
 
     private static final int sidebarWidth = 180;
     private static final int textureDrawWidth = 196;
@@ -84,8 +86,7 @@ public class WildfireBreastUVEditorScreen extends BaseWildfireScreen {
                 .position(x + 5, y + 5)
                 .size(this.width - x - 10, 20)
                 .onPress(_ -> {
-                    var player = Objects.requireNonNull(getPlayer(), "getPlayer()");
-                    if (player.uvs().reset()) {
+                    if (config.uvs().reset()) {
                         save();
                     }
                 }));
@@ -199,21 +200,19 @@ public class WildfireBreastUVEditorScreen extends BaseWildfireScreen {
     @Override
     public void tick() {
         super.tick();
-        var player = getPlayer();
-        if(player == null) return;
 
         selectedUVs = switch (selectedBreastIndex) {
-            case RIGHT -> player.uvs().skin().right().get();
-            case LEFT_OVERLAY -> player.uvs().overlay().left().get();
-            case RIGHT_OVERLAY -> player.uvs().overlay().right().get();
-            default -> player.uvs().skin().left().get();
+            case RIGHT -> config.uvs().skin().right().get();
+            case LEFT_OVERLAY -> config.uvs().overlay().left().get();
+            case RIGHT_OVERLAY -> config.uvs().overlay().right().get();
+            default -> config.uvs().skin().left().get();
         };
     }
 
     // TODO this should be broken up into smaller methods
     @Override
     public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
-        var entity = getEntity();
+        LivingEntity entity = getEntity();
         if(!(entity instanceof ClientAvatarEntity avatar)) {
             return;
         }

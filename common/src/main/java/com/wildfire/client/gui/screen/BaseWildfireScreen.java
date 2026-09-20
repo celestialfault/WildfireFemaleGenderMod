@@ -69,11 +69,6 @@ public abstract class BaseWildfireScreen extends Screen implements IFancyFontRen
         return addRenderableWidget(sliderBuilder.build(lastMSInitialized));
     }
 
-    // TODO does this still serve a purpose?
-    public AbstractAvatarConfigHolder getPlayer() {
-        return config;
-    }
-
     protected @Nullable LivingEntity getEntity() {
         Level level = minecraft.level;
         if(level == null) {

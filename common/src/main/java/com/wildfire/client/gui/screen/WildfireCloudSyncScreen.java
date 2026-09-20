@@ -18,16 +18,17 @@
 
 package com.wildfire.client.gui.screen;
 
-import com.wildfire.client.gui.WildfireButton;
-import com.wildfire.common.WildfireGender;
-import com.wildfire.common.WildfireLang;
 import com.wildfire.client.cloud.CloudSync;
 import com.wildfire.client.cloud.SyncLog;
 import com.wildfire.client.cloud.SyncingTooFrequentlyException;
 import com.wildfire.client.config.ClientConfig;
+import com.wildfire.client.gui.WildfireButton;
+import com.wildfire.common.WildfireGender;
+import com.wildfire.common.WildfireLang;
 import com.wildfire.common.config.value.ConfigValue;
-import com.wildfire.common.entities.avatars.AbstractAvatarConfigHolder;
 import com.wildfire.common.entities.players.PlayerConfigHolder;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
@@ -36,11 +37,6 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.resources.Identifier;
-
-import java.util.Objects;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 import org.jetbrains.annotations.UnknownNullability;
 
 /// @apiNote Only use this on the client side

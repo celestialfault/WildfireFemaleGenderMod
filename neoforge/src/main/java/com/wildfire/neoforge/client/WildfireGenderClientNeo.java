@@ -206,6 +206,7 @@ public class WildfireGenderClientNeo {
             if (hurtSounds.isEmpty()) {
                 hurtSounds = Arrays.stream(DamageEffects.values()).map(DamageEffects::sound).collect(Collectors.toUnmodifiableSet());
             }
+            // FIXME doesn't seem to apply to mannequins (potentially other players?)
             if (hurtSounds.contains(soundHolder.value()) && event.getEntity() instanceof Avatar p && p.level().isClientSide()) {
                 //Cancel as we handle all hurt sounds manually so that we can
                 if (p.hurtTime == p.hurtDuration && p.hurtTime > 0) {
