@@ -36,8 +36,6 @@ public record ClientboundEditMannequinPacket(UUID uuid, AvatarConfig config) imp
     public static final Type<ClientboundEditMannequinPacket> TYPE = WildfireGender.clientBoundPacket("edit_mannequin");
     public static final StreamCodec<ByteBuf, ClientboundEditMannequinPacket> STREAM_CODEC = StreamCodec.composite(
         UUIDUtil.STREAM_CODEC, ClientboundEditMannequinPacket::uuid,
-        // always include the config in case the player is (for whatever reason) editing the mannequin
-        // while they haven't been render distance of it
         AvatarConfig.STREAM_CODEC, ClientboundEditMannequinPacket::config,
         ClientboundEditMannequinPacket::new
     );

@@ -25,6 +25,7 @@ import com.wildfire.common.WildfireLang;
 import com.wildfire.common.config.GenderConfigTranslations;
 import com.wildfire.common.config.value.ConfigValue;
 import com.wildfire.common.entities.avatars.AbstractAvatarConfigHolder;
+import com.wildfire.common.entities.avatars.MannequinConfigHolder;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -174,7 +175,8 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
             AbstractWidget bounceSlider, floppySlider, overridePhysics, dualPhysics;
         };
 
-        addButton(builder -> builder
+        if(!(config instanceof MannequinConfigHolder)) {
+            addButton(builder -> builder
                 .message(WildfireLang.CHAR_SETTINGS_JUMP::translate)
                 .position(this.width / 2 - 130, this.height / 2 + 65)
                 .size(80, 15)
@@ -192,6 +194,7 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
                         }
                     }
                 }));
+        }
 
         addButton(builder -> builder
                 .message(() -> WildfireLang.CHAR_SETTINGS_PHYSICS.translate(config.breasts().physics().enabled().get() ? ENABLED : DISABLED))

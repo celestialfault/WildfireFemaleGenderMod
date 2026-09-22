@@ -51,7 +51,6 @@ import net.minecraft.core.Holder;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.TriState;
 import net.minecraft.world.damagesource.DamageEffects;
-import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -206,8 +205,7 @@ public class WildfireGenderClientNeo {
             if (hurtSounds.isEmpty()) {
                 hurtSounds = Arrays.stream(DamageEffects.values()).map(DamageEffects::sound).collect(Collectors.toUnmodifiableSet());
             }
-            // FIXME doesn't seem to apply to mannequins (potentially other players?)
-            if (hurtSounds.contains(soundHolder.value()) && event.getEntity() instanceof Avatar p && p.level().isClientSide()) {
+            if (hurtSounds.contains(soundHolder.value()) && event.getEntity() instanceof Player p && p.level().isClientSide()) {
                 //Cancel as we handle all hurt sounds manually so that we can
                 if (p.hurtTime == p.hurtDuration && p.hurtTime > 0) {
                     //Note: We check hurtTime == hurtDuration and hurtTime > 0 or otherwise when the server sends a hurt sound to the client

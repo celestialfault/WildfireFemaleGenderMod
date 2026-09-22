@@ -32,8 +32,7 @@ public record ClientboundMannequinDataPacket(UUID uuid, AvatarConfig config) imp
     public static final Type<ClientboundMannequinDataPacket> TYPE = WildfireGender.clientBoundPacket("mannequin_data");
     public static final StreamCodec<ByteBuf, ClientboundMannequinDataPacket> STREAM_CODEC = StreamCodec.composite(
         UUIDUtil.STREAM_CODEC, ClientboundMannequinDataPacket::uuid,
-        // see the serverbound component to see why this is using the full codec over the compact codec
-        AvatarConfig.STREAM_CODEC, ClientboundMannequinDataPacket::config,
+        AvatarConfig.COMPACT_STREAM_CODEC, ClientboundMannequinDataPacket::config,
         ClientboundMannequinDataPacket::new
     );
 
