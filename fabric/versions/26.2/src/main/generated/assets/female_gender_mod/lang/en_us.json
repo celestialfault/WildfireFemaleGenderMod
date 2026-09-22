@@ -105,7 +105,7 @@
   "female_gender_mod.command.server.mannequin.data.physics": "breast physics enabled",
   "female_gender_mod.command.server.mannequin.data.physics_bounce": "breast physics intensity",
   "female_gender_mod.command.server.mannequin.data.physics_floppy": "breast physics momentum",
-  "female_gender_mod.command.server.mannequin.data.physics_uniboob": "separate breast physics",
+  "female_gender_mod.command.server.mannequin.data.physics_uniboob": "unified breast physics",
   "female_gender_mod.command.server.mannequin.data.show_in_armor": "show breasts in armor",
   "female_gender_mod.command.server.mannequin.data.xOffset": "breast separation",
   "female_gender_mod.command.server.mannequin.data.yOffset": "breast height",

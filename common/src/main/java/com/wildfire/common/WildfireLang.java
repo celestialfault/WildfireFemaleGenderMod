@@ -290,7 +290,7 @@ public enum WildfireLang {
         setFallbackString("breast physics momentum");
     }},
     COMMAND_MANNEQUIN_DATA_PHYSICS_UNIBOOB("command.server.mannequin.data.physics_uniboob") {{
-        setFallbackString("separate breast physics");
+        setFallbackString("unified breast physics");
     }},
     COMMAND_MANNEQUIN_DATA_HURT_SOUNDS("command.server.mannequin.data.hurt_sounds") {{
         setFallbackString("female hurt sounds");
