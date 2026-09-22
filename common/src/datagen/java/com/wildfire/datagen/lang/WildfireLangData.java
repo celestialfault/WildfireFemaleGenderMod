@@ -231,7 +231,7 @@ public class WildfireLangData {
         add(builder, WildfireLang.CLOUD_TOOLTIP, "Cloud Sync");
         add(builder, WildfireLang.CLOUD_UNAVAILABLE_INVALID_ACC, "Cloud syncing is unavailable as you aren't currently logged into a valid Minecraft account");
         add(builder, WildfireLang.CLOUD_UNAVAILABLE_OFFLINE_SERVER, "Cloud syncing is unavailable as the server you're connected to is in offline mode");
-        add(builder, WildfireLang.CLOUD_UNAVAILABLE_EDITING_MANNEQUIN, "Not applicable while editing a mannequin");
+        add(builder, WildfireLang.CLOUD_UNAVAILABLE_EDITING_MANNEQUIN, "Unavailable while editing a mannequin");
         add(builder, WildfireLang.CLOUD_STATUS, "Cloud Sync: %1$s");
         add(builder, WildfireLang.CLOUD_AUTOMATIC, "Automatic Sync: %1$s");
         add(builder, WildfireLang.CLOUD_AUTOMATIC_TOOLTIP,
@@ -299,7 +299,7 @@ public class WildfireLangData {
         add(builder, WildfireLang.NOT_IN_WORLD_TITLE, "Unavailable in Main Menu");
         add(builder, WildfireLang.NOT_IN_WORLD, "You need to be in a world to configure your gender settings.");
 
-        add(builder, WildfireLang.HURT_SOUND_SUBTITLE, "Female Player Hurt");
+        add(builder, WildfireLang.HURT_SOUND_SUBTITLE, "Female player hurts");
 
         add(builder, WildfireLang.KEY_CATEGORY, "Female Gender Mod");
         add(builder, WildfireLang.KEY_CONFIG, "Female Gender Menu");
@@ -343,6 +343,7 @@ public class WildfireLangData {
         addFromFallback(builder, WildfireLang.COMMAND_MANNEQUIN_DATA_HURT_SOUNDS);
         addFromFallback(builder, WildfireLang.COMMAND_MANNEQUIN_DATA_HURT_PITCH);
 
+        // TODO do these debug command strings need to be translated?
         add(builder, WildfireLang.DEBUG_COMMAND_LOOKING_AT, "Looking at: %1$s");
         add(builder, WildfireLang.DEBUG_COMMAND_LOOKING_AT_NONE, "No entity in sight.");
         add(builder, WildfireLang.DEBUG_COMMAND_LOOKING_AT_UUID, "UUID: %1$s");
