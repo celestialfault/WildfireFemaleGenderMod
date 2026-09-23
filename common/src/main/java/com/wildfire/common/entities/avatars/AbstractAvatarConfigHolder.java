@@ -30,8 +30,9 @@ import java.util.UUID;
 import net.minecraft.core.Holder;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.entity.Avatar;
+import net.minecraft.world.entity.Avatar;import org.jetbrains.annotations.ApiStatus;
 
+@ApiStatus.NonExtendable
 public abstract class AbstractAvatarConfigHolder extends EntityConfigHolder<AvatarConfig> {
     protected AbstractAvatarConfigHolder(final UUID uuid, final AvatarConfig config) {
         super(uuid, config);
@@ -45,22 +46,24 @@ public abstract class AbstractAvatarConfigHolder extends EntityConfigHolder<Avat
         AvatarConfig.CODEC.parse(JsonOps.INSTANCE, serialized).ifSuccess(parsed -> config = parsed);
     }
 
-    public void updateFromPacket(AvatarConfig config) {
-        this.config = config;
-    }
+    public abstract void updateFromPacket(AvatarConfig config);
 
     /// Play the relevant mod hurt sound when a player takes damage
     ///
     /// @apiNote Only call this on the client side as sounds are only registered on the client.
     public void tryPlayHurtSound(Avatar player) {
-        if (sounds().hurt().get()) {
-            Holder<SoundEvent> hurtSound = ClientHelper.INSTANCE.hurtSound(gender().get());
-            if (hurtSound != null) {
-                float pitchVariation = (player.getRandom().nextFloat() - player.getRandom().nextFloat()) * 0.2F;
-                player.level().playLocalSound(player.getX(), player.getY(), player.getZ(), hurtSound.value(),
-                    SoundSource.PLAYERS, 1f, pitchVariation + sounds().voicePitch().get(), false);
-            }
+        if(!sounds().hurt().get()) {
+            return;
         }
+
+        Holder<SoundEvent> hurtSound = ClientHelper.INSTANCE.hurtSound(gender().get());
+        if(hurtSound == null) {
+            return;
+        }
+
+        float pitchVariation = (player.getRandom().nextFloat() - player.getRandom().nextFloat()) * 0.2F;
+        player.level().playLocalSound(player.getX(), player.getY(), player.getZ(), hurtSound.value(),
+            SoundSource.PLAYERS, 1f, pitchVariation + sounds().voicePitch().get(), false);
     }
 
     @Override

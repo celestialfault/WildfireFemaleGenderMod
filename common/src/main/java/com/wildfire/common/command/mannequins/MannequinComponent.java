@@ -91,7 +91,7 @@ import org.jspecify.annotations.Nullable;
     }
 
     @FunctionalInterface
-    interface Parser<T> {
+    /*package-private*/ interface Parser<T> {
         static <T> Parser<T> of(final Class<T> type) {
             return (ctx, name) -> ctx.getArgument(name, type);
         }
@@ -100,12 +100,12 @@ import org.jspecify.annotations.Nullable;
     }
 
     @FunctionalInterface
-    interface ConfigValueGetter<T> {
+    /*package-private*/ interface ConfigValueGetter<T> {
         ConfigValue<T> get(MannequinConfigHolder config);
     }
 
     @SuppressWarnings("NotNullFieldNotInitialized")
-    static class Builder<T> {
+    /*package-private*/ static class Builder<T> {
         private ArgumentType<?> argument;
         private Component name;
         private Parser<T> parser;

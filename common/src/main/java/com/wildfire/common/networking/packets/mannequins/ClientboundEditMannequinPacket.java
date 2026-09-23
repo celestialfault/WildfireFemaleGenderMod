@@ -33,7 +33,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.entity.decoration.Mannequin;
 
 public record ClientboundEditMannequinPacket(UUID uuid, AvatarConfig config) implements CustomPacketPayload {
-    public static final Type<ClientboundEditMannequinPacket> TYPE = WildfireGender.clientBoundPacket("edit_mannequin");
+    public static final Type<ClientboundEditMannequinPacket> TYPE = WildfireGender.clientBoundPacket("mannequin/edit");
     public static final StreamCodec<ByteBuf, ClientboundEditMannequinPacket> STREAM_CODEC = StreamCodec.composite(
         UUIDUtil.STREAM_CODEC, ClientboundEditMannequinPacket::uuid,
         AvatarConfig.STREAM_CODEC, ClientboundEditMannequinPacket::config,
@@ -52,11 +52,9 @@ public record ClientboundEditMannequinPacket(UUID uuid, AvatarConfig config) imp
 
     /// @apiNote Only call on the client
     public void handle() {
-        var config = WildfireClientAPI.mannequins().getOrCreate(uuid());
+        final MannequinConfigHolder config = WildfireClientAPI.mannequins().getOrCreate(uuid());
+        final Minecraft client = Minecraft.getInstance();
         config.setConfig(config());
-        // TODO does Fabric/Neo invoke packet receivers on the networking thread?
-        // probably safest to make sure we're running on the client thread to open this screen anyway...
-        Minecraft.getInstance().execute(() ->
-            WardrobeBrowserScreen.open(Minecraft.getInstance(), config));
+        client.execute(() -> WardrobeBrowserScreen.open(client, config));
     }
 }

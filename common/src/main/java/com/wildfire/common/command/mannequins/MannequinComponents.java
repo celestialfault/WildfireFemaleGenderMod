@@ -120,12 +120,10 @@ import java.util.Locale;
         .build();
 
     private static ArgumentType<Float> boundedFloat(ConfigKey<Float> key) {
-        var validator = key.validator();
-        if(validator instanceof ConfigRange<Float>(Float minInclusive, Float maxInclusive)) {
+        if(key.validator() instanceof ConfigRange<Float>(Float minInclusive, Float maxInclusive)) {
             return FloatArgumentType.floatArg(minInclusive, maxInclusive);
-        } else {
-            return FloatArgumentType.floatArg();
         }
+        return FloatArgumentType.floatArg();
     }
 
     private MannequinComponents() {

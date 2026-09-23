@@ -133,7 +133,7 @@ public class PlayerConfigHolder extends AbstractAvatarConfigHolder {
 
     @Override
     public void updateFromPacket(final AvatarConfig config) {
-        super.updateFromPacket(config);
+        this.config = config;
         this.syncStatus = SyncStatus.SYNCED;
     }
 

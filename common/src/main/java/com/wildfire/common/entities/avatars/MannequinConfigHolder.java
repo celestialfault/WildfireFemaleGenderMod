@@ -34,17 +34,28 @@ public class MannequinConfigHolder extends AbstractAvatarConfigHolder {
         super(uuid, AvatarConfig.createDefault());
     }
 
+    @Override
+    public void updateFromPacket(final AvatarConfig config) {
+        this.config = config;
+    }
+
     public boolean canEdit(ServerPlayer player) {
         // TODO extend this to allow for some kind of proper permission API?
         return player.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER);
     }
 
+    /// Sets the config stored on this holder
     @ApiStatus.Internal
     public void setConfig(AvatarConfig config) {
         this.config = config;
     }
 
-    /// @apiNote Only call on the logical server
+    /// Saves the current config to the provided [Mannequin] entity and syncs it to all nearby players
+    ///
+    /// @param mannequin The [Mannequin] entity to save this config on
+    /// @param except Optional player to skip syncing this config to
+    ///
+    /// @throws IllegalArgumentException If the provided [Mannequin] is not on the logical server
     @ApiStatus.Internal
     public void sync(Mannequin mannequin, @Nullable ServerPlayer except) {
         Preconditions.checkArgument(!mannequin.level().isClientSide(), "This method can only be run on a mannequin on the logical server");
@@ -52,7 +63,17 @@ public class MannequinConfigHolder extends AbstractAvatarConfigHolder {
         WildfireSync.sendToAllClients(mannequin, this, except);
     }
 
-    /// @apiNote Only call on the logical server
+    /// Convenience method that sets the config stored on this holder, saves it to the provided [Mannequin] entity,
+    /// and syncs it to nearby players.
+    ///
+    /// @param mannequin The [Mannequin] entity to [save to][#sync(Mannequin, ServerPlayer)]
+    /// @param config The new config to set on this holder
+    /// @param except Optional player to skip syncing the new config to
+    ///
+    /// @see #setConfig(AvatarConfig)
+    /// @see #sync(Mannequin, ServerPlayer)
+    ///
+    /// @throws IllegalArgumentException If the provided [Mannequin] is not on the logical server
     @ApiStatus.Internal
     public void setConfigAndSync(Mannequin mannequin, AvatarConfig config, @Nullable ServerPlayer except) {
         Preconditions.checkArgument(!mannequin.level().isClientSide(), "This method can only be run on a mannequin on the logical server");

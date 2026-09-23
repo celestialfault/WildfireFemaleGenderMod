@@ -29,7 +29,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 
 public record ClientboundMannequinDataPacket(UUID uuid, AvatarConfig config) implements CustomPacketPayload {
-    public static final Type<ClientboundMannequinDataPacket> TYPE = WildfireGender.clientBoundPacket("mannequin_data");
+    public static final Type<ClientboundMannequinDataPacket> TYPE = WildfireGender.clientBoundPacket("mannequin/sync");
     public static final StreamCodec<ByteBuf, ClientboundMannequinDataPacket> STREAM_CODEC = StreamCodec.composite(
         UUIDUtil.STREAM_CODEC, ClientboundMannequinDataPacket::uuid,
         AvatarConfig.COMPACT_STREAM_CODEC, ClientboundMannequinDataPacket::config,
@@ -49,6 +49,6 @@ public record ClientboundMannequinDataPacket(UUID uuid, AvatarConfig config) imp
     public void handle() {
         // TODO update gui if another player edits the same mannequin we already have the gui open for?
         var config = WildfireClientAPI.mannequins().getOrCreate(uuid());
-        config.updateFromPacket(config());
+        config.setConfig(config());
     }
 }

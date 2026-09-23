@@ -31,7 +31,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.decoration.Mannequin;
 
 public record ServerboundMannequinDataPacket(UUID uuid, AvatarConfig config) implements CustomPacketPayload {
-    public static final Type<ServerboundMannequinDataPacket> TYPE = WildfireGender.serverBoundPacket("mannequin_data");
+    public static final Type<ServerboundMannequinDataPacket> TYPE = WildfireGender.serverBoundPacket("mannequin/sync");
     public static final StreamCodec<ByteBuf, ServerboundMannequinDataPacket> STREAM_CODEC = StreamCodec.composite(
         UUIDUtil.STREAM_CODEC, ServerboundMannequinDataPacket::uuid,
         AvatarConfig.STREAM_CODEC, ServerboundMannequinDataPacket::config,

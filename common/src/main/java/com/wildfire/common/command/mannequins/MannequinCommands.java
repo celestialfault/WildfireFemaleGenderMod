@@ -121,9 +121,7 @@ public final class MannequinCommands extends AbstractWildfireCommand<ServerComma
             .result().orElseThrow().getFirst();
 
         config.setConfigAndSync(mannequin, copy, null);
-        ctx.getSource().sendSuccess(() ->
-            WildfireLang.COMMAND_MANNEQUIN_COPIED_DATA.translate(fromLiving.getDisplayName(), mannequin.getDisplayName()),
-            true);
+        ctx.getSource().sendSuccess(() -> WildfireLang.COMMAND_MANNEQUIN_COPIED_DATA.translate(fromLiving, mannequin), true);
 
         return Command.SINGLE_SUCCESS;
     }
