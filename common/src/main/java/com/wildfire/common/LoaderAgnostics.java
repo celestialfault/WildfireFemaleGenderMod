@@ -39,7 +39,6 @@ public interface LoaderAgnostics {
 
     boolean onClient();
 
-    // TODO move these to a different class
     @Nullable AvatarConfig readFromMannequin(Mannequin mannequin);
     void writeToMannequin(Mannequin mannequin, AvatarConfig config);
 }

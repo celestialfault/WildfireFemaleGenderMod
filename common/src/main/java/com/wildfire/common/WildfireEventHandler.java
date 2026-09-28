@@ -19,9 +19,8 @@
 package com.wildfire.common;
 
 import com.wildfire.api.server.WildfireServerAPI;
+import com.wildfire.common.entities.avatars.AbstractAvatarConfigHolder;
 import com.wildfire.common.entities.avatars.AvatarConfig;
-import com.wildfire.common.entities.avatars.MannequinConfigHolder;
-import com.wildfire.common.entities.players.PlayerConfigHolder;
 import com.wildfire.common.networking.WildfireSync;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -40,22 +39,7 @@ public final class WildfireEventHandler {
 
     /// Send a sync packet when an avatar-like entity enters the render distance of another player
     public static void onBeginTracking(Entity tracked, ServerPlayer syncTo) {
-        if(tracked instanceof Player toSync) {
-            PlayerConfigHolder genderToSync = WildfireServerAPI.players().get(toSync);
-            if(genderToSync == null) {
-                return;
-            }
-            // Note that we intentionally don't check if we've previously synced a player with this code path;
-            // because we use entity tracking to sync, it's entirely possible that one player would leave the
-            // tracking distance of another, change their settings, and then re-enter their tracking distance;
-            // we wouldn't sync while they're out of tracking distance, and as such, their settings would be out
-            // of sync until they relog.
-            WildfireSync.sendToClient(syncTo, genderToSync);
-        } else if(tracked instanceof Mannequin toSync) {
-            MannequinConfigHolder config = WildfireServerAPI.mannequins().get(toSync);
-            if(config == null) {
-                return;
-            }
+        if(WildfireServerAPI.getConfigIfPresent(tracked) instanceof AbstractAvatarConfigHolder config) {
             WildfireSync.sendToClient(syncTo, config);
         }
     }
@@ -66,7 +50,8 @@ public final class WildfireEventHandler {
             AvatarConfig saved = LoaderAgnostics.INSTANCE.readFromMannequin(mannequin);
             if(saved != null) {
                 // we're not using #setConfigAndSync() here as we don't need to immediately
-                // write the config we just read back to the entity
+                // write the config we just read back to the entity, and the assumption is that
+                // this is done early enough that players haven't begun tracking the mannequin yet
                 config.setConfig(saved);
             }
         }

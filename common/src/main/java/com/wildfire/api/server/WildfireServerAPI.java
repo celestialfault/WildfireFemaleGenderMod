@@ -18,14 +18,13 @@
 
 package com.wildfire.api.server;
 
-import com.google.common.cache.CacheLoader;
 import com.wildfire.api.EntityCache;
 import com.wildfire.api.impl.EntityCacheImpl;
 import com.wildfire.common.entities.EntityConfig;
 import com.wildfire.common.entities.EntityConfigHolder;
 import com.wildfire.common.entities.avatars.MannequinConfigHolder;
 import com.wildfire.common.entities.players.PlayerConfigHolder;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.decoration.Mannequin;
 import net.minecraft.world.entity.player.Player;
 import org.jspecify.annotations.Nullable;
@@ -35,14 +34,23 @@ public final class WildfireServerAPI {
     private WildfireServerAPI() {
     }
 
-    private static final EntityCache<PlayerConfigHolder, Player> PLAYERS = new EntityCacheImpl<>(CacheLoader.from(PlayerConfigHolder::new));
-    private static final EntityCache<MannequinConfigHolder, Mannequin> AVATARS = new EntityCacheImpl<>(CacheLoader.from(MannequinConfigHolder::new));
+    private static final EntityCache<PlayerConfigHolder, Player> PLAYERS = new EntityCacheImpl<>(PlayerConfigHolder::new);
+    private static final EntityCache<MannequinConfigHolder, Mannequin> AVATARS = new EntityCacheImpl<>(MannequinConfigHolder::new);
 
     @Nullable
-    public static EntityConfigHolder<? extends EntityConfig> getConfig(LivingEntity entity) {
+    public static EntityConfigHolder<? extends EntityConfig> getConfig(Entity entity) {
         return switch(entity) {
             case Player player -> players().getOrCreate(player);
             case Mannequin mannequin -> mannequins().getOrCreate(mannequin);
+            default -> null;
+        };
+    }
+
+    @Nullable
+    public static EntityConfigHolder<? extends EntityConfig> getConfigIfPresent(Entity entity) {
+        return switch(entity) {
+            case Player player -> players().get(player);
+            case Mannequin mannequin -> mannequins().get(mannequin);
             default -> null;
         };
     }

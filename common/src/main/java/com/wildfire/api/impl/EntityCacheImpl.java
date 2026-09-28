@@ -49,8 +49,8 @@ public class EntityCacheImpl<TYPE extends EntityConfigHolder<? extends EntityCon
         this(CacheLoader.from(constructor), expiryTime);
     }
 
-    public EntityCacheImpl(final CacheLoader<UUID, TYPE> loader) {
-        this(loader, null);
+    public EntityCacheImpl(final Function<UUID, TYPE> constructor) {
+        this(constructor, null);
     }
 
     @Override

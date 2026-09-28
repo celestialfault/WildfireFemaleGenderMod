@@ -76,7 +76,7 @@ public final class MannequinCommands extends AbstractWildfireCommand<ServerComma
                 .then(helper.literal("sounds")
                     .then(setter("enabled", MannequinComponents.HURT_SOUNDS))
                     .then(setter("pitch", MannequinComponents.VOICE_PITCH)))
-                );
+            );
     }
 
     private Mannequin getMannequin(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
@@ -92,7 +92,7 @@ public final class MannequinCommands extends AbstractWildfireCommand<ServerComma
         if(!(from instanceof Avatar avatar)) {
             throw TARGET_NOT_AVATAR.create();
         }
-        var fromConfig = WildfireServerAPI.getConfig(avatar);
+        var fromConfig = WildfireServerAPI.getConfigIfPresent(avatar);
         if(!(fromConfig instanceof AbstractAvatarConfigHolder avatarConfig)) {
             throw TARGET_NOT_AVATAR.create();
         }
