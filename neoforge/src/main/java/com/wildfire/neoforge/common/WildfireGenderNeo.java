@@ -24,6 +24,7 @@ import com.wildfire.common.WildfireEventHandler;
 import com.wildfire.common.command.WildfireServerCommand;
 import com.wildfire.common.entities.avatars.AvatarConfig;
 import com.wildfire.neoforge.common.networking.NeoSync;
+import java.util.function.Supplier;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
@@ -35,8 +36,6 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
-import org.jetbrains.annotations.ApiStatus;
-import java.util.function.Supplier;
 
 @Mod(WildfireAPI.MODID)
 public class WildfireGenderNeo {

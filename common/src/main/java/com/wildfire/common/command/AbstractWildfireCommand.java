@@ -19,7 +19,6 @@
 package com.wildfire.common.command;
 
 import com.mojang.brigadier.context.CommandContext;
-import com.wildfire.client.command.ClientCommandHelper;
 import com.wildfire.common.WildfireLang;
 import java.util.ArrayList;
 import java.util.List;

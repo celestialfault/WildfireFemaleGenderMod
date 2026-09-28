@@ -27,7 +27,7 @@ import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import net.minecraft.commands.SharedSuggestionProvider;
 
-public class GenderSuggestionProvider<S extends SharedSuggestionProvider> implements SuggestionProvider<S> {
+public final class GenderSuggestionProvider<S extends SharedSuggestionProvider> implements SuggestionProvider<S> {
     @Override
     public CompletableFuture<Suggestions> getSuggestions(final CommandContext<S> context, final SuggestionsBuilder builder) {
         return SharedSuggestionProvider.suggest(Arrays.stream(Gender.values()).map(Gender::name), builder);

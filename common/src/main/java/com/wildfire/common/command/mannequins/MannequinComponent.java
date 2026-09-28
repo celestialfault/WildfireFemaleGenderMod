@@ -27,6 +27,7 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.wildfire.common.WildfireLang;
 import com.wildfire.common.command.ServerCommandHelper;
 import com.wildfire.common.config.value.ConfigValue;
+import com.wildfire.common.entities.avatars.AbstractAvatarConfigHolder;
 import com.wildfire.common.entities.avatars.MannequinConfigHolder;
 import java.util.Objects;
 import net.minecraft.commands.CommandSourceStack;
@@ -66,8 +67,12 @@ import org.jspecify.annotations.Nullable;
         return name;
     }
 
-    public Object value(MannequinConfigHolder config) {
-        Object value = this.value.get(config).get();
+    public T rawValue(AbstractAvatarConfigHolder config) {
+        return this.value.get(config).get();
+    }
+
+    public Object formattedValue(AbstractAvatarConfigHolder config) {
+        Object value = rawValue(config);
         // quick and dirty fix for booleans displaying as 1/0
         if(value instanceof Boolean bool) {
             return Boolean.toString(bool);
@@ -83,6 +88,10 @@ import org.jspecify.annotations.Nullable;
 
     public boolean update(MannequinConfigHolder config, CommandContext<CommandSourceStack> ctx, String name) throws CommandSyntaxException {
         T input = parser.parse(ctx, name);
+        return update(config, input);
+    }
+
+    public boolean update(MannequinConfigHolder config, T input) {
         ConfigValue<T> value = this.value.get(config);
         if(Objects.equals(value.get(), input)) {
             return false;
@@ -101,7 +110,7 @@ import org.jspecify.annotations.Nullable;
 
     @FunctionalInterface
     /*package-private*/ interface ConfigValueGetter<T> {
-        ConfigValue<T> get(MannequinConfigHolder config);
+        ConfigValue<T> get(AbstractAvatarConfigHolder config);
     }
 
     @SuppressWarnings("NotNullFieldNotInitialized")

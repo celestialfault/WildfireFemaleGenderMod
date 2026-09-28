@@ -255,8 +255,11 @@ public enum WildfireLang {
     COMMAND_MANNEQUIN_SET_VALUE("command.server.mannequin.set") {{
         setFallbackString("Set %1$s %2$s to %3$s");
     }},
-    COMMAND_MANNEQUIN_SET_VALUE_FAILED("command.server.mannequin.set_failure") {{
-        setFallbackString("Failed to update %1$s for %2$s");
+    COMMAND_MANNEQUIN_COPIED_MULTIPLE_VALUES("command.server.mannequin.set.copied_multiple") {{
+        setFallbackString("Copied %1$s settings from %2$s to %3$s");
+    }},
+    COMMAND_MANNEQUIN_NO_CHANGES("command.server.mannequin.set.no_changes") {{
+        setFallbackString("No changes were made to %1$s");
     }},
 
     COMMAND_MANNEQUIN_DATA_GENDER("command.server.mannequin.data.gender") {{

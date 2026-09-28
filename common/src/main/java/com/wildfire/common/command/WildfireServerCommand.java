@@ -25,6 +25,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.wildfire.api.server.WildfireServerAPI;
+import com.wildfire.common.LoaderAgnostics;
 import com.wildfire.common.WildfireGender;
 import com.wildfire.common.WildfireLang;
 import com.wildfire.common.command.mannequins.MannequinCommands;
@@ -43,23 +44,30 @@ import net.minecraft.world.item.equipment.trim.TrimMaterials;
 import net.minecraft.world.item.equipment.trim.TrimPatterns;
 
 public final class WildfireServerCommand extends AbstractWildfireCommand<ServerCommandHelper, CommandSourceStack> {
+    private final MannequinCommands mannequinCommands;
+
     public WildfireServerCommand(final ServerCommandHelper helper) {
         super(helper);
+        this.mannequinCommands = new MannequinCommands(helper);
     }
 
     public void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-        var mannequin = new MannequinCommands(helper);
-        dispatcher.register(helper.literal("fgmserver")
-            .requires(source -> helper.hasPermission(source, ServerCommandHelper.COMMAND_PERMISSION))
+        var node = helper.literal("fgmserver")
+            .requires(helper.requirePermissions(ServerCommandHelper.COMMAND_PERMISSION))
             .executes(this::syncStats)
-            .then(mannequin.createNode())
-            .then(createDebugNode())
-        );
+            .then(mannequinCommands.createNode());
+
+        // only register these in a dev env as these debug commands are just used as convenient shorthands to
+        // actions that could otherwise be done manually
+        if(LoaderAgnostics.INSTANCE.isDevelopmentEnv()) {
+            node.then(createDebugNode());
+        }
+
+        dispatcher.register(node);
     }
 
     private LiteralArgumentBuilder<CommandSourceStack> createDebugNode() {
         return helper.literal("debug")
-            .requires(source -> helper.hasPermission(source, ServerCommandHelper.DEBUG_PERMISSION))
             .executes(ctx -> {
                 sendHelp(ctx, WildfireLang.DEBUG_COMMAND,
                     WildfireLang.COMMAND_TRIM,
@@ -81,7 +89,7 @@ public final class WildfireServerCommand extends AbstractWildfireCommand<ServerC
             WildfireLang.COMMAND_VERSION_INFO.translateColored(TextColor.GRAY,
                 Component.literal(WildfireGender.getModVersion()).withColor(TextColor.GREEN))));
 
-        final var server = helper.getServer(ctx.getSource());
+        final var server = ctx.getSource().getServer();
         final int online = server.getPlayerList().getPlayerCount();
         int synced = 0;
         for(var player : server.getPlayerList().getPlayers()) {
@@ -100,7 +108,7 @@ public final class WildfireServerCommand extends AbstractWildfireCommand<ServerC
     private int equipTrimmedChestplate(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         var player = ctx.getSource().getPlayerOrException();
         var item = new ItemStack(Items.IRON_CHESTPLATE);
-        var glint = getOrDefault(ctx, "glint", null, Boolean.class);
+        Boolean glint = getOrDefault(ctx, "glint", null, Boolean.class);
 
         var material = player.registryAccess().lookupOrThrow(Registries.TRIM_MATERIAL).getOrThrow(TrimMaterials.AMETHYST);
         var pattern = player.registryAccess().lookupOrThrow(Registries.TRIM_PATTERN).getOrThrow(TrimPatterns.COAST);
@@ -115,23 +123,23 @@ public final class WildfireServerCommand extends AbstractWildfireCommand<ServerC
 
     private int spawnArmorStand(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         var player = ctx.getSource().getPlayerOrException();
-        var world = player.level();
+        var level = player.level();
 
         var item = new ItemStack(Items.IRON_CHESTPLATE);
         var config = WildfireServerAPI.players().getOrCreate(player);
         var component = BreastDataComponent.fromPlayer(player, config);
-        if (component == null) {
+        if(component == null) {
             helper.sendFailure(ctx.getSource(), WildfireLang.COMMAND_ARMOR_STAND_NO_COMPONENT.translateColored(TextColor.RED));
             return 0;
         }
         component.write(item);
 
-        var stand = new ArmorStand(world, player.getBlockX(), player.getBlockY(), player.getBlockZ());
+        var stand = new ArmorStand(level, player.getBlockX(), player.getBlockY(), player.getBlockZ());
         stand.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.IRON_HELMET));
         stand.setItemSlot(EquipmentSlot.CHEST, item);
         stand.setItemSlot(EquipmentSlot.LEGS, new ItemStack(Items.IRON_LEGGINGS));
         stand.setItemSlot(EquipmentSlot.FEET, new ItemStack(Items.IRON_BOOTS));
-        world.addFreshEntity(stand);
+        level.addFreshEntity(stand);
 
         return Command.SINGLE_SUCCESS;
     }

@@ -21,15 +21,9 @@ package com.wildfire.neoforge.common;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.wildfire.common.command.ServerCommandHelper;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 
 public class NeoServerCommandHelper extends AbstractNeoCommandHelper implements ServerCommandHelper {
-    @Override
-    public MinecraftServer getServer(final CommandSourceStack source) {
-        return source.getServer();
-    }
-
     @Override
     public ServerPlayer getPlayer(final CommandSourceStack source) throws CommandSyntaxException {
         return source.getPlayerOrException();

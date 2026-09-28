@@ -19,6 +19,7 @@
 package com.wildfire.fabric.common;
 
 import com.wildfire.common.WildfireEventHandler;
+import com.wildfire.common.WildfireGender;
 import com.wildfire.common.command.WildfireServerCommand;
 import com.wildfire.common.entities.avatars.AvatarConfig;
 import com.wildfire.fabric.common.networking.FabricSync;
@@ -31,7 +32,7 @@ import net.fabricmc.fabric.api.networking.v1.EntityTrackingEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 
 public class WildfireGenderFabric implements ModInitializer {
-    public static final AttachmentType<AvatarConfig> AVATAR_ATTACHMENT = AttachmentRegistry.create(com.wildfire.common.WildfireGender.id("gender_data"),
+    public static final AttachmentType<AvatarConfig> AVATAR_ATTACHMENT = AttachmentRegistry.create(WildfireGender.id("gender_data"),
         builder -> builder.persistent(AvatarConfig.CODEC));
 
     @Override

@@ -320,14 +320,15 @@ public class WildfireLangData {
 
         addFromFallback(builder, WildfireLang.COMMAND_VERSION_INFO);
         addFromFallback(builder, WildfireLang.COMMAND_SYNCED_PLAYER_COUNT);
+
         addFromFallback(builder, WildfireLang.COMMAND_ENTITY_MUST_BE_MANNEQUIN);
         addFromFallback(builder, WildfireLang.COMMAND_ENTITY_MUST_BE_AVATAR_LIKE);
         addFromFallback(builder, WildfireLang.COMMAND_SERVER_NO_MOD_ON_CLIENT);
         addFromFallback(builder, WildfireLang.COMMAND_MANNEQUIN_COPIED_DATA);
-        addFromFallback(builder, WildfireLang.COMMAND_SERVER_INVALID_GENDER);
-
         addFromFallback(builder, WildfireLang.COMMAND_MANNEQUIN_SET_VALUE);
-        addFromFallback(builder, WildfireLang.COMMAND_MANNEQUIN_SET_VALUE_FAILED);
+        addFromFallback(builder, WildfireLang.COMMAND_MANNEQUIN_COPIED_MULTIPLE_VALUES);
+        addFromFallback(builder, WildfireLang.COMMAND_MANNEQUIN_NO_CHANGES);
+        addFromFallback(builder, WildfireLang.COMMAND_SERVER_INVALID_GENDER);
 
         addFromFallback(builder, WildfireLang.COMMAND_MANNEQUIN_DATA_GENDER);
         addFromFallback(builder, WildfireLang.COMMAND_MANNEQUIN_DATA_BREAST_SIZE);
