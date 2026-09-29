@@ -4,8 +4,7 @@
     "package": "com.wildfire.neoforge.common.mixins",
     "compatibilityLevel": "JAVA_${java_version}",
     "mixins": [
-        "ShowPlayerListModeMixin",
-        "SyncVerbosityMixin"
+        "NamedEnumMixin"
     ],
     "injectors": {
         "defaultRequire": 1

@@ -19,6 +19,7 @@
 package com.wildfire.common.config.enums;
 
 import com.mojang.serialization.Codec;
+import com.wildfire.api.NamedEnum;
 import com.wildfire.common.WildfireLang;
 import io.netty.buffer.ByteBuf;
 import java.util.Locale;
@@ -32,7 +33,7 @@ import net.minecraft.util.StringRepresentable;
 
 import java.util.function.IntFunction;
 
-public enum SyncVerbosity implements StringRepresentable {
+public enum SyncVerbosity implements StringRepresentable, NamedEnum {
     DEFAULT(WildfireLang.SYNC_LOG_VERBOSITY_DEFAULT),
     SHOW_FETCHES(WildfireLang.SYNC_LOG_VERBOSITY_SHOW_FETCHES);
 
@@ -54,7 +55,7 @@ public enum SyncVerbosity implements StringRepresentable {
         return this.saveName;
     }
 
-    /// @implNote **Do not rename this method, our Neo impl mixes in an interface (net.neoforged.neoforge.common.TranslatableEnum) so that it can be translated in the config screen**
+    @Override
     public Component getTranslatedName() {
         return this.name.translate();
     }

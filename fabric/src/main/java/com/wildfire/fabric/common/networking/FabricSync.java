@@ -47,8 +47,6 @@ public class FabricSync {
 
     @ApiStatus.Internal
     public static void register() {
-        //Note: Fabric requires registering packets on both client and server side, even if it is a single directional packet
-
         //Configuration
         registerConfig(ClientboundSyncHelloPacket.TYPE, ClientboundSyncHelloPacket.STREAM_CODEC);
         registerConfig(ServerboundSyncHelloPacket.TYPE, ServerboundSyncHelloPacket.STREAM_CODEC);
@@ -109,6 +107,7 @@ public class FabricSync {
         });
     }
 
+    // fabric requires registering packets on both sides, regardless of the direction of the given packet
     private static <T extends CustomPacketPayload> void registerPlay(CustomPacketPayload.Type<T> type, StreamCodec<? super FriendlyByteBuf, T> codec) {
         PayloadTypeRegistry.serverboundPlay().register(type, codec);
         PayloadTypeRegistry.clientboundPlay().register(type, codec);

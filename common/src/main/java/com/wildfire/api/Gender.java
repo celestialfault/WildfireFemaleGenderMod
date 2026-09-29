@@ -62,7 +62,7 @@ public enum Gender implements StringRepresentable, NamedEnum {
     }
 
     @Override
-    public Component getDisplayName() {
+    public Component getTranslatedName() {
         return name.translateColored(color);
     }
 

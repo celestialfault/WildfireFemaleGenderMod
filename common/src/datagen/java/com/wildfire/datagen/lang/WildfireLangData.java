@@ -96,7 +96,7 @@ public class WildfireLangData {
     }
 
     private void addFromFallback(BiConsumer<String, String> builder, WildfireLang lang) {
-        String message = lang.getFallbackString();
+        String message = lang.getFallback();
         Preconditions.checkNotNull(message, "Fallback string for %s is null", lang);
         add(builder, lang, message);
     }
@@ -324,7 +324,6 @@ public class WildfireLangData {
         addFromFallback(builder, WildfireLang.COMMAND_ENTITY_MUST_BE_MANNEQUIN);
         addFromFallback(builder, WildfireLang.COMMAND_ENTITY_MUST_BE_AVATAR_LIKE);
         addFromFallback(builder, WildfireLang.COMMAND_SERVER_NO_MOD_ON_CLIENT);
-        addFromFallback(builder, WildfireLang.COMMAND_MANNEQUIN_COPIED_DATA);
         addFromFallback(builder, WildfireLang.COMMAND_MANNEQUIN_SET_VALUE);
         addFromFallback(builder, WildfireLang.COMMAND_MANNEQUIN_COPIED_MULTIPLE_VALUES);
         addFromFallback(builder, WildfireLang.COMMAND_MANNEQUIN_NO_CHANGES);
@@ -343,6 +342,7 @@ public class WildfireLangData {
         addFromFallback(builder, WildfireLang.COMMAND_MANNEQUIN_DATA_PHYSICS_UNIBOOB);
         addFromFallback(builder, WildfireLang.COMMAND_MANNEQUIN_DATA_HURT_SOUNDS);
         addFromFallback(builder, WildfireLang.COMMAND_MANNEQUIN_DATA_HURT_PITCH);
+        addFromFallback(builder, WildfireLang.MANNEQUIN_CANT_EDIT_NO_PERMISSIONS);
 
         // TODO do these debug command strings need to be translated?
         add(builder, WildfireLang.DEBUG_COMMAND_LOOKING_AT, "Looking at: %1$s");

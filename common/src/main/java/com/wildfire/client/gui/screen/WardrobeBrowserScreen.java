@@ -112,7 +112,7 @@ public class WardrobeBrowserScreen extends BaseWildfireScreen {
                 }));
 
         addButton(builder -> builder
-                .message(() -> config.gender().get().getDisplayName())
+                .message(() -> config.gender().get().getTranslatedName())
                 .position(this.width / 2 - 130, this.height / 2 + 33)
                 .size(80, 15)
                 .onPress(_ -> {

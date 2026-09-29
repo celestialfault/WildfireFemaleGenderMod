@@ -20,11 +20,13 @@ package com.wildfire.common.networking.packets.mannequins;
 
 import com.wildfire.api.server.WildfireServerAPI;
 import com.wildfire.common.WildfireGender;
+import com.wildfire.common.WildfireLang;
 import com.wildfire.common.entities.avatars.AvatarConfig;
 import com.wildfire.common.entities.avatars.MannequinConfigHolder;
 import io.netty.buffer.ByteBuf;
 import java.util.UUID;
 import net.minecraft.core.UUIDUtil;
+import net.minecraft.network.chat.TextColor;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
@@ -54,7 +56,7 @@ public record ServerboundMannequinDataPacket(UUID uuid, AvatarConfig config) imp
         }
         var config = WildfireServerAPI.mannequins().getOrCreate(mannequin);
         if(!config.canEdit(player)) {
-            // TODO send some kind of feedback for rejected edits
+            player.sendSystemMessage(WildfireLang.MANNEQUIN_CANT_EDIT_NO_PERMISSIONS.translateColored(TextColor.RED));
             return;
         }
         config.setConfigAndSync(mannequin, config(), player);

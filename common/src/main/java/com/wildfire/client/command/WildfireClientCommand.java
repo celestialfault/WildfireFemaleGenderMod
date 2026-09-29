@@ -186,7 +186,7 @@ public final class WildfireClientCommand<S extends SharedSuggestionProvider> ext
 
             var info = ComponentUtils.formatList(config.getDebugInfo(), CommonComponents.NEW_LINE, Component::literal);
 
-            lines.add(WildfireLang.GENERIC_DASH_EXPLANATION.translate(entity.getDisplayName(), config.gender().get().getDisplayName())
+            lines.add(WildfireLang.GENERIC_DASH_EXPLANATION.translate(entity.getDisplayName(), config.gender().get().getTranslatedName())
                 .withStyle(style -> style.withHoverEvent(new HoverEvent.ShowText(info))));
         }
         return lines;

@@ -21,5 +21,5 @@ package com.wildfire.api;
 import net.minecraft.network.chat.Component;
 
 public interface NamedEnum {
-    Component getDisplayName();
+    Component getTranslatedName();
 }
