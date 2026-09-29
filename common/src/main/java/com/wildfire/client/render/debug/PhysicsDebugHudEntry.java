@@ -37,6 +37,16 @@ import org.jspecify.annotations.Nullable;
 public class PhysicsDebugHudEntry implements DebugScreenEntry {
     public static final Identifier ID = WildfireGender.id("physics");
 
+    //? if >=26.4-snapshot-2 {
+    private static final net.minecraft.client.gui.components.debug.DebugGroup GROUP =
+        net.minecraft.client.gui.components.debug.DebugGroup.Builder.titled(net.minecraft.network.chat.Component.empty()
+                .append(GenderDebugHudEntry.PREFIX)
+                .append(" - Physics"))
+            .withAccentColor(net.minecraft.network.chat.TextColor.DARK_PURPLE.getValue())
+            .withPreferredColumn(net.minecraft.client.gui.components.debug.DebugColumn.Side.LEFT)
+            .build();
+    //?}
+
     @Override
     public void display(DebugScreenDisplayer lines, @Nullable Level world, @Nullable LevelChunk clientChunk, @Nullable LevelChunk chunk) {
         var player = Minecraft.getInstance().player;
@@ -68,7 +78,8 @@ public class PhysicsDebugHudEntry implements DebugScreenEntry {
             add(info, breastPhysics.right());
         }
 
-        lines.addToGroup(ID, info);
+        //~ if >=26.4-snapshot-2 ID -> GROUP
+        lines.addToGroup(GROUP, info);
     }
 
     private void add(List<String> lines, BreastPhysics physics) {
