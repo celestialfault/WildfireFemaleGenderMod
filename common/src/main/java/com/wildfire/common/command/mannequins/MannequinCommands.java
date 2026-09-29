@@ -104,8 +104,6 @@ public final class MannequinCommands extends AbstractWildfireCommand<ServerComma
         Mannequin mannequin = getMannequin(ctx);
 
         if(WildfireNetworking.INSTANCE.canSendToPlayer(player, ClientboundEditMannequinPacket.TYPE)) {
-            // does it make sense to send a feedback message here? I feel like the GUI opening
-            // would be feedback enough in most cases
             WildfireNetworking.INSTANCE.sendToClient(player, new ClientboundEditMannequinPacket(mannequin));
         } else {
             ctx.getSource().sendFailure(WildfireLang.COMMAND_SERVER_NO_MOD_ON_CLIENT.translateColored(TextColor.RED));

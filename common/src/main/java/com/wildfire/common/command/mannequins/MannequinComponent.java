@@ -86,8 +86,8 @@ import org.jspecify.annotations.Nullable;
             .suggests(suggestionProvider);
     }
 
-    public boolean update(MannequinConfigHolder config, CommandContext<CommandSourceStack> ctx, String name) throws CommandSyntaxException {
-        T input = parser.parse(ctx, name);
+    public boolean update(MannequinConfigHolder config, CommandContext<CommandSourceStack> ctx, String argName) throws CommandSyntaxException {
+        T input = parser.parse(ctx, argName);
         return update(config, input);
     }
 
