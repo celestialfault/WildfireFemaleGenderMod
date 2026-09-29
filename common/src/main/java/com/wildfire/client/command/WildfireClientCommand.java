@@ -107,7 +107,8 @@ public final class WildfireClientCommand<S extends SharedSuggestionProvider> ext
         // the .schedule() is necessary as otherwise the chat screen will simply immediately close the opened screen
         helper.getMinecraft(ctx.getSource()).schedule(() -> {
             LocalPlayer player = helper.getPlayer(ctx.getSource());
-            var screen = new WildfireFirstTimeSetupScreen(null, player.getUUID());
+            var config = WildfireClientAPI.players().getOrCreate(player);
+            var screen = new WildfireFirstTimeSetupScreen(null, config);
             client.gui.setScreen(screen);
         });
         return Command.SINGLE_SUCCESS;
@@ -185,7 +186,7 @@ public final class WildfireClientCommand<S extends SharedSuggestionProvider> ext
 
             var info = ComponentUtils.formatList(config.getDebugInfo(), CommonComponents.NEW_LINE, Component::literal);
 
-            lines.add(WildfireLang.GENERIC_DASH_EXPLANATION.translate(entity.getDisplayName(), config.gender().get().getDisplayName())
+            lines.add(WildfireLang.GENERIC_DASH_EXPLANATION.translate(entity.getDisplayName(), config.gender().get().getTranslatedName())
                 .withStyle(style -> style.withHoverEvent(new HoverEvent.ShowText(info))));
         }
         return lines;

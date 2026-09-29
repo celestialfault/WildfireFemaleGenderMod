@@ -90,7 +90,7 @@ public final class SyncedPlayerList {
 
         int yPos = 18;
         for(var entry : syncedPlayers) {
-            Component text = WildfireLang.GENERIC_DASH_EXPLANATION.translate(entry.coloredName(), entry.gender().getDisplayName());
+            Component text = WildfireLang.GENERIC_DASH_EXPLANATION.translate(entry.coloredName(), entry.gender().getTranslatedName());
             fontRenderer.drawScrollingString(graphics, text, 5, yPos, TextAlignment.LEFT, CommonColors.WHITE, playerWidth - 5, 5, false);
             yPos += 10;
         }

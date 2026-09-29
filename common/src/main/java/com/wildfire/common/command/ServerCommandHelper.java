@@ -19,24 +19,28 @@
 package com.wildfire.common.command;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.minecraft.commands.SharedSuggestionProvider;
-import net.minecraft.server.MinecraftServer;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.permissions.Permission;
 import net.minecraft.server.permissions.Permissions;
+import java.util.function.Predicate;
 
-public interface ServerCommandHelper<SOURCE extends SharedSuggestionProvider> extends CommandHelper<SOURCE> {
-    final Permission SERVER_COMMAND = Permissions.COMMANDS_GAMEMASTER;
-    final Permission DEBUG_COMMANDS = Permissions.COMMANDS_GAMEMASTER;
+public interface ServerCommandHelper extends CommandHelper<CommandSourceStack> {
+    CommandPermission COMMAND_PERMISSION = new CommandPermission("command", Permissions.COMMANDS_GAMEMASTER);
 
-    MinecraftServer getServer(SOURCE source);
-    ServerPlayer getPlayer(SOURCE source) throws CommandSyntaxException;
+    ServerPlayer getPlayer(CommandSourceStack source) throws CommandSyntaxException;
 
-    default boolean hasCommandPermission(SOURCE source) {
-        return source.permissions().hasPermission(SERVER_COMMAND);
+    /// Returns a [Predicate] to determine if the provided [command source][CommandSourceStack] has
+    /// the given [permissions][CommandPermission] to use a command
+    ///
+    /// Use of this is recommended over checking a vanilla permission level to allow for future
+    /// support of a permissions API.
+    default Predicate<CommandSourceStack> requirePermissions(CommandPermission permission) {
+        return source -> source.permissions().hasPermission(permission.vanilla());
     }
 
-    default boolean hasDebugCommandPermission(SOURCE source) {
-        return source.permissions().hasPermission(DEBUG_COMMANDS);
+    // TODO extract this out to its own class and use it in MannequinConfigHolder if/when we support a proper
+    //      permissions API (e.g. Neo's / LuckPerms / etc.)
+    record CommandPermission(String key, Permission vanilla) {
     }
 }

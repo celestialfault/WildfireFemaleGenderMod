@@ -16,12 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.wildfire.neoforge.common.mixins;
+@NullMarked
+package com.wildfire.common.networking.packets.mannequins;
 
-import com.wildfire.common.config.enums.ShowPlayerListMode;
-import net.neoforged.neoforge.common.TranslatableEnum;
-import org.spongepowered.asm.mixin.Mixin;
-
-@Mixin(ShowPlayerListMode.class)
-abstract class ShowPlayerListModeMixin implements TranslatableEnum {
-}
+import org.jspecify.annotations.NullMarked;

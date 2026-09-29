@@ -19,7 +19,6 @@
 package com.wildfire.common.command;
 
 import com.mojang.brigadier.context.CommandContext;
-import com.wildfire.client.command.ClientCommandHelper;
 import com.wildfire.common.WildfireLang;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +42,7 @@ public abstract class AbstractWildfireCommand<T extends CommandHelper<S>, S exte
         helper.sendSystemMessage(ctx.getSource(), WildfireLang.GENERIC_SPACE.translate(COMMAND_PREFIX, text));
     }
 
+    @SuppressWarnings("SameParameterValue")
     @UnknownNullability("nullability depends on the relevant ArgumentType & defaultValue")
     protected <V> V getOrDefault(
         CommandContext<S> ctx,
@@ -58,15 +58,12 @@ public abstract class AbstractWildfireCommand<T extends CommandHelper<S>, S exte
         return value;
     }
 
-    protected void sendHelp(
-        CommandContext<S> ctx,
-        WildfireLang header,
-        WildfireLang... usageToDescription
-    ) {
+    @SuppressWarnings("SameParameterValue")
+    protected void sendHelp(CommandContext<S> ctx, WildfireLang header, WildfireLang... commands) {
         List<Component> lines = new ArrayList<>();
         lines.add(WildfireLang.GENERIC_SPACE.translate(COMMAND_PREFIX, header.translate().withStyle(style -> style.withUnderlined(true))));
 
-        for (WildfireLang langEntry : usageToDescription) {
+        for (WildfireLang langEntry : commands) {
             lines.add(WildfireLang.GENERIC_SPACE.translate(COMMAND_PREFIX, WildfireLang.GENERIC_DASH_EXPLANATION.translateColored(TextColor.GRAY,
                 langEntry.translateColored(TextColor.AQUA),
                 langEntry.translateDescription().withColor(TextColor.WHITE)

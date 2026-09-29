@@ -26,10 +26,9 @@ import com.wildfire.common.command.ServerCommandHelper;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 
-public class FabricServerCommandHelper implements ServerCommandHelper<CommandSourceStack> {
+public class FabricServerCommandHelper implements ServerCommandHelper {
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> literal(String key) {
         return Commands.literal(key);
@@ -53,10 +52,5 @@ public class FabricServerCommandHelper implements ServerCommandHelper<CommandSou
     @Override
     public void sendFailure(CommandSourceStack source, Component message) {
         source.sendFailure(message);
-    }
-
-    @Override
-    public MinecraftServer getServer(CommandSourceStack source) {
-        return source.getServer();
     }
 }

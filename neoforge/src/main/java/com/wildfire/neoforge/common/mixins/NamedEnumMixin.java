@@ -18,10 +18,10 @@
 
 package com.wildfire.neoforge.common.mixins;
 
-import com.wildfire.common.config.enums.SyncVerbosity;
+import com.wildfire.api.NamedEnum;
 import net.neoforged.neoforge.common.TranslatableEnum;
 import org.spongepowered.asm.mixin.Mixin;
 
-@Mixin(SyncVerbosity.class)
-abstract class SyncVerbosityMixin implements TranslatableEnum {
+@Mixin(NamedEnum.class)
+interface NamedEnumMixin extends TranslatableEnum {
 }

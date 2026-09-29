@@ -18,13 +18,21 @@
 
 package com.wildfire.common;
 
+import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
+import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+import com.wildfire.api.NamedEnum;
 import com.wildfire.api.WildfireAPI;
 import java.util.Arrays;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextColor;
+import net.minecraft.world.Nameable;
+import org.jspecify.annotations.Nullable;
 
 public enum WildfireLang {
+    // TODO change this path?
+    MOD_NAME("player_list.title", "Female Gender Mod"),
+
     ARMOR_TOOLTIP("armor.tooltip"),
 
     UV_EDITOR("uv_editor"),
@@ -54,7 +62,6 @@ public enum WildfireLang {
     CREDITS_GENERAL("credits.general"),
     CREDITS_TRANSLATORS("credits.translators"),
 
-    MOD_NAME("player_list.title"), // TODO change this path?
     PLAYER_LIST_SETTINGS("player_list.settings_button"),
     PLAYER_LIST_SYNC_STATUS("player_list.sync_status"),
     PLAYER_LIST_LOADING("player_list.state.loading"),
@@ -103,6 +110,10 @@ public enum WildfireLang {
     CHAR_SETTINGS_OVERRIDE_PHYSICS("char_settings.override_armor_physics"),
 
     LABEL_GENDER("label.gender"),
+    LABEL_FEMALE("label.female", "Female"),
+    LABEL_MALE("label.male", "Male"),
+    LABEL_OTHER("label.other", "Other"),
+
     LABEL_ENABLED("label.enabled"),
     LABEL_DISABLED("label.disabled"),
     LABEL_ON("label.on"),
@@ -124,6 +135,7 @@ public enum WildfireLang {
     CLOUD_TOOLTIP("cloud.tooltip"),
     CLOUD_UNAVAILABLE_INVALID_ACC("cloud.unavailable.invalid_account"),
     CLOUD_UNAVAILABLE_OFFLINE_SERVER("cloud.unavailable.offline_server"),
+    CLOUD_UNAVAILABLE_EDITING_MANNEQUIN("cloud.unavailable.editing_mannequin"),
     CLOUD_STATUS("cloud.status"),
     CLOUD_AUTOMATIC("cloud.automatic"),
     CLOUD_AUTOMATIC_TOOLTIP("cloud.automatic.tooltip"),
@@ -170,7 +182,7 @@ public enum WildfireLang {
     GENERIC_BRACKETS("generic.brackets"),
     GENERIC_ELLIPSIS_SUFFIX("generic.ellipsis.suffix"),
     GENERIC_CONCAT("generic.concat"),
-    GENERIC_COMMA("generic.comma"),
+    GENERIC_COMMA("generic.comma", "%1$s, %2$s"),
     GENERIC_SPACE("generic.space"),
     GENERIC_DASH_EXPLANATION("generic.dash_explanation"),
 
@@ -181,12 +193,12 @@ public enum WildfireLang {
     NOT_IN_WORLD("not_in_world"),
     NOT_IN_WORLD_TITLE("not_in_world.title"),
 
-    HURT_SOUND_SUBTITLE("hurt", "female"),
-    KEY_CATEGORY("key.category", "generic"),
-    KEY_CONFIG("key", "gender_menu"),
-    KEY_TOGGLE("key", "toggle"),
+    HURT_SOUND_SUBTITLE("hurt", "female", null),
+    KEY_CATEGORY("key.category", "generic", null),
+    KEY_CONFIG("key", "gender_menu", null),
+    KEY_TOGGLE("key", "toggle", null),
 
-    TOAST_GET_STARTED("toast", "get_started"),
+    TOAST_GET_STARTED("toast", "get_started", null),
 
     DEBUG_COMMAND("command.debug"),
     COMMAND_INVALIDATE_CACHE("command.debug.invalidate_cache"),
@@ -199,9 +211,6 @@ public enum WildfireLang {
     COMMAND_ARMOR_STAND_NO_COMPONENT("command.server.debug.armor_stand.error.no_component"),
     COMMAND_TRIM("command.server.debug.trim"),
 
-    COMMAND_VERSION_INFO("command.server.version_info"),
-    COMMAND_SYNCED_PLAYER_COUNT("command.server.synced_players"),
-
     DEBUG_COMMAND_LOOKING_AT("command.looking_at"),
     DEBUG_COMMAND_LOOKING_AT_NONE("command.looking_at.none"),
     DEBUG_COMMAND_LOOKING_AT_UUID("command.looking_at.uuid"),
@@ -212,17 +221,57 @@ public enum WildfireLang {
     DEBUG_COMMAND_SYNCED_PLAYERS("command.synced_players"),
     DEBUG_COMMAND_ENTITIES("command.entities"),
 
+    COMMAND_VERSION_INFO("command.server.version_info", "running version %1$s"),
+    COMMAND_SYNCED_PLAYER_COUNT("command.server.synced_players", "%1$s/%2$s synced players online"),
+    COMMAND_ENTITY_MUST_BE_MANNEQUIN("command.server.mannequin.not_mannequin", "Provided entity must be a mannequin"),
+    COMMAND_ENTITY_MUST_BE_AVATAR_LIKE("command.server.mannequin.not_avatar_like", "Provided entity must be a player or mannequin"),
+    COMMAND_SERVER_NO_MOD_ON_CLIENT("command.server.no_mod", "This command requires a compatible version of Female Gender Mod to use"),
+    COMMAND_SERVER_INVALID_GENDER("command.server.invalid_gender", "%1$s is not a recognized gender"),
+
+    COMMAND_MANNEQUIN_SET_VALUE("command.server.mannequin.set", "Set %1$s %2$s to %3$s"),
+    COMMAND_MANNEQUIN_COPIED_MULTIPLE_VALUES("command.server.mannequin.set.copied_multiple", "Copied %1$s settings from %2$s to %3$s"),
+    COMMAND_MANNEQUIN_NO_CHANGES("command.server.mannequin.set.no_changes", "No changes were made to %1$s"),
+
+    COMMAND_MANNEQUIN_DATA_GENDER("command.server.mannequin.data.gender", "gender"),
+    COMMAND_MANNEQUIN_DATA_BREAST_SIZE("command.server.mannequin.data.breast_size", "breast size"),
+    COMMAND_MANNEQUIN_DATA_X_OFFSET("command.server.mannequin.data.xOffset", "breast separation"),
+    COMMAND_MANNEQUIN_DATA_Y_OFFSET("command.server.mannequin.data.yOffset", "breast height"),
+    COMMAND_MANNEQUIN_DATA_Z_OFFSET("command.server.mannequin.data.zOffset", "breast depth"),
+    COMMAND_MANNEQUIN_DATA_CLEAVAGE("command.server.mannequin.data.cleavage", "breast rotation"),
+    COMMAND_MANNEQUIN_DATA_SHOW_IN_ARMOR("command.server.mannequin.data.show_in_armor", "show breasts in armor"),
+    COMMAND_MANNEQUIN_DATA_PHYSICS("command.server.mannequin.data.physics", "breast physics enabled"),
+    COMMAND_MANNEQUIN_DATA_PHYSICS_BOUNCE("command.server.mannequin.data.physics_bounce", "breast physics intensity"),
+    COMMAND_MANNEQUIN_DATA_PHYSICS_FLOPPY("command.server.mannequin.data.physics_floppy", "breast physics momentum"),
+    COMMAND_MANNEQUIN_DATA_PHYSICS_UNIBOOB("command.server.mannequin.data.physics_uniboob", "unified breast physics"),
+    COMMAND_MANNEQUIN_DATA_HURT_SOUNDS("command.server.mannequin.data.hurt_sounds", "female hurt sounds"),
+    COMMAND_MANNEQUIN_DATA_HURT_PITCH("command.server.mannequin.data.hurt_pitch", "hurt sound pitch"),
+
+    MANNEQUIN_CANT_EDIT_NO_PERMISSIONS("mannequin.edit.no_permissions", "You don't have permission to edit this mannequin"),
+
     ;
 
     private final String translationKey;
+    private final @Nullable String fallback;
 
-    WildfireLang(String type, String path) {
-        this.translationKey = WildfireGender.id(path).toLanguageKey(type);
+    WildfireLang(@Nullable String type, String path, @Nullable String fallback) {
+        if(type == null) {
+            this.translationKey = WildfireAPI.MODID + "." + path;
+        } else {
+            this.translationKey = WildfireGender.id(path).toLanguageKey(type);
+        }
+        this.fallback = fallback;
+    }
+
+    WildfireLang(String path, @Nullable String fallback) {
+        this(null, path, fallback);
     }
 
     WildfireLang(String path) {
-        //TODO: Evaluate changing lang key paths to actually using mojang's toLanguageKey helpers
-        this.translationKey = WildfireAPI.MODID + "." + path;
+        this(null, path, null);
+    }
+
+    public @Nullable String getFallback() {
+        return fallback;
     }
 
     public String getTranslationKey() {
@@ -249,12 +298,20 @@ public enum WildfireLang {
     *///?}
 
     public MutableComponent translate() {
-        return Component.translatable(translationKey);
+        if(fallback == null) {
+            return Component.translatable(translationKey);
+        } else {
+            return Component.translatableWithFallback(translationKey, fallback);
+        }
     }
 
     public MutableComponent translate(Object... args) {
-        //Simple filter to auto translate any sub lang entries
-        return Component.translatable(translationKey, Arrays.stream(args).map(arg -> arg instanceof WildfireLang lang ? lang.translate() : arg).toArray());
+        Object[] arguments = Arrays.stream(args).map(WildfireLang::parse).toArray();
+        if(fallback == null) {
+            return Component.translatable(translationKey, arguments);
+        } else {
+            return Component.translatableWithFallback(translationKey, fallback, arguments);
+        }
     }
 
     public MutableComponent line(int line) {
@@ -267,5 +324,22 @@ public enum WildfireLang {
 
     public MutableComponent translateDescription() {
         return Component.translatable(translationKey + ".description");
+    }
+
+    public SimpleCommandExceptionType simpleCommandException() {
+        return new SimpleCommandExceptionType(translate());
+    }
+
+    public DynamicCommandExceptionType dynamicCommandException() {
+        return new DynamicCommandExceptionType(this::translate);
+    }
+
+    private static Object parse(Object other) {
+        return switch(other) {
+            case Nameable nameable -> nameable.getDisplayName();
+            case NamedEnum named -> named.getTranslatedName();
+            case WildfireLang lang -> lang.translate();
+            default -> other;
+        };
     }
 }

@@ -19,6 +19,7 @@
 package com.wildfire.common.config.enums;
 
 import com.mojang.serialization.Codec;
+import com.wildfire.api.NamedEnum;
 import com.wildfire.common.WildfireLang;
 import io.netty.buffer.ByteBuf;
 import java.util.Locale;
@@ -33,7 +34,7 @@ import java.util.function.IntFunction;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.StringRepresentable;
 
-public enum ShowPlayerListMode implements StringRepresentable {
+public enum ShowPlayerListMode implements StringRepresentable, NamedEnum {
     MOD_UI_ONLY(WildfireLang.PLAYER_LIST_MODE_MOD_UI, WildfireLang.PLAYER_LIST_MODE_MOD_UI_TOOLTIP),
     TAB_LIST_OPEN(WildfireLang.PLAYER_LIST_MODE_TAB_LIST, WildfireLang.PLAYER_LIST_MODE_TAB_LIST_TOOLTIP),
     ALWAYS(WildfireLang.PLAYER_LIST_MODE_ALWAYS, WildfireLang.PLAYER_LIST_MODE_ALWAYS_TOOLTIP);
@@ -77,7 +78,7 @@ public enum ShowPlayerListMode implements StringRepresentable {
         return Tooltip.create(tooltip.translate());
     }
 
-    /// @implNote **Do not rename this method, our Neo impl mixes in an interface (net.neoforged.neoforge.common.TranslatableEnum) so that it can be translated in the config screen**
+    @Override
     public Component getTranslatedName() {
         return this.name.translate();
     }
