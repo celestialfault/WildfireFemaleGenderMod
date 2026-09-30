@@ -1,6 +1,7 @@
-- Added the ability to edit breast settings on mannequins with `/fgmserver mannequin`
+- Mannequin breast appearances can now be customized when the server has the mod installed or in singleplayer with `/fgmserver mannequin`
 - Reworked player configuration caches to be properly split on the client and server
-- Fixed armor trim rendering on 26.1 and 26.2
+- Fixed armor trims incorrectly rendering the entire trim atlas on 26.1 and 26.2
 - Fixed UV editor screen not handling clicks properly on 26.3
 - Fixed armor stands incorrectly loading data that doesn't exist if there's other data in the `custom_data` component
-- Added a breaks on the old mod ID on Fabric to catch any older versions that may exist
+- Removed the contributor list query that was done once per game session
+- The Fabric version now declares an incompatibility with the old mod ID to warn when an older version is also present

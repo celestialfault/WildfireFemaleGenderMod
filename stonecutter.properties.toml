@@ -1,5 +1,5 @@
 # Mod Properties
-mod_version = "5.0.0-Beta.5"
+mod_version = "5.0.0"
 mod_license = "LGPL-3.0"
 mod_id = "female_gender_mod"
 mod_description = "Adds extra customization options to the player model by adding breasts for a more feminine appearance"
@@ -38,7 +38,7 @@ dependencies.fabric_loader_version = "0.19.5"
 dependencies.modmenu = "18.0.0-alpha.6"
 debug.load_modmenu = false
 
-publish.type = "BETA"
+publish.type = "STABLE"
 publish.curseforge = "456319"
 publish.modrinth = "bcOsQHnC"
 
