@@ -184,10 +184,10 @@ public final class WildfireClientCommand<S extends SharedSuggestionProvider> ext
                 continue;
             }
 
-            var info = ComponentUtils.formatList(config.getDebugInfo(), CommonComponents.NEW_LINE, Component::literal);
+            // TODO figure out if this is feasible to make support this new debug line format
+            //var info = ComponentUtils.formatList(config.getDebugInfo(), CommonComponents.NEW_LINE, Component::literal);
 
-            lines.add(WildfireLang.GENERIC_DASH_EXPLANATION.translate(entity.getDisplayName(), config.gender().get().getTranslatedName())
-                .withStyle(style -> style.withHoverEvent(new HoverEvent.ShowText(info))));
+            lines.add(WildfireLang.GENERIC_DASH_EXPLANATION.translate(entity, config.gender().get()));
         }
         return lines;
     }

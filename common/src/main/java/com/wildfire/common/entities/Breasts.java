@@ -21,13 +21,12 @@ package com.wildfire.common.entities;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.wildfire.client.render.debug.DebugLines;
 import com.wildfire.common.WildfireHelper;
 import com.wildfire.common.config.validator.ConfigRange;
 import com.wildfire.common.config.value.ConfigKey;
 import com.wildfire.common.config.value.ConfigValue;
 import io.netty.buffer.ByteBuf;
-import java.util.ArrayList;
-import java.util.List;
 import net.minecraft.network.codec.StreamCodec;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
@@ -114,14 +113,17 @@ public record Breasts(
         cleavage.update(component.cleavage());
     }
 
-    public List<String> getDebugInfo() {
-        List<String> info = new ArrayList<>();
-        info.add("Breast size: " + bustSize());
-        info.add("Physics enabled: " + physics().enabled());
-        info.add("Uniboob: " + physics().uniboob());
-        info.add("Cleavage: " + cleavage());
-        info.add("Offsets: (" + xOffset.get() + ", " + yOffset.get() + ", " + zOffset.get() + ")");
-        return info;
+    public DebugLines getDebugInfo() {
+        var lines = new DebugLines();
+        lines.fact("Breast size", fact -> fact.value(bustSize()));
+        lines.fact("Physics", fact -> fact.value(physics().enabled()));
+        lines.fact("Uniboob", fact -> fact.value(physics().uniboob()));
+        lines.fact("Cleavage", fact -> fact.value(cleavage()));
+        lines.fact("Offsets", fact -> fact.text("(")
+            .value(xOffset).text(", ")
+            .value(yOffset).text(", ")
+            .value(zOffset).text(")"));
+        return lines;
     }
 
     /// @param uniboob  Determines if breast physics should be independent of each other; also referred to as Dual-Physics in the UI.

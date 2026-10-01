@@ -25,13 +25,14 @@ import com.wildfire.client.cloud.CloudSync;
 import com.wildfire.client.cloud.SyncLog;
 import com.wildfire.client.config.ClientConfig;
 import com.wildfire.client.gui.screen.BaseWildfireScreen;
+import com.wildfire.client.render.debug.DebugLine;
+import com.wildfire.client.render.debug.DebugLines;
 import com.wildfire.common.WildfireGender;
 import com.wildfire.common.WildfireLang;
 import com.wildfire.common.config.Configuration;
 import com.wildfire.common.config.value.ConfigKey;
 import com.wildfire.common.entities.avatars.AbstractAvatarConfigHolder;
 import com.wildfire.common.entities.avatars.AvatarConfig;
-import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import net.minecraft.client.Minecraft;
@@ -138,9 +139,9 @@ public class PlayerConfigHolder extends AbstractAvatarConfigHolder {
     }
 
     @Override
-    public List<String> getDebugInfo() {
-        List<String> lines = super.getDebugInfo();
-        lines.add(1, "Sync status: " + getSyncStatus());
+    public DebugLines getDebugInfo() {
+        DebugLines lines = super.getDebugInfo();
+        lines.add(1, DebugLine.fact("Sync status", builder -> builder.value(getSyncStatus())));
         return lines;
     }
 }

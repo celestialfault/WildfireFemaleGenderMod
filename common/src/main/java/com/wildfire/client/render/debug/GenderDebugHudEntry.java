@@ -24,8 +24,6 @@ import com.wildfire.client.physics.BreastPhysics;
 import com.wildfire.client.resources.GenderArmorResourceManager;
 import com.wildfire.common.WildfireGender;
 import com.wildfire.common.entities.EntityConfigHolder;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Function;
 import net.minecraft.Optionull;
 import net.minecraft.client.Minecraft;
@@ -39,51 +37,32 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.LevelChunk;
 import org.jspecify.annotations.Nullable;
-import net.minecraft.ChatFormatting;
 
 public class GenderDebugHudEntry implements DebugScreenEntry {
     public static final Identifier SELF = WildfireGender.id("self_gender_info");
     public static final Identifier OTHER = WildfireGender.id("target_gender_info");
 
-    //? if <=26.3 {
-    /*private static final String PREFIX =
-            ChatFormatting.GRAY + "" + ChatFormatting.UNDERLINE + "["
-                    + ChatFormatting.LIGHT_PURPLE + ChatFormatting.UNDERLINE + "F"
-                    + ChatFormatting.WHITE + ChatFormatting.UNDERLINE + "GM"
-                    + ChatFormatting.GRAY + ChatFormatting.UNDERLINE + "]" +
-                    ChatFormatting.RESET + ChatFormatting.UNDERLINE;
-    private final Identifier id;
-    *///?} else {
-    static final net.minecraft.network.chat.Component PREFIX = net.minecraft.network.chat.Component.empty()
-        .append(net.minecraft.network.chat.Component.literal("F").withColor(net.minecraft.network.chat.TextColor.LIGHT_PURPLE))
-        .append("GM")
-        .withColor(net.minecraft.network.chat.TextColor.WHITE);
-
-    private final net.minecraft.client.gui.components.debug.DebugGroup group, chestplateGroup;
-    //?}
+    private final DebugGroup mainGroup, chestplateGroup;
 
     private final boolean clientPlayer;
 
     public GenderDebugHudEntry(boolean clientPlayer) {
         this.clientPlayer = clientPlayer;
-        //? if >=26.4-snapshot-2 {
-        var mainTitle = net.minecraft.network.chat.Component.empty().append(PREFIX).append(" - Gender Info");
-        var chestplateTitle = net.minecraft.network.chat.Component.empty().append(PREFIX).append(" - Equipped Chestplate");
-        var preferredSide = clientPlayer ? net.minecraft.client.gui.components.debug.DebugColumn.Side.RIGHT :
-            net.minecraft.client.gui.components.debug.DebugColumn.Side.LEFT;
-
-        group = net.minecraft.client.gui.components.debug.DebugGroup.Builder.titled(mainTitle)
-            .withPreferredColumn(preferredSide)
-            .withAccentColor(TextColor.LIGHT_PURPLE.getValue())
+        //~ color_as_rgb !named_text_color
+        this.mainGroup = DebugGroup.builder()
+            .id(clientPlayer ? SELF : OTHER)
+            .named("Gender Data")
+            .accentColor(TextColor.LIGHT_PURPLE)
+            .preferredSide(clientPlayer ? DebugGroup.Side.RIGHT : DebugGroup.Side.LEFT)
             .build();
 
-        chestplateGroup = net.minecraft.client.gui.components.debug.DebugGroup.Builder.titled(chestplateTitle)
-            .withAccentColor(TextColor.AQUA.getValue())
-            .withPreferredColumn(preferredSide)
+        this.chestplateGroup = DebugGroup.builder()
+            .id(clientPlayer ? SELF : OTHER)
+            .named("Equipped Chestplate")
+            .accentColor(TextColor.AQUA)
+            .preferredSide(clientPlayer ? DebugGroup.Side.RIGHT : DebugGroup.Side.LEFT)
             .build();
-        //?} else {
-        /*this.id = clientPlayer ? SELF : OTHER;
-        *///?}
+        //~ !color_as_rgb named_text_color
     }
 
     @Override
@@ -99,49 +78,61 @@ public class GenderDebugHudEntry implements DebugScreenEntry {
             return;
         }
 
-        List<String> lines = new ArrayList<>();
-        //? if <=26.3
-        //lines.add(PREFIX + " Gender Data");
-        lines.add("UUID: " + target.getUUID());
+        var lines = new DebugLines(/*? <=26.3 >> ')'*//*mainGroup*/);
         lines.addAll(config.getDebugInfo());
 
-        //~ if >=26.4-snapshot-2 id -> group
-        displayer.addToGroup(group, lines);
+        //? if >=26.4-snapshot-2 {
+        lines.submit(mainGroup, displayer);
         addEquippedChestplate(displayer, config, living);
+        //?} else {
+        /*addEquippedChestplate(lines, config, living);
+        lines.submit(mainGroup, displayer);
+        *///?}
     }
 
-    private void addEquippedChestplate(DebugScreenDisplayer displayer, EntityConfigHolder<?> config, LivingEntity entity) {
+    private void addEquippedChestplate(
+        //? if >=26.4-snapshot-2 {
+        DebugScreenDisplayer displayer,
+        //?} else {
+        /*DebugLines parent,
+        *///?}
+        EntityConfigHolder<?> config,
+        LivingEntity entity
+    ) {
         var equippedChestplate = entity.getItemBySlot(EquipmentSlot.CHEST);
         var equippable = equippedChestplate.get(DataComponents.EQUIPPABLE);
         // null is perfectly valid to return here
         //noinspection DataFlowIssue
         var asset = Optionull.map(equippable, it -> it.assetId().orElse(null));
-        if(asset == null) return;
+        if(asset == null) {
+            return;
+        }
 
-        var lines = new ArrayList<String>();
-        lines.add("");
-        //? if <=26.3
-        //lines.add(PREFIX + " Equipped Chestplate");
+        var lines = new DebugLines(/*? <=26.3 >> ')'*//*chestplateGroup*/);
 
         var id = asset.identifier();
         var armorConfig = Optionull.mapOrDefault(GenderArmorResourceManager.get(id), Function.identity(), IGenderArmor.DEFAULT);
-        lines.add("Material: " + id);
+        lines.fact("Material", fact -> fact.value(id.toString()));
         if(!armorConfig.coversBreasts()) {
-            lines.add("Covers breasts: false");
-            return;
+            lines.fact("Covers breasts", fact -> fact.value(false));
         } else if(armorConfig.alwaysHidesBreasts()) {
-            lines.add("Covers breasts: true");
-            return;
-        }
-        lines.add("Physics resistance: " + armorConfig.physicsResistance());
-        lines.add("Tightness: " + armorConfig.tightness());
-        lines.add("Armor stands copy: " + armorConfig.armorStandsCopySettings());
-        if(armorConfig.tightness() > 0) {
-            float renderedSize = config.breasts().bustSize().get() * (1 - BreastPhysics.TIGHTNESS_REDUCTION_FACTOR * armorConfig.tightness());
-            lines.add("Rendered breast size: " + renderedSize);
+            lines.fact("Hides breasts", fact -> fact.value(true));
+        } else {
+            lines.fact("Physics resistance", fact -> fact.value(Float.toString(armorConfig.physicsResistance())));
+            lines.fact("Tightness", fact -> fact.value(Float.toString(armorConfig.tightness())));
+            lines.fact("Armor stands copy", fact -> fact.value(armorConfig.armorStandsCopySettings()));
+            if (armorConfig.tightness() > 0) {
+                float renderedSize = config.breasts().bustSize().get() * (1 - BreastPhysics.TIGHTNESS_REDUCTION_FACTOR * armorConfig.tightness());
+                lines.fact("Rendered breast size", fact -> fact.value(Float.toString(renderedSize)));
+            }
         }
 
-        //~ if >=26.4-snapshot-2 id -> chestplateGroup
-        displayer.addToGroup(chestplateGroup, lines);
+        //? if >=26.4-snapshot-2 {
+        lines.submit(chestplateGroup, displayer);
+        //?} else {
+        /*parent.literal("");
+        parent.addHeader(lines);
+        parent.addAll(lines);
+        *///?}
     }
 }

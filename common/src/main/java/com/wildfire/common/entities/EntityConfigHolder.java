@@ -19,10 +19,11 @@
 package com.wildfire.common.entities;
 
 import com.wildfire.api.Gender;
-import com.wildfire.common.config.value.ConfigValue;
-import com.wildfire.common.config.UVs;
 import com.wildfire.client.physics.BothBreastsPhysics;
-import java.util.List;
+import com.wildfire.client.render.debug.DebugLine;
+import com.wildfire.client.render.debug.DebugLines;
+import com.wildfire.common.config.UVs;
+import com.wildfire.common.config.value.ConfigValue;
 import java.util.UUID;
 import net.minecraft.ChatFormatting;
 import org.jetbrains.annotations.ApiStatus;
@@ -61,14 +62,16 @@ public abstract class EntityConfigHolder<CONFIG extends EntityConfig> {
         return breastPhysics;
     }
 
-    public List<String> getDebugInfo() {
-        List<String> info = breasts().getDebugInfo();
-        info.addFirst("Gender: " + switch(gender().get()) {
-            case FEMALE -> ChatFormatting.LIGHT_PURPLE + "Female";
-            case MALE -> ChatFormatting.BLUE + "Male";
-            case OTHER -> ChatFormatting.GREEN + "Other";
-        });
-        return info;
+    public DebugLines getDebugInfo() {
+        DebugLines lines = breasts().getDebugInfo();
+        lines.addFirst(DebugLine.fact("Gender", fact -> {
+            switch(gender().get()) {
+                case FEMALE -> fact.value(ChatFormatting.LIGHT_PURPLE, "Female");
+                case MALE -> fact.value(ChatFormatting.BLUE, "Male");
+                case OTHER -> fact.value(ChatFormatting.GREEN, "Other");
+            }
+        }));
+        return lines;
     }
 
     @Override

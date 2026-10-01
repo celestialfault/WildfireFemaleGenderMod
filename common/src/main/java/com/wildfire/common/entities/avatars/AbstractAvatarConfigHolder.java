@@ -22,15 +22,16 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.JsonOps;
 import com.wildfire.client.ClientHelper;
+import com.wildfire.client.render.debug.DebugLines;
 import com.wildfire.common.config.value.ConfigValue;
 import com.wildfire.common.entities.EntityConfigHolder;
 import com.wildfire.common.entities.Sounds;
-import java.util.List;
 import java.util.UUID;
 import net.minecraft.core.Holder;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.entity.Avatar;import org.jetbrains.annotations.ApiStatus;
+import net.minecraft.world.entity.Avatar;
+import org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.NonExtendable
 public abstract class AbstractAvatarConfigHolder extends EntityConfigHolder<AvatarConfig> {
@@ -67,10 +68,10 @@ public abstract class AbstractAvatarConfigHolder extends EntityConfigHolder<Avat
     }
 
     @Override
-    public List<String> getDebugInfo() {
-        List<String> lines = super.getDebugInfo();
-        lines.add("Female hurt sounds: " + sounds().hurt());
-        lines.add("Show in armor: " + showBreastsInArmor());
+    public DebugLines getDebugInfo() {
+        DebugLines lines = super.getDebugInfo();
+        lines.fact("Female hurt sounds", builder -> builder.value(sounds().hurt()));
+        lines.fact("Show in armor", builder -> builder.value(showBreastsInArmor()));
         return lines;
     }
 

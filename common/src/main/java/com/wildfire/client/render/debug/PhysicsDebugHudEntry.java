@@ -19,72 +19,63 @@
 package com.wildfire.client.render.debug;
 
 import com.wildfire.api.client.WildfireClientAPI;
-import com.wildfire.common.WildfireGender;
-import com.wildfire.client.physics.BreastPhysics;
 import com.wildfire.client.physics.BothBreastsPhysics;
-import net.minecraft.ChatFormatting;
+import com.wildfire.client.physics.BreastPhysics;
+import com.wildfire.client.render.BreastSide;
+import com.wildfire.common.WildfireGender;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.debug.DebugScreenDisplayer;
 import net.minecraft.client.gui.components.debug.DebugScreenEntry;
+import net.minecraft.network.chat.TextColor;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.LevelChunk;
-
-import java.util.ArrayList;
-import java.util.List;
 import org.jspecify.annotations.Nullable;
 
 public class PhysicsDebugHudEntry implements DebugScreenEntry {
     public static final Identifier ID = WildfireGender.id("physics");
 
-    //? if >=26.4-snapshot-2 {
-    private static final net.minecraft.client.gui.components.debug.DebugGroup GROUP =
-        net.minecraft.client.gui.components.debug.DebugGroup.Builder.titled(net.minecraft.network.chat.Component.empty()
-                .append(GenderDebugHudEntry.PREFIX)
-                .append(" - Physics"))
-            .withAccentColor(net.minecraft.network.chat.TextColor.DARK_PURPLE.getValue())
-            .withPreferredColumn(net.minecraft.client.gui.components.debug.DebugColumn.Side.LEFT)
-            .build();
-    //?}
+    private static final DebugGroup GROUP = DebugGroup.builder()
+        .named("Breast Physics Values")
+        //~ color_as_rgb !named_text_color
+        .accentColor(TextColor.DARK_PURPLE)
+        //~ !color_as_rgb named_text_color
+        .preferredSide(DebugGroup.Side.LEFT)
+        .build();
 
     @Override
-    public void display(DebugScreenDisplayer lines, @Nullable Level world, @Nullable LevelChunk clientChunk, @Nullable LevelChunk chunk) {
+    public void display(DebugScreenDisplayer displayer, @Nullable Level world, @Nullable LevelChunk clientChunk, @Nullable LevelChunk chunk) {
         var player = Minecraft.getInstance().player;
         if(player == null) return;
         var config = WildfireClientAPI.players().get(player);
         if(config == null) return;
 
         BothBreastsPhysics breastPhysics = config.breastPhysics();
-        List<String> info = new ArrayList<>();
+        var lines = new DebugLines(/*? <=26.3 >> ')'*//*GROUP*/);
 
         var swingState = BreastPhysics.getSwingState(player);
-        info.add(ChatFormatting.UNDERLINE + "Swing Progress");
         if(!swingState.isSwinging()) {
-            info.add("Arm is not currently swinging");
+            lines.fact("Arm swinging", fact -> fact.value(false));
         } else {
-            info.add("Duration: " + swingState.tick() + "/" + swingState.duration());
-            info.add("Swing effect amplifiers: " + swingState.amplifier() + " (" + swingState.xAmplifier() + ")");
+            lines.fact("Arm swinging", fact -> fact.value(true));
+            lines.fact("Duration", fact -> fact.value(swingState.tick()).text("/").value(swingState.duration()));
+            lines.fact("Swing effect amplifiers", fact -> fact.value(swingState.amplifier()).text(" (").value(swingState.xAmplifier()).text(")"));
         }
-        info.add("");
 
         if(config.breasts().physics().uniboob().get()) {
-            info.add(ChatFormatting.UNDERLINE + "Breast Physics");
-            add(info, breastPhysics.left());
+            add(lines, null, breastPhysics.left());
         } else {
-            info.add(ChatFormatting.UNDERLINE + "Left Breast Physics");
-            add(info, breastPhysics.left());
-            info.add("");
-            info.add(ChatFormatting.UNDERLINE + "Right Breast Physics");
-            add(info, breastPhysics.right());
+            add(lines, BreastSide.LEFT, breastPhysics.left());
+            add(lines, BreastSide.RIGHT, breastPhysics.right());
         }
 
-        //~ if >=26.4-snapshot-2 ID -> GROUP
-        lines.addToGroup(GROUP, info);
+        lines.submit(GROUP, displayer);
     }
 
-    private void add(List<String> lines, BreastPhysics physics) {
-        lines.add("Breast size: " + physics.getBreastSize());
-        lines.add("Position: (" + physics.getPositionX() + ", " + physics.getPositionY() + ")");
-        lines.add("Rotation: " + physics.getBounceRotation());
+    private void add(DebugLines lines, @Nullable BreastSide side, BreastPhysics physics) {
+        String sideName = side == null ? "Uniboob" : side == BreastSide.LEFT ? "Left" : "Right";
+        lines.fact(sideName + " breast size", fact -> fact.value(physics.getBreastSize()));
+        lines.fact(sideName + " position", fact -> fact.text("(").value(physics.getPositionX()).text(", ").value(physics.getPositionY()).text(")"));
+        lines.fact(sideName + " rotation", fact -> fact.value(physics.getBounceRotation()));
     }
 }
