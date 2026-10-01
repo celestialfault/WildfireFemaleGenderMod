@@ -73,6 +73,10 @@ loom {
         displayName = runtimeEnvironment.map { "Fabric ${it.replaceFirstChar(Char::uppercase)}" }
         generateRunConfig = true
         ideConfigFolder = "Fabric"
+        // Loom now defaults to using a Gradle task to work around issues with IntelliJ when the configuration
+        // cache is enabled as of 1.18; we already explicitly disable the configuration cache due to the
+        // various issues it causes with and without this option, so we can also safely disable this.
+        preferGradleTask = false
         // by default loom will use versions/*/run for the run dir, so instead tell it to use the
         // run dir in the project root directory
         runDirectory = sc.branch.project.layout.projectDirectory.dir("run")

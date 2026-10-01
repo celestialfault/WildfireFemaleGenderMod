@@ -7,7 +7,7 @@ import dev.kikugie.stonecutter.data.tree.ProjectNode
 plugins {
     id("dev.kikugie.stonecutter")
     id("net.neoforged.moddev") version "2.0.147" apply false
-    id("net.fabricmc.fabric-loom") version "1.17-SNAPSHOT" apply false
+    id("net.fabricmc.fabric-loom") version "1.18-SNAPSHOT" apply false
     id("idea")
 }
 
