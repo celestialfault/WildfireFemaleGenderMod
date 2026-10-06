@@ -30,8 +30,8 @@ import java.util.function.Consumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Util;
@@ -92,13 +92,6 @@ public abstract class BaseWildfireScreen extends Screen implements IFancyFontRen
         }
     }
 
-    protected void renderPlayerInFrame(GuiGraphicsExtractor graphics, int xP, int yP, int mouseX, int mouseY) {
-        LivingEntity entity = getEntity();
-        if(entity != null) {
-            InventoryScreen.extractEntityInInventoryFollowsMouse(graphics, xP - 38, yP - 79, xP + 38, yP + 9, 70, getEntityScale(entity, 0.4F), mouseX, mouseY, entity);
-        }
-    }
-
     @Override
     protected void init() {
         super.init();
@@ -120,22 +113,36 @@ public abstract class BaseWildfireScreen extends Screen implements IFancyFontRen
         minecraft.gui.setScreen(parent);
     }
 
+    //~ entity_portrait_widget
+    protected void renderPlayerInFrame(GuiGraphicsExtractor graphics, int xP, int yP, int mouseX, int mouseY) {
+        LivingEntity entity = getEntity();
+        if(entity != null) {
+            net.minecraft.client.gui.screens.social.EntityPortraitWidget.extractEntityInInventoryFollowsMouse(
+                graphics,
+                xP - 38, yP - 79,
+                xP + 38, yP + 9,
+                70, getEntityScale(entity, 0.4F),
+                mouseX, mouseY, entity);
+        }
+    }
+
     protected static float getEntityScale(LivingEntity entity, float shift) {
         return getEntityScale(entity, shift, true);
     }
 
     protected static float getEntityScale(LivingEntity entity, float shift, boolean adjustByHeight) {
         float scale = ENTITY_SCALE;
+        EntityRenderState state = net.minecraft.client.gui.screens.social.EntityPortraitWidget.extractRenderState(entity);
         //Note: While we could reimplement the default values that get set for state.isUpsideDown,
         // it is easier and more mod compatible to just extract the render state an extra time
-        if (InventoryScreen.extractRenderState(entity) instanceof LivingEntityRenderState state && state.isUpsideDown) {
+        if (state instanceof LivingEntityRenderState livingState && livingState.isUpsideDown) {
             //Invert the scale
             scale = -scale;
             if (adjustByHeight) {
-                state.boundingBoxWidth /= state.scale;
-                state.boundingBoxHeight /= state.scale;
+                livingState.boundingBoxWidth /= livingState.scale;
+                livingState.boundingBoxHeight /= livingState.scale;
                 //Negate the scale and also undo the transformation that InventoryScreen#extractEntityInInventoryFollowsMouse does
-                scale -= state.boundingBoxHeight / 2;
+                scale -= livingState.boundingBoxHeight / 2;
             }
         }
         return scale + shift;

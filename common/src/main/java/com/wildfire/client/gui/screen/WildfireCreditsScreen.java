@@ -30,7 +30,6 @@ import java.util.List;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextColor;
@@ -215,7 +214,14 @@ public class WildfireCreditsScreen extends BaseWildfireScreen {
             int xP = creditBoxX + (52 / 2);
             int yP = creditBoxY + (68 / 2);
             var entity = creditBox.getEntity();
-            InventoryScreen.extractEntityInInventoryFollowsMouse(graphics, xP - 38, yP - 29, xP + 38, yP + 20, 40, getEntityScale(entity, 0.5F), mouseX, mouseY, entity);
+            //~ entity_portrait_widget
+            net.minecraft.client.gui.screens.social.EntityPortraitWidget.extractEntityInInventoryFollowsMouse(
+                graphics,
+                xP - 38, yP - 29,
+                xP + 38, yP + 20,
+                40, getEntityScale(entity, 0.5F),
+                mouseX, mouseY, entity);
+            //~ !entity_portrait_widget
 
             drawScaledScrollingString(graphics, Component.literal(creditBox.getName()), creditBoxX + 3, yP + 23, TextAlignment.CENTER, CommonColors.WHITE, 46,  1, false, 0.55F);
 

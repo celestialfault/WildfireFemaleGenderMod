@@ -5,6 +5,6 @@
         "26.1:26.1.2": ["", "common", "fabric", "neoforge"],
         "26.2:26.2": ["", "common", "fabric", "neoforge"],
         "26.3:26.3": ["", "common", "fabric", "neoforge"],
-        "26.4:26.4-snapshot-2": ["", "common", "fabric"],
+        "26.4:26.4-snapshot-3": ["", "common", "fabric"],
     }
 }

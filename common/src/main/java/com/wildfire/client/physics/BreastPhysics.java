@@ -436,7 +436,7 @@ public class BreastPhysics {
         }
 
         final float reduced = rawAmplifier < 0 ? 1 + (rawAmplifier / 1.5f) : (float)Math.pow(1 + rawAmplifier, -0.65);
-        final float xAmp = Mth.clamp(reduced, 0.25f, 1.225f);
+        final float xAmp = Math.clamp(reduced, 0.25f, 1.225f);
 
         return new SwingState(
             /*isSwinging=*/ isSwinging,

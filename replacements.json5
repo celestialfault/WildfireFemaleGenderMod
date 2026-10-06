@@ -83,4 +83,11 @@
             },
         ],
     },
+
+    entity_portrait_widget: {
+        when: ">=26.4-snapshot-3",
+        strings: [
+            ["net.minecraft.client.gui.screens.inventory.InventoryScreen", "net.minecraft.client.gui.screens.social.EntityPortraitWidget"],
+        ],
+    },
 }

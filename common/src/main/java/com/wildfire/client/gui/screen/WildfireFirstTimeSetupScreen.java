@@ -35,7 +35,6 @@ import java.util.function.Supplier;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -177,7 +176,14 @@ public class WildfireFirstTimeSetupScreen extends BaseWildfireScreen {
         drawScaledScrollingString(graphics, NOTICE, x - (SCREEN_WIDTH / 2), y + 63, TextAlignment.CENTER, CommonColors.DARK_GRAY, SCREEN_WIDTH, 6, false, 0.8F);
 
         var fakeKeira = this.fakeKeira.get().getEntity();
-        InventoryScreen.extractEntityInInventoryFollowsMouse(graphics, x - 132, y - 13, x - 75, y + 60, 50, getEntityScale(fakeKeira, 0.4f), mouseX, mouseY, fakeKeira);
+        //~ entity_portrait_widget
+        net.minecraft.client.gui.screens.social.EntityPortraitWidget.extractEntityInInventoryFollowsMouse(
+            graphics,
+            x - 132, y - 13,
+            x - 75, y + 60,
+            50, getEntityScale(fakeKeira, 0.4f),
+            mouseX, mouseY, fakeKeira);
+        //~ !entity_portrait_widget
     }
 
     @Override

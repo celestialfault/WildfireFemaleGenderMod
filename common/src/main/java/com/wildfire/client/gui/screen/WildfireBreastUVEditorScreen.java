@@ -34,7 +34,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.ClientAvatarEntity;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
@@ -263,8 +262,14 @@ public class WildfireBreastUVEditorScreen extends BaseWildfireScreen {
             modelScale = 200;
         }
 
-        InventoryScreen.extractEntityInInventoryFollowsMouse(graphics, this.width / 2 - modelScale, this.height / 2 - modelScale, this.width / 2 + modelScale,
-            this.height / 2 + modelScale, modelScale, getEntityScale(entity, 0, false), mouseX, mouseY, entity);
+        //~ entity_portrait_widget
+        net.minecraft.client.gui.screens.social.EntityPortraitWidget.extractEntityInInventoryFollowsMouse(
+            graphics,
+            this.width / 2 - modelScale, this.height / 2 - modelScale,
+            this.width / 2 + modelScale, this.height / 2 + modelScale,
+            modelScale, getEntityScale(entity, 0, false),
+            mouseX, mouseY, entity);
+        //~ !entity_portrait_widget
         drawScrollingString(graphics, getTitle(), uvWindowPos.x(), 20, TextAlignment.CENTER, CommonColors.WHITE, textureDrawWidth, 2, false);
 
         super.extractRenderState(graphics, mouseX, mouseY, delta);
