@@ -66,10 +66,15 @@ abstract class AvatarRendererMixin extends LivingEntityRenderer<Avatar, AvatarRe
     public void renderNametag(
         final AvatarRenderState state,
         final PoseStack poseStack,
-        final SubmitNodeCollector collector,
+        final SubmitNodeCollector submitNodeCollector,
         final CameraRenderState camera,
         CallbackInfo ci
     ) {
-        WildfireClientEventHandler.onPlayerNametag(state, collector, poseStack, camera);
+        //? if >=26.4-snapshot-4 {
+        if(state.nameTag == null) {
+            return;
+        }
+        //?}
+        WildfireClientEventHandler.onPlayerNametag(state, submitNodeCollector, poseStack, camera);
     }
 }

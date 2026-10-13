@@ -81,7 +81,7 @@ public class WildfireButton extends Button implements IFancyFontRenderer {
         return this;
     }
 
-    //? if >=26.4-snapshot-2
+    //? if >=26.4-snapshot-4
     @Override
     public void setVisible(boolean visible) {
         if (this.visible != visible) {

@@ -25,14 +25,13 @@ import com.wildfire.client.render.BreastSide;
 import com.wildfire.common.WildfireGender;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.debug.DebugScreenDisplayer;
-import net.minecraft.client.gui.components.debug.DebugScreenEntry;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.LevelChunk;
 import org.jspecify.annotations.Nullable;
 
-public class PhysicsDebugHudEntry implements DebugScreenEntry {
+public class PhysicsDebugHudEntry implements WildfireDebugEntry {
     public static final Identifier ID = WildfireGender.id("physics");
 
     private static final DebugGroup GROUP = DebugGroup.builder()
@@ -42,6 +41,11 @@ public class PhysicsDebugHudEntry implements DebugScreenEntry {
         //~ !color_as_rgb named_text_color
         .preferredSide(DebugGroup.Side.LEFT)
         .build();
+
+    @Override
+    public Identifier id() {
+        return ID;
+    }
 
     @Override
     public void display(DebugScreenDisplayer displayer, @Nullable Level world, @Nullable LevelChunk clientChunk, @Nullable LevelChunk chunk) {

@@ -74,9 +74,9 @@ publish.modrinth = "bcOsQHnC"
     publish.max_version = "26.3"
 
 ["26.4"]
-    meta.supported_minecraft_versions = ">=26.4-alpha.3 <26.4"
-    meta.minecraft_version_range = "[26.4-snapshot-3,26.4)"
-    dependencies.fabric_api = "0.162.2"
+    meta.supported_minecraft_versions = ">=26.4-alpha.4 <26.4"
+    meta.minecraft_version_range = "[26.4-snapshot-4,26.4)"
+    dependencies.fabric_api = "0.162.3"
     #dependencies.neo_version = "26.3.0.0-beta"
     #dependencies.min_neo_version = "26.3.0.0-beta"
     publish.version_title = "26.4"

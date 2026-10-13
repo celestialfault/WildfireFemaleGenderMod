@@ -16,24 +16,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+//~ !entity_types
 package com.wildfire.fabric.client;
 
-//~ !entity_types
 import com.wildfire.client.WildfireClientEventHandler;
 import com.wildfire.client.WildfireGenderClient;
 import com.wildfire.client.WildfireKeyBindings;
 import com.wildfire.client.command.WildfireClientCommand;
-import com.wildfire.client.gui.SyncedPlayerList;
-import com.wildfire.common.LoaderAgnostics;
-import com.wildfire.common.WildfireGender;
 import com.wildfire.client.config.ClientConfig;
-import com.wildfire.fabric.common.networking.FabricSync;
+import com.wildfire.client.gui.SyncedPlayerList;
 import com.wildfire.client.render.debug.GenderDebugHudEntry;
 import com.wildfire.client.render.debug.PhysicsDebugHudEntry;
+import com.wildfire.client.render.debug.WildfireDebugEntry;
 import com.wildfire.client.resources.GenderArmorResourceManager;
+import com.wildfire.common.LoaderAgnostics;
+import com.wildfire.common.WildfireGender;
+import com.wildfire.fabric.common.networking.FabricSync;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
-import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
@@ -42,7 +42,6 @@ import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityRenderLayerRegist
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
-import net.minecraft.client.gui.components.debug.DebugScreenEntries;
 import net.minecraft.client.renderer.entity.ArmorStandRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
@@ -63,16 +62,26 @@ public class WildfireGenderClientFabric implements ClientModInitializer {
         registerKeybindings();
         registerClientEvents();
         ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloadListener(GenderArmorResourceManager.ID, GenderArmorResourceManager.INSTANCE);
-        DebugScreenEntries.register(GenderDebugHudEntry.SELF, new GenderDebugHudEntry(true));
-        DebugScreenEntries.register(GenderDebugHudEntry.OTHER, new GenderDebugHudEntry(false));
+        registerDebugEntry(new GenderDebugHudEntry(true));
+        registerDebugEntry(new GenderDebugHudEntry(false));
         // only register this in dev env, as this likely isn't going to be very useful anywhere else.
         if (LoaderAgnostics.INSTANCE.isDevelopmentEnv()) {
-            DebugScreenEntries.register(PhysicsDebugHudEntry.ID, new PhysicsDebugHudEntry());
+            registerDebugEntry(new PhysicsDebugHudEntry());
         }
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, _) -> {
             var command = new WildfireClientCommand<>(new FabricClientCommandHelper());
             command.register(dispatcher);
         });
+    }
+
+    private void registerDebugEntry(WildfireDebugEntry entry) {
+        //? if >=26.4-snapshot-4 {
+        var registry = net.minecraft.client.core.registries.BuiltInClientRegistries.DEBUG_SCREEN_ENTRY;
+        var key = net.minecraft.resources.ResourceKey.create(registry.key(), entry.id());
+        net.minecraft.core.Registry.register(registry, key, entry);
+        //?} else {
+        /*net.minecraft.client.gui.components.debug.DebugScreenEntries.register(entry.id(), entry);
+        *///?}
     }
 
     private void registerKeybindings() {

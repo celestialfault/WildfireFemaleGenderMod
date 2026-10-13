@@ -28,7 +28,6 @@ import java.util.function.Function;
 import net.minecraft.Optionull;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.debug.DebugScreenDisplayer;
-import net.minecraft.client.gui.components.debug.DebugScreenEntry;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.resources.Identifier;
@@ -38,31 +37,39 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.LevelChunk;
 import org.jspecify.annotations.Nullable;
 
-public class GenderDebugHudEntry implements DebugScreenEntry {
+public class GenderDebugHudEntry implements WildfireDebugEntry {
     public static final Identifier SELF = WildfireGender.id("self_gender_info");
     public static final Identifier OTHER = WildfireGender.id("target_gender_info");
 
     private final DebugGroup mainGroup, chestplateGroup;
 
+    private final Identifier id;
     private final boolean clientPlayer;
 
     public GenderDebugHudEntry(boolean clientPlayer) {
         this.clientPlayer = clientPlayer;
+        this.id = clientPlayer ? SELF : OTHER;
+
         //~ color_as_rgb !named_text_color
         this.mainGroup = DebugGroup.builder()
-            .id(clientPlayer ? SELF : OTHER)
+            .id(id)
             .named("Gender Data")
             .accentColor(TextColor.LIGHT_PURPLE)
             .preferredSide(clientPlayer ? DebugGroup.Side.RIGHT : DebugGroup.Side.LEFT)
             .build();
 
         this.chestplateGroup = DebugGroup.builder()
-            .id(clientPlayer ? SELF : OTHER)
+            .id(id)
             .named("Equipped Chestplate")
             .accentColor(TextColor.AQUA)
             .preferredSide(clientPlayer ? DebugGroup.Side.RIGHT : DebugGroup.Side.LEFT)
             .build();
         //~ !color_as_rgb named_text_color
+    }
+
+    @Override
+    public Identifier id() {
+        return id;
     }
 
     @Override
@@ -81,7 +88,7 @@ public class GenderDebugHudEntry implements DebugScreenEntry {
         var lines = new DebugLines(/*? <=26.3 >> ')'*//*mainGroup*/);
         lines.addAll(config.getDebugInfo());
 
-        //? if >=26.4-snapshot-2 {
+        //? if >=26.4-snapshot-4 {
         lines.submit(mainGroup, displayer);
         addEquippedChestplate(displayer, config, living);
         //?} else {
@@ -91,7 +98,7 @@ public class GenderDebugHudEntry implements DebugScreenEntry {
     }
 
     private void addEquippedChestplate(
-        //? if >=26.4-snapshot-2 {
+        //? if >=26.4-snapshot-4 {
         DebugScreenDisplayer displayer,
         //?} else {
         /*DebugLines parent,
@@ -127,7 +134,7 @@ public class GenderDebugHudEntry implements DebugScreenEntry {
             }
         }
 
-        //? if >=26.4-snapshot-2 {
+        //? if >=26.4-snapshot-4 {
         lines.submit(chestplateGroup, displayer);
         //?} else {
         /*parent.literal("");

@@ -35,7 +35,7 @@ public record DebugFactLine(String name, Fact fact) implements DebugLine {
 
     @Override
     public void addToDisplay(final DebugGroup group, final DebugScreenDisplayer displayer) {
-        //? if >=26.4-snapshot-2 {
+        //? if >=26.4-snapshot-4 {
         displayer.addFactToGroup(group.vanillaGroup(), name, fact::applyToFact);
         //?} else {
         /*var string = new StringBuilder()
@@ -49,14 +49,14 @@ public record DebugFactLine(String name, Fact fact) implements DebugLine {
     /// Facade interface providing access to 26.4 debug menu facts while supporting older versions,
     /// along with supporting some value types that vanilla's fact builder doesn't.
     public static class Fact {
-        //? if >=26.4-snapshot-2 {
+        //? if >=26.4-snapshot-4 {
         private final ArrayList<Consumer<net.minecraft.client.gui.components.debug.DebugFact>> lines = new ArrayList<>();
         //?} else {
         /*private final StringBuilder value = new StringBuilder();
         *///?}
 
         public Fact text(final Component text) {
-            //? if >=26.4-snapshot-2 {
+            //? if >=26.4-snapshot-4 {
             this.lines.add(fact -> fact.text(text));
             //?} else {
             /*this.value.append(text.tryCollapseToString());
@@ -65,7 +65,7 @@ public record DebugFactLine(String name, Fact fact) implements DebugLine {
         }
 
         public Fact text(final String text) {
-            //? if >=26.4-snapshot-2 {
+            //? if >=26.4-snapshot-4 {
             this.lines.add(fact -> fact.text(text));
             //?} else {
             /*this.value.append(text);
@@ -74,7 +74,7 @@ public record DebugFactLine(String name, Fact fact) implements DebugLine {
         }
 
         public Fact value(final String value) {
-            //? if >=26.4-snapshot-2 {
+            //? if >=26.4-snapshot-4 {
             this.lines.add(fact -> fact.value(value));
             //?} else {
             /*this.value.append(value);
@@ -83,7 +83,7 @@ public record DebugFactLine(String name, Fact fact) implements DebugLine {
         }
 
         public Fact value(final long value) {
-            //? if >=26.4-snapshot-2 {
+            //? if >=26.4-snapshot-4 {
             this.lines.add(fact -> fact.value(value));
             //?} else {
             /*this.value.append(value);
@@ -92,7 +92,7 @@ public record DebugFactLine(String name, Fact fact) implements DebugLine {
         }
 
         public Fact value(final int value) {
-            //? if >=26.4-snapshot-2 {
+            //? if >=26.4-snapshot-4 {
             this.lines.add(fact -> fact.value(value));
             //?} else {
             /*this.value.append(value);
@@ -101,7 +101,7 @@ public record DebugFactLine(String name, Fact fact) implements DebugLine {
         }
 
         public Fact formattedValue(final String format, final Object... args) {
-            //? if >=26.4-snapshot-2 {
+            //? if >=26.4-snapshot-4 {
             this.lines.add(fact -> fact.formattedValue(format, args));
             //?} else {
             /*this.value.append(String.format(java.util.Locale.ROOT, format, args));
@@ -111,7 +111,7 @@ public record DebugFactLine(String name, Fact fact) implements DebugLine {
 
         //<editor-fold desc="Non-standard overloads">
         public Fact value(ChatFormatting color, String value) {
-            //? if >=26.4-snapshot-2 {
+            //? if >=26.4-snapshot-4 {
             return text(Component.literal(value).withStyle(color));
             //?} else {
             /*return value(color + value);
@@ -119,7 +119,7 @@ public record DebugFactLine(String name, Fact fact) implements DebugLine {
         }
 
         public Fact value(boolean value) {
-            //? if >=26.4-snapshot-2 {
+            //? if >=26.4-snapshot-4 {
             if(value) {
                 return text(Component.literal("true").withColor(TextColor.GREEN));
             }
@@ -142,7 +142,7 @@ public record DebugFactLine(String name, Fact fact) implements DebugLine {
         }
 
         public Fact value(Enum<?> value) {
-            //? if >=26.4-snapshot-2 {
+            //? if >=26.4-snapshot-4 {
             if(value instanceof NamedEnum named) {
                 return text(named.getTranslatedName());
             }
