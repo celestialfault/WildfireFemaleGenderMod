@@ -46,7 +46,7 @@ import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.pipeline.RenderPipelines;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentUtils;
@@ -164,7 +164,7 @@ public class WardrobeBrowserScreen extends BaseWildfireScreen {
     }
 
     @Override
-    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+    public void extractBackground(GuiGraphicsExtractor graphics/*? <=26.3 >> ')'*//*, int mouseX, int mouseY, float delta*/) {
         extractTransparentBackground(graphics);
 
         Identifier backgroundTexture = switch(config.gender().get()) {
@@ -175,16 +175,24 @@ public class WardrobeBrowserScreen extends BaseWildfireScreen {
 
         graphics.blit(RenderPipelines.GUI_TEXTURED, backgroundTexture, (this.width - 272) / 2, (this.height - 138) / 2, 0, 0, 268, 124, 512, 512);
 
+        //? if >=26.4-snapshot-5 {
+        int mouseX = graphics.mouseX();
+        int mouseY = graphics.mouseY();
+        //?}
         renderPlayerInFrame(graphics, this.width / 2 - 90, this.height / 2 + 18, mouseX, mouseY);
     }
 
     @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
-        super.extractRenderState(graphics, mouseX, mouseY, delta);
+    public void extractRenderState(GuiGraphicsExtractor graphics/*? <=26.3 >> ')'*//*, int mouseX, int mouseY, float delta*/) {
+        super.extractRenderState(graphics/*? <=26.3 >> ')'*//*, mouseX, mouseY, delta*/);
         int x = this.width / 2;
         int y = this.height / 2;
         drawScrollingString(graphics, getTitle(), 0, y - 82, TextAlignment.CENTER, CommonColors.WHITE, graphics.guiWidth(), 5, false);
 
+        //? if >=26.4-snapshot-5 {
+        int mouseX = graphics.mouseX();
+        int mouseY = graphics.mouseY();
+        //?}
         drawCreatorContributorText(graphics, mouseX, mouseY, y + 65 + (isBreastCancerAwarenessMonth ? 30 : 0));
 
         if(isBreastCancerAwarenessMonth) {

@@ -33,7 +33,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.pipeline.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.resources.Identifier;
@@ -158,16 +158,16 @@ public class WildfireCloudSyncScreen extends BaseWildfireScreen {
     }
 
     @Override
-    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+    public void extractBackground(GuiGraphicsExtractor graphics/*? <=26.3 >> ')'*//*, int mouseX, int mouseY, float delta*/) {
         extractTransparentBackground(graphics);
         graphics.blit(RenderPipelines.GUI_TEXTURED, BACKGROUND, (this.width - 172) / 2, (this.height - 124) / 2, 0, 0, 172, 144, 256, 256);
         graphics.blit(RenderPipelines.GUI_TEXTURED, BACKGROUND, (this.width - 172) / 2, (this.height - 124) / 2, 0, 0, 172, 144, 256, 256);
     }
 
     @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+    public void extractRenderState(GuiGraphicsExtractor graphics/*? <=26.3 >> ')'*//*, int mouseX, int mouseY, float delta*/) {
         if(minecraft.level == null) return;
-        super.extractRenderState(graphics, mouseX, mouseY, delta);
+        super.extractRenderState(graphics/*? <=26.3 >> ')'*//*, mouseX, mouseY, delta*/);
 
         int x = this.width / 2;
         int y = this.height / 2;

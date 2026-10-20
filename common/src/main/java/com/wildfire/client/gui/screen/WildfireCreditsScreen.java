@@ -30,7 +30,7 @@ import java.util.List;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.pipeline.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.resources.Identifier;
@@ -49,7 +49,7 @@ public class WildfireCreditsScreen extends BaseWildfireScreen {
 
     //General contributor list
     private final FakeGUIPlayer[] contributors = Contributors.getContributors().entrySet().stream()
-            .filter(it -> it.getValue().name() != null && it.getValue().showInCredits())
+            .filter(it -> it.getValue().showInCredits())
             .filter(it -> it.getValue().role() != Role.TRANSLATOR) // exclude translators
             .sorted(Comparator.comparing(it -> it.getValue().name()))
             .sorted(Comparator.comparing(it -> it.getValue().role()))
@@ -58,7 +58,7 @@ public class WildfireCreditsScreen extends BaseWildfireScreen {
 
     //Translator list
     private final FakeGUIPlayer[] translators = Contributors.getContributors().entrySet().stream()
-            .filter(it -> it.getValue().name() != null && it.getValue().showInCredits())
+            .filter(it -> it.getValue().showInCredits())
             .filter(it -> it.getValue().role() == Role.TRANSLATOR) // only have translators
             .sorted(Comparator.comparing(it -> it.getValue().name()))
             .sorted(Comparator.comparing(it -> it.getValue().role()))
@@ -154,7 +154,7 @@ public class WildfireCreditsScreen extends BaseWildfireScreen {
     }
 
     @Override
-    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+    public void extractBackground(GuiGraphicsExtractor graphics/*? <=26.3 >> ')'*//*, int mouseX, int mouseY, float a*/) {
         extractTransparentBackground(graphics);
     }
 
@@ -175,7 +175,7 @@ public class WildfireCreditsScreen extends BaseWildfireScreen {
     }
 
     @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+    public void extractRenderState(GuiGraphicsExtractor graphics/*? <=26.3 >> ')'*//*, int mouseX, int mouseY, float delta*/) {
         drawScrollingString(graphics, getTitle(), 0, height / 2 - 100, TextAlignment.CENTER, CommonColors.WHITE, graphics.guiWidth(), 5, false);
         drawScrollingString(graphics, WildfireLang.CREDITS_DESCRIPTION.translate(), 0, height / 2 - 85, TextAlignment.CENTER, 0xFF888888, graphics.guiWidth(), 5, false);
 
@@ -220,11 +220,17 @@ public class WildfireCreditsScreen extends BaseWildfireScreen {
                 xP - 38, yP - 29,
                 xP + 38, yP + 20,
                 40, getEntityScale(entity, 0.5F),
-                mouseX, mouseY, entity);
+                //? if <=26.3
+                //mouseX, mouseY,
+                entity);
             //~ !entity_portrait_widget
 
             drawScaledScrollingString(graphics, Component.literal(creditBox.getName()), creditBoxX + 3, yP + 23, TextAlignment.CENTER, CommonColors.WHITE, 46,  1, false, 0.55F);
 
+            //? if >=26.4-snapshot-5 {
+            int mouseX = graphics.mouseX();
+            int mouseY = graphics.mouseY();
+            //?}
             if (mouseX > xP - 24 && mouseX < xP + 23 && mouseY > yP + 22 && mouseY < yP + 31) {
                 List<Component> txtList = new ArrayList<>();
                 txtList.add(WildfireLang.GENERIC_DASH_EXPLANATION.translateColored(TextColor.DARK_GRAY,
@@ -241,6 +247,6 @@ public class WildfireCreditsScreen extends BaseWildfireScreen {
         //String pageInfo = (creditsPage) + " / " + (totalPages-1);
         //GuiUtils.drawCenteredText(ctx, textRenderer, Text.literal(pageInfo), width / 2, height / 2, CommonColors.WHITE);
 
-        super.extractRenderState(graphics, mouseX, mouseY, delta);
+        super.extractRenderState(graphics/*? <=26.3 >> ')'*//*, mouseX, mouseY, delta*/);
     }
 }

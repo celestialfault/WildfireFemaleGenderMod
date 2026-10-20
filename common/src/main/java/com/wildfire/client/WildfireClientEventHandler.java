@@ -36,7 +36,6 @@ import com.wildfire.common.entities.players.PlayerConfigHolder;
 import com.wildfire.common.networking.WildfireSync;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.model.object.armorstand.ArmorStandArmorModel;
@@ -119,7 +118,7 @@ public final class WildfireClientEventHandler {
         tooltipAppender.accept(WildfireLang.ARMOR_TOOLTIP.translateColored(TextColor.LIGHT_PURPLE, formatted));
     }
 
-    public static void renderHud(GuiGraphicsExtractor context, @SuppressWarnings("unused") DeltaTracker tickCounter) {
+    public static void renderHud(GuiGraphicsExtractor context/*? <=26.3 >> ')'*//*, net.minecraft.client.DeltaTracker tickCounter*/) {
         var client = Minecraft.getInstance();
         if (client.gui.screen() instanceof WardrobeBrowserScreen) {
             SyncedPlayerList.resetTimer();

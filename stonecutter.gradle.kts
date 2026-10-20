@@ -7,7 +7,7 @@ import dev.kikugie.stonecutter.data.tree.ProjectNode
 plugins {
     id("dev.kikugie.stonecutter")
     id("net.neoforged.moddev") version "2.0.147" apply false
-    id("net.fabricmc.fabric-loom") version "1.18-SNAPSHOT" apply false
+    id("net.fabricmc.fabric-loom") version "1.19-SNAPSHOT" apply false
     id("idea")
 }
 
@@ -22,11 +22,11 @@ idea {
 stonecutter active "26.4"
 
 tasks.named<Wrapper>("wrapper") {
-    gradleVersion = "9.7.1"
+    gradleVersion = "9.8.2"
     // https://gradle.org/release-checksums/
     // Note that we use the -all distribution to make it easier to modify build scripts by being able
     // to view Javadocs
-    distributionSha256Sum = "92c1a136d76b5017732a66d2e0a648ebff00dd3687d8bff0d0047a1bd904fdf2"
+    distributionSha256Sum = "a1bb7e9651ef09e4cd9a62d471564e0ee23b5757e5f21fd7358d7cfc21018fdf"
     distributionType = Wrapper.DistributionType.ALL
 }
 
@@ -52,10 +52,10 @@ tasks.register<ValidateJson>("validateJson") {
         "fabric/src/main/resources/fabric.mod.json",
         "common/src/main/resources/${modId}.mixins.json",
         "fabric/src/main/resources/${modId}.fabric.mixins.json",
-        "neoforge/src/main/resources/${modId}.neo.mixins.json"
+        "neoforge/src/main/resources/${modId}.neo.mixins.json",
     )
     rootTranslation.set(layout.projectDirectory.file(
-        "fabric/versions/${stonecutter.current?.project}/src/main/generated/assets/${modId}/lang/en_us.json"
+        "fabric/versions/${stonecutter.current?.project}/src/main/generated/assets/${modId}/lang/en_us.json",
     ))
     translationFiles.from(fileTree(layout.projectDirectory) {
         include("*/versions/*/src/main/generated/assets/${modId}/lang/*.json")
@@ -67,7 +67,7 @@ tasks.register<ValidateJson>("validateJson") {
         "en_ca",
         "en_gb",
         //Exact matches such as "N" does not generate the duplicate file
-        "en_ud"
+        "en_ud",
     ))
 }
 

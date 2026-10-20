@@ -19,23 +19,22 @@
 package com.wildfire.client.gui;
 
 import com.wildfire.client.WildfireKeyBindings;
+import com.wildfire.client.config.ClientConfig;
 import com.wildfire.client.gui.screen.BaseWildfireScreen;
 import com.wildfire.common.WildfireGender;
-import com.wildfire.client.config.ClientConfig;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.components.toasts.ToastManager;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.pipeline.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.CommonColors;
 import net.minecraft.util.FormattedCharSequence;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import org.jspecify.annotations.Nullable;
 
 /// @apiNote Only use this on the client side

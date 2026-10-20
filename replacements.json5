@@ -38,6 +38,14 @@
         ],
     },
 
+    "26.4": {
+        when: ">=26.4-snapshot-5",
+        alwaysActive: true,
+        strings: [
+            ["net.minecraft.client.renderer.RenderPipelines", "net.minecraft.client.renderer.pipeline.RenderPipelines"],
+        ],
+    },
+
     "!entity_types": {
         when: ">=26.2",
         strings: [

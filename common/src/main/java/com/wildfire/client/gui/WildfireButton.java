@@ -19,13 +19,12 @@
 package com.wildfire.client.gui;
 
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
+import java.util.function.Supplier;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.CommonColors;
-
-import java.util.function.Supplier;
 import net.minecraft.util.Util;
 import org.jspecify.annotations.Nullable;
 
@@ -48,6 +47,16 @@ public class WildfireButton extends Button implements IFancyFontRenderer {
         setMessage(messageSupplier.get());
     }
 
+    private int getBackgroundColor() {
+        if(!active) {
+            return 0x54222222;
+        } else if(this.isHoveredOrFocused()) {
+            return 0x54666666;
+        } else {
+            return 0x54444444;
+        }
+    }
+
     protected void drawInner(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks) {
         if(renderer != null) {
             renderer.render(this, graphics, mouseX, mouseY, partialTicks);
@@ -59,13 +68,18 @@ public class WildfireButton extends Button implements IFancyFontRenderer {
     }
 
     @Override
-    protected void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks) {
-        int clr = 0x54444444;
-        if(this.isHoveredOrFocused()) clr = 0x54666666;
-        if(!active) clr = 0x54222222;
-        if(!transparent) graphics.fill(getX(), getY(), getRight(), getBottom(), clr);
+    protected void extractContents(GuiGraphicsExtractor graphics/*? <=26.3 >> ')'*//*, int mouseX, int mouseY, float partialTicks*/) {
+        if(!transparent) {
+            graphics.fill(getX(), getY(), getRight(), getBottom(), getBackgroundColor());
+        }
 
+        //? if >=26.4-snapshot-5 {
+        int mouseX = graphics.mouseX();
+        int mouseY = graphics.mouseY();
+        float partialTicks = graphics.partialTicks();
+        //?}
         drawInner(graphics, mouseX, mouseY, partialTicks);
+
         if(isHovered()) {
             graphics.requestCursor(active ? CursorTypes.POINTING_HAND : CursorTypes.NOT_ALLOWED);
         }
@@ -81,7 +95,7 @@ public class WildfireButton extends Button implements IFancyFontRenderer {
         return this;
     }
 
-    //? if >=26.4-snapshot-4
+    //? if >=26.4-snapshot-5
     @Override
     public void setVisible(boolean visible) {
         if (this.visible != visible) {

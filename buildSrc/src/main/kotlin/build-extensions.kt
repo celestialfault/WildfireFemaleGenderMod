@@ -25,7 +25,7 @@ import org.gradle.api.tasks.bundling.Jar
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.named
 
-val Project.stonecutterBuild get() = extensions.getByType<StonecutterBuildExtension>()
+internal val Project.stonecutterBuild get() = extensions.getByType<StonecutterBuildExtension>()
 
 val loaderAttribute = Attribute.of("io.github.mcgradleconventions.loader", String::class.java)
 //TODO: This should be the same as stonecutterBuild.branch.id, but the build stuff requires the property to be defined
@@ -35,6 +35,9 @@ private val Project.modPublishExtension get() = extensions.getByType<ModPublishE
 
 private val Project.modrinthToken get() = providers.environmentVariable("MODRINTH_TOKEN")
 private val Project.cfToken get() = providers.environmentVariable("CURSEFORGE_TOKEN")
+
+private val Project.publishVersions: List<String>
+    get() = stonecutterBuild.properties.raw("publish", "versions").asList().map { it.asPrimitive().toString() }
 
 val Project.performDryRun get() = modrinthToken.getOrNull() == null && cfToken.getOrNull() == null
 
@@ -61,15 +64,11 @@ val Project.basePublishingOps get() = modPublishExtension.publishOptions {
     )
 }
 
-//TODO - Neo: Technically neo min version is different just because of min neo version required being only on 26.1.2
 val Project.modrinthOps get() = modPublishExtension.modrinthOptions {
     accessToken.set(modrinthToken)
     projectId.set(stonecutterBuild.properties["publish.modrinth"] as String)
     environment.set(CLIENT_ONLY_SERVER_OPTIONAL)
-    minecraftVersionRange {
-        start.set(stonecutterBuild.properties["publish.min_version"] as String)
-        end.set(stonecutterBuild.properties["publish.max_version"] as String)
-    }
+    minecraftVersions.set(publishVersions)
 }
 
 val Project.cfOps get() = modPublishExtension.curseforgeOptions {
@@ -78,8 +77,9 @@ val Project.cfOps get() = modPublishExtension.curseforgeOptions {
     projectSlug.set("female-gender")
     client.set(true)
     server.set(true)
-    minecraftVersionRange {
-        start.set(stonecutterBuild.properties["publish.min_version"] as String)
-        end.set(stonecutterBuild.properties["publish.max_version"] as String)
-    }
+    minecraftVersions.set(publishVersions)
+}
+
+internal fun <K, V> MutableMap<K, V>.expand(vararg items: Pair<K, V>) {
+    putAll(items.toList())
 }

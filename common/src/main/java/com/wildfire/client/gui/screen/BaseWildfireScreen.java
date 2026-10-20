@@ -122,7 +122,9 @@ public abstract class BaseWildfireScreen extends Screen implements IFancyFontRen
                 xP - 38, yP - 79,
                 xP + 38, yP + 9,
                 70, getEntityScale(entity, 0.4F),
-                mouseX, mouseY, entity);
+                //? if <=26.3
+                //mouseX, mouseY,
+                entity);
         }
     }
 

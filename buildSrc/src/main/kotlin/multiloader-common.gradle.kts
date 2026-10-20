@@ -128,13 +128,10 @@ tasks.named<ProcessResources>("processResources") {
     dependsOn(":common:${stonecutterBuild.current.project}:stonecutterGenerate")
     val authors = stonecutterBuild.properties.raw("authors").asList()
     val contributors = stonecutterBuild.properties.raw("contributors").asList()
-    val expandProps = mapOf(
+
+    val expandProps = mutableMapOf<String, String>(
         "version" to modVersion,
         "minecraft_version" to stonecutterBuild.current.version,
-        "minecraft_version_range" to stonecutterBuild.properties["meta.minecraft_version_range"],
-        "supported_minecraft_versions" to stonecutterBuild.properties["meta.supported_minecraft_versions"],
-        "fabric_version" to stonecutterBuild.properties["dependencies.fabric_api"],
-        "fabric_loader_version" to stonecutterBuild.properties["dependencies.fabric_loader_version"],
         "mod_name" to modName,
         "mod_id" to stonecutterBuild.properties["mod_id"],
         "license" to stonecutterBuild.properties["mod_license"],
@@ -145,10 +142,27 @@ tasks.named<ProcessResources>("processResources") {
         "authors_list" to authors.asTomlList(),
         "contributors" to contributors.asListedElements(),
         "contributors_list" to contributors.asTomlList(),
-        // may be omitted during snapshot cycles
-        "neoforge_version" to (stonecutterBuild.properties.getOrNull("dependencies.min_neo_version") ?: "${stonecutterBuild.current.version}.0-beta"),
         "java_version" to javaVersion,
     )
+
+    when(val loader = loader) {
+        "fabric" -> {
+            expandProps.expand(
+                "supported_minecraft_versions" to stonecutterBuild.properties["meta.minecraft_version"],
+                "fabric_version" to stonecutterBuild.properties["dependencies.fabric_api"],
+                "fabric_loader_version" to stonecutterBuild.properties["meta.min_fabric_loader"],
+            )
+        }
+        "neoforge" -> {
+            expandProps.expand(
+                "neoforge_version" to stonecutterBuild.properties.get("meta.min_neo_version"),
+                "minecraft_version_range" to stonecutterBuild.properties["meta.minecraft_version"],
+            )
+        }
+        "common" -> {}
+        else -> error("Don't know how to add resource properties for loader ${loader}!")
+    }
+
     inputs.properties(expandProps)
 
     filesMatching("META-INF/neoforge.mods.toml") {

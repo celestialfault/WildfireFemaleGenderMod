@@ -26,59 +26,74 @@ contributors = [
 source_code = "https://github.com/FemaleGenderMod/FemaleGenderMod"
 issue_tracker = "https://github.com/FemaleGenderMod/FemaleGenderMod/issues"
 
-# This is the implementation of the version of minecraft that the 'common' project uses,
-# you can find a list of all versions here: https://projects.neoforged.net/neoforged/neoform
-# If a specific MC version needs a newer version than the initial release one (or needs a snapshot version),
-# override it for the specific project version
-dependencies.neoform_timestamp = "1"
-dependencies.fabric_loader_version = "0.19.5"
-#dependencies.neoforge_snapshot_pr=3403
-# Note that mod menu may be several versions out of date; this is fine, as we only care about using this
-# for its API, which shouldn't realistically need to be updated often (if ever).
-dependencies.modmenu = "18.0.0-alpha.6"
-debug.load_modmenu = false
-
 publish.type = "STABLE"
 publish.curseforge = "456319"
 publish.modrinth = "bcOsQHnC"
 
+[common]
+    # This is the implementation of the version of minecraft that the 'common' project uses.
+    # You can find a list of all versions here: https://projects.neoforged.net/neoforged/neoform
+    # If a specific MC version needs a newer version than the initial release one (or needs a snapshot version),
+    # override it for the specific project version
+    dependencies.neoform_timestamp = "1"
+    # If you need to update these, check what version each loader is using to see what is compatible
+    # https://github.com/neoforged/NeoForge/blob/26.2.x/gradle.properties#L37
+    # https://github.com/FabricMC/fabric-loader/blob/master/gradle.properties#L12
+    # Also remember to bump any min loader requirements as necessary
+    dependencies.fabric_mixin = "0.17.3+mixin.0.8.7"
+    dependencies.mixinextras = "0.5.4"
+
+[fabric]
+    meta.min_fabric_loader = "0.19.5"
+    dependencies.fabric_loader_version = "0.20.1"
+    # Note that this doesn't harm anything to be out of date, as this is only ever used as a compile-time dependency
+    # for its API, which should realistically not need to be updated often (if ever).
+    dependencies.modmenu = "18.0.0-alpha.6"
+    debug.load_modmenu = false
+
+[neoforge]
+    #dependencies.neoforge_snapshot_pr=3403
+
 ["26.1"]
-    meta.supported_minecraft_versions = ">=26.1 <26.2"
-    meta.minecraft_version_range = "[26.1.2,26.2)"
-    dependencies.fabric_api = "0.144.3"
-    dependencies.neo_version = "26.1.2.109"
-    dependencies.min_neo_version = "26.1.2.97"
     publish.version_title = "26.1.x"
-    publish.min_version = "26.1"
-    publish.max_version = "26.1.2"
+    publish.versions = ["26.1", "26.1.1", "26.1.2"]
+[fabric."26.1"]
+    meta.minecraft_version = ">=26.1 <26.2"
+    dependencies.fabric_api = "0.144.3"
+[neoforge."26.1"]
+    meta.minecraft_version = "[26.1.2,26.2)"
+    dependencies.neo_version = "26.1.2.109"
+    meta.min_neo_version = "26.1.2.97"
+    publish.version_title = "26.1.2"
+    publish.versions = ["26.1.2"]
 
 ["26.2"]
-    meta.supported_minecraft_versions = ">=26.2 <26.3"
-    meta.minecraft_version_range = "[26.2,26.3)"
-    dependencies.fabric_api = "0.152.1"
-    dependencies.neoform_timestamp = "2"
-    dependencies.neo_version = "26.2.0.88"
-    dependencies.min_neo_version = "26.2.0.81"
     publish.version_title = "26.2"
-    publish.min_version = "26.2"
-    publish.max_version = "26.2"
+    publish.versions = ["26.2"]
+[common."26.2"]
+    dependencies.neoform_timestamp = "2"
+[fabric."26.2"]
+    meta.minecraft_version = ">=26.2 <26.3"
+    dependencies.fabric_api = "0.152.1"
+[neoforge."26.2"]
+    meta.minecraft_version = "[26.2,26.3)"
+    meta.min_neo_version = "26.2.0.81"
+    dependencies.neo_version = "26.2.0.88"
 
 ["26.3"]
-    meta.supported_minecraft_versions = ">=26.3 <26.4"
-    meta.minecraft_version_range = "[26.3,26.4)"
-    dependencies.fabric_api = "0.160.5"
-    dependencies.neo_version = "26.3.0.38-beta"
-    dependencies.min_neo_version = "26.3.0.0-beta"
     publish.version_title = "26.3"
-    publish.min_version = "26.3"
-    publish.max_version = "26.3"
+    publish.versions = ["26.3"]
+[fabric."26.3"]
+    meta.minecraft_version = ">=26.3 <26.4"
+    dependencies.fabric_api = "0.160.5"
+[neoforge."26.3"]
+    meta.minecraft_version = "[26.3,26.4)"
+    meta.min_neo_version = "26.3.0.0-beta"
+    dependencies.neo_version = "26.3.0.38-beta"
 
 ["26.4"]
-    meta.supported_minecraft_versions = ">=26.4-alpha.4 <26.4"
-    meta.minecraft_version_range = "[26.4-snapshot-4,26.4)"
-    dependencies.fabric_api = "0.162.3"
-    #dependencies.neo_version = "26.3.0.0-beta"
-    #dependencies.min_neo_version = "26.3.0.0-beta"
     publish.version_title = "26.4"
-    publish.min_version = "26.4"
-    publish.max_version = "26.4"
+    publish.versions = ["26.4"]
+[fabric."26.4"]
+    meta.minecraft_version = ">=26.4-alpha.5 <26.4"
+    dependencies.fabric_api = "0.164.1"

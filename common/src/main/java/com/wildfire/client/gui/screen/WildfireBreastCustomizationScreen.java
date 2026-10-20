@@ -34,7 +34,7 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.pipeline.RenderPipelines;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextColor;
@@ -311,7 +311,7 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
     }
 
     @Override
-    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+    public void extractBackground(GuiGraphicsExtractor graphics/*? <=26.3 >> ')'*//*, int mouseX, int mouseY, float delta*/) {
         extractTransparentBackground(graphics);
 
         Identifier backgroundTexture = switch(config.gender().get()) {
@@ -327,6 +327,10 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
         graphics.blit(RenderPipelines.GUI_TEXTURED, currentTab.background, this.width / 2 - 42, this.height / 2 - 43, 0, 0, 178, currentTab.backgroundHeight, 512, 512);
         drawScrollingString(graphics, getTitle(), 0, (height / 2) - 82, TextAlignment.CENTER, CommonColors.WHITE, graphics.guiWidth(), 5, false);
 
+        //? if >=26.4-snapshot-5 {
+        int mouseX = graphics.mouseX();
+        int mouseY = graphics.mouseY();
+        //?}
         renderPlayerInFrame(graphics, this.width / 2 - 90, this.height / 2 + 44, mouseX, mouseY);
     }
 

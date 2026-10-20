@@ -21,8 +21,8 @@ package com.wildfire.client.gui;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import com.wildfire.common.WildfireHelper;
-import com.wildfire.common.config.validator.ConfigValidator;
 import com.wildfire.common.config.validator.ConfigRange;
+import com.wildfire.common.config.validator.ConfigValidator;
 import com.wildfire.common.config.value.ConfigValue;
 import it.unimi.dsi.fastutil.floats.Float2ObjectFunction;
 import it.unimi.dsi.fastutil.floats.FloatConsumer;
@@ -143,10 +143,11 @@ public class WildfireSlider extends AbstractWidget implements IFancyFontRenderer
     }
 
     @Override
-    protected void extractWidgetRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
-        if (!this.visible) {
+    protected void extractWidgetRenderState(GuiGraphicsExtractor graphics/*? <=26.3 >> ')'*//*, int mouseX, int mouseY, float delta*/) {
+        if(!this.visible) {
             return;
         }
+
         int xP = getX() + 2;
         graphics.fill(xP - 2, getY(), getRight(), getBottom(), 0x80222222);
         int xPos = getX() + 2 + (int) (this.value * (float)(this.width - 3));
@@ -219,7 +220,7 @@ public class WildfireSlider extends AbstractWidget implements IFancyFontRenderer
         updateMessage();
     }
 
-    //? if >=26.4-snapshot-4
+    //? if >=26.4-snapshot-5
     @Override
     public void setVisible(boolean visible) {
         if (this.visible != visible) {

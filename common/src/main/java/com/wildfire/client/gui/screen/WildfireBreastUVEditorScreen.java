@@ -35,7 +35,7 @@ import net.minecraft.client.entity.ClientAvatarEntity;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.pipeline.RenderPipelines;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextColor;
@@ -181,7 +181,7 @@ public class WildfireBreastUVEditorScreen extends BaseWildfireScreen {
     }
 
     @Override
-    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+    public void extractBackground(GuiGraphicsExtractor graphics/*? <=26.3 >> ')'*//*, int mouseX, int mouseY, float delta*/) {
         //super.renderBackground(ctx, mouseX, mouseY, delta);
         extractTransparentBackground(graphics);
         //ctx.drawTexture(RenderPipelines.GUI_TEXTURED, BACKGROUND, (this.width - 190) / 2, (this.height - 107) / 2, 0, 0, 190, 107, 512, 512);
@@ -194,7 +194,6 @@ public class WildfireBreastUVEditorScreen extends BaseWildfireScreen {
         graphics.fill(uvWindowPos.x() - 2, uvWindowPos.y() - 2, uvWindowPos.x() + textureDrawWidth + 2, uvWindowPos.y() + textureDrawWidth + 2, ARGB.black(0xCC));
         graphics.fill(uvWindowPos.x(), uvWindowPos.y(), uvWindowPos.x() + textureDrawWidth, uvWindowPos.y() + textureDrawWidth, CommonColors.WHITE);
     }
-
 
     @Override
     public void tick() {
@@ -210,11 +209,16 @@ public class WildfireBreastUVEditorScreen extends BaseWildfireScreen {
 
     // TODO this should be broken up into smaller methods
     @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+    public void extractRenderState(GuiGraphicsExtractor graphics/*? <=26.3 >> ')'*//*, int mouseX, int mouseY, float delta*/) {
         LivingEntity entity = getEntity();
         if(!(entity instanceof ClientAvatarEntity avatar)) {
             return;
         }
+
+        //? if >=26.4-snapshot-5 {
+        int mouseX = graphics.mouseX();
+        int mouseY = graphics.mouseY();
+        //?}
 
         if(selectedUVs != null) {
             //noinspection SuspiciousNameCombination
@@ -268,11 +272,13 @@ public class WildfireBreastUVEditorScreen extends BaseWildfireScreen {
             this.width / 2 - modelScale, this.height / 2 - modelScale,
             this.width / 2 + modelScale, this.height / 2 + modelScale,
             modelScale, getEntityScale(entity, 0, false),
-            mouseX, mouseY, entity);
+            //? if <=26.3
+            //mouseX, mouseY,
+            entity);
         //~ !entity_portrait_widget
         drawScrollingString(graphics, getTitle(), uvWindowPos.x(), 20, TextAlignment.CENTER, CommonColors.WHITE, textureDrawWidth, 2, false);
 
-        super.extractRenderState(graphics, mouseX, mouseY, delta);
+        super.extractRenderState(graphics/*? <=26.3 >> ')'*//*, mouseX, mouseY, delta*/);
     }
 
     private void drawFaceBorders(GuiGraphicsExtractor graphics, UVLayout uvList, int mouseX, int mouseY, boolean faded) {

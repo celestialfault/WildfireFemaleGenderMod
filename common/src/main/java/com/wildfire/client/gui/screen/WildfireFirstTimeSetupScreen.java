@@ -35,7 +35,7 @@ import java.util.function.Supplier;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.pipeline.RenderPipelines;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextColor;
@@ -148,7 +148,7 @@ public class WildfireFirstTimeSetupScreen extends BaseWildfireScreen {
     }
 
     @Override
-    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+    public void extractBackground(GuiGraphicsExtractor graphics/*? <=26.3 >> ')'*//*, int mouseX, int mouseY, float delta*/) {
         extractTransparentBackground(graphics);
         graphics.blit(RenderPipelines.GUI_TEXTURED, BACKGROUND, (this.width - SCREEN_WIDTH) / 2, (this.height - 200) / 2, 0, 0, SCREEN_WIDTH, 200, 512, 512);
     }
@@ -160,8 +160,8 @@ public class WildfireFirstTimeSetupScreen extends BaseWildfireScreen {
     }
 
     @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
-        super.extractRenderState(graphics, mouseX, mouseY, delta);
+    public void extractRenderState(GuiGraphicsExtractor graphics/*? <=26.3 >> ')'*//*, int mouseX, int mouseY, float delta*/) {
+        super.extractRenderState(graphics/*? <=26.3 >> ')'*//*, mouseX, mouseY, delta*/);
 
         int x = this.width / 2;
         int y = this.height / 2;
@@ -182,7 +182,9 @@ public class WildfireFirstTimeSetupScreen extends BaseWildfireScreen {
             x - 132, y - 13,
             x - 75, y + 60,
             50, getEntityScale(fakeKeira, 0.4f),
-            mouseX, mouseY, fakeKeira);
+            //? if <26.4-snapshot-5
+            //mouseX, mouseY,
+            fakeKeira);
         //~ !entity_portrait_widget
     }
 
