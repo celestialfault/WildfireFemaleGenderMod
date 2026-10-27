@@ -35,7 +35,6 @@ import java.util.function.Supplier;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.pipeline.RenderPipelines;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextColor;
@@ -150,7 +149,7 @@ public class WildfireFirstTimeSetupScreen extends BaseWildfireScreen {
     @Override
     public void extractBackground(GuiGraphicsExtractor graphics/*? <=26.3 >> ')'*//*, int mouseX, int mouseY, float delta*/) {
         extractTransparentBackground(graphics);
-        graphics.blit(RenderPipelines.GUI_TEXTURED, BACKGROUND, (this.width - SCREEN_WIDTH) / 2, (this.height - 200) / 2, 0, 0, SCREEN_WIDTH, 200, 512, 512);
+        graphics.blit(guiTextured(), BACKGROUND, (this.width - SCREEN_WIDTH) / 2, (this.height - 200) / 2, 0, 0, SCREEN_WIDTH, 200, 512, 512);
     }
 
     @Override
@@ -182,7 +181,7 @@ public class WildfireFirstTimeSetupScreen extends BaseWildfireScreen {
             x - 132, y - 13,
             x - 75, y + 60,
             50, getEntityScale(fakeKeira, 0.4f),
-            //? if <26.4-snapshot-5
+            //? if <26.4-snapshot-6
             //mouseX, mouseY,
             fakeKeira);
         //~ !entity_portrait_widget

@@ -30,7 +30,6 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.components.toasts.ToastManager;
-import net.minecraft.client.renderer.pipeline.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.CommonColors;
@@ -79,9 +78,10 @@ public class WildfireToast implements Toast, IFancyFontRenderer {
     @Override
     public void extractRenderState(GuiGraphicsExtractor graphics, Font font, long fullyVisibleForMs) {
         int i = this.height();
-        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TEXTURE, 0, 0, width(), i);
 
-        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, ICON, 6, 6, 20, 20);
+        graphics.blitSprite(BaseWildfireScreen.guiTextured(), TEXTURE, 0, 0, width(), i);
+        graphics.blitSprite(BaseWildfireScreen.guiTextured(), ICON, 6, 6, 20, 20);
+
         int j = this.text.size() * 11;
         int lineY = 7 + (getTextHeight() - j) / 2;
 

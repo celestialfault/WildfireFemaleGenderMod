@@ -30,7 +30,6 @@ import java.util.List;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.pipeline.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.resources.Identifier;
@@ -179,8 +178,8 @@ public class WildfireCreditsScreen extends BaseWildfireScreen {
         drawScrollingString(graphics, getTitle(), 0, height / 2 - 100, TextAlignment.CENTER, CommonColors.WHITE, graphics.guiWidth(), 5, false);
         drawScrollingString(graphics, WildfireLang.CREDITS_DESCRIPTION.translate(), 0, height / 2 - 85, TextAlignment.CENTER, 0xFF888888, graphics.guiWidth(), 5, false);
 
-        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, BUTTON_CONTAINER, this.width / 2 - (190 / 2), navigationY, 190, 25);
-        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TAB_CONTAINER, this.width / 2 - (190 / 2), navigationY + 28, 190, 25);
+        graphics.blitSprite(guiTextured(), BUTTON_CONTAINER, this.width / 2 - (190 / 2), navigationY, 190, 25);
+        graphics.blitSprite(guiTextured(), TAB_CONTAINER, this.width / 2 - (190 / 2), navigationY + 28, 190, 25);
 
         int columns = 6;
         int boxW = 60;
@@ -205,10 +204,10 @@ public class WildfireCreditsScreen extends BaseWildfireScreen {
             int creditBoxX = startX + (col * boxW);
             int creditBoxY = startY + (row * boxH);
 
-            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, CREDIT_CONTAINER, creditBoxX, creditBoxY, 52, 68);
+            graphics.blitSprite(guiTextured(), CREDIT_CONTAINER, creditBoxX, creditBoxY, 52, 68);
 
             Role role = creditBox.getRoleOrGeneric();
-            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, CREDIT_OUTLINE, creditBoxX + 3, creditBoxY + 3, 46, 53,
+            graphics.blitSprite(guiTextured(), CREDIT_OUTLINE, creditBoxX + 3, creditBoxY + 3, 46, 53,
                 ARGB.opaque(role.getColor().getValue()));
 
             int xP = creditBoxX + (52 / 2);
@@ -227,7 +226,7 @@ public class WildfireCreditsScreen extends BaseWildfireScreen {
 
             drawScaledScrollingString(graphics, Component.literal(creditBox.getName()), creditBoxX + 3, yP + 23, TextAlignment.CENTER, CommonColors.WHITE, 46,  1, false, 0.55F);
 
-            //? if >=26.4-snapshot-5 {
+            //? if >=26.4-snapshot-6 {
             int mouseX = graphics.mouseX();
             int mouseY = graphics.mouseY();
             //?}

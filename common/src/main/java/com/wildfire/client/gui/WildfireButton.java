@@ -73,7 +73,7 @@ public class WildfireButton extends Button implements IFancyFontRenderer {
             graphics.fill(getX(), getY(), getRight(), getBottom(), getBackgroundColor());
         }
 
-        //? if >=26.4-snapshot-5 {
+        //? if >=26.4-snapshot-6 {
         int mouseX = graphics.mouseX();
         int mouseY = graphics.mouseY();
         float partialTicks = graphics.partialTicks();
@@ -95,7 +95,7 @@ public class WildfireButton extends Button implements IFancyFontRenderer {
         return this;
     }
 
-    //? if >=26.4-snapshot-5
+    //? if >=26.4-snapshot-6
     @Override
     public void setVisible(boolean visible) {
         if (this.visible != visible) {

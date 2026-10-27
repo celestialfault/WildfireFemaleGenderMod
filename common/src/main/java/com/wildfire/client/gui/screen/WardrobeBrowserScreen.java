@@ -46,7 +46,6 @@ import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.pipeline.RenderPipelines;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentUtils;
@@ -134,7 +133,7 @@ public class WardrobeBrowserScreen extends BaseWildfireScreen {
             builder.position(this.width / 2 - 36, y + 30);
             builder.size(24, 18);
             builder.renderer((button, ctx, _, _, _) ->
-                ctx.blitSprite(RenderPipelines.GUI_TEXTURED, CLOUD_ICON, button.getX() + 2, button.getY() + 2, 20, 14)
+                ctx.blitSprite(guiTextured(), CLOUD_ICON, button.getX() + 2, button.getY() + 2, 20, 14)
             );
             builder.onPress(_ ->
                 client.gui.setScreen(new WildfireCloudSyncScreen(this, (PlayerConfigHolder) config))
@@ -173,9 +172,9 @@ public class WardrobeBrowserScreen extends BaseWildfireScreen {
             case OTHER -> BACKGROUND_OTHER;
         };
 
-        graphics.blit(RenderPipelines.GUI_TEXTURED, backgroundTexture, (this.width - 272) / 2, (this.height - 138) / 2, 0, 0, 268, 124, 512, 512);
+        graphics.blit(guiTextured(), backgroundTexture, (this.width - 272) / 2, (this.height - 138) / 2, 0, 0, 268, 124, 512, 512);
 
-        //? if >=26.4-snapshot-5 {
+        //? if >=26.4-snapshot-6 {
         int mouseX = graphics.mouseX();
         int mouseY = graphics.mouseY();
         //?}
@@ -189,7 +188,7 @@ public class WardrobeBrowserScreen extends BaseWildfireScreen {
         int y = this.height / 2;
         drawScrollingString(graphics, getTitle(), 0, y - 82, TextAlignment.CENTER, CommonColors.WHITE, graphics.guiWidth(), 5, false);
 
-        //? if >=26.4-snapshot-5 {
+        //? if >=26.4-snapshot-6 {
         int mouseX = graphics.mouseX();
         int mouseY = graphics.mouseY();
         //?}
@@ -200,7 +199,7 @@ public class WardrobeBrowserScreen extends BaseWildfireScreen {
             graphics.fill(x - 159, bcaY + 106, x + 159, bcaY + 136, ARGB.black(0x55));
             drawScrollingString(graphics, WildfireLang.CANCER_AWARENESS_TITLE.translate().withStyle(style -> style.withBold(true).withItalic(true)),
                 x - 153, bcaY + 117, TextAlignment.LEFT, CommonColors.WHITE, 283, 5, false);
-            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TXTR_RIBBON, x + 130, bcaY + 109, 26, 26);
+            graphics.blitSprite(guiTextured(), TXTR_RIBBON, x + 130, bcaY + 109, 26, 26);
         }
 
         SyncedPlayerList.drawSyncedPlayers(this, graphics, 126, graphics.guiWidth());

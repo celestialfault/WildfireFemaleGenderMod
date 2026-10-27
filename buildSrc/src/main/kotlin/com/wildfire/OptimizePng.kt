@@ -13,9 +13,9 @@ import java.util.*
 import javax.inject.Inject
 
 /**
- * From <a href="https://github.com/mekanism/Mekanism/blob/26.2/buildSrc/src/main/groovy/mekanism/OptimizePng.groovy">Mekanism</a>
+ * From [Mekanism](https://github.com/mekanism/Mekanism/blob/26.2/buildSrc/src/main/groovy/mekanism/OptimizePng.groovy)
  *
- * License: <a href="https://github.com/mekanism/Mekanism/blob/26.2/LICENSE">MIT</a>
+ * License: [MIT](https://github.com/mekanism/Mekanism/blob/26.2/LICENSE)
  */
 abstract class OptimizePng : DefaultTask() {
 

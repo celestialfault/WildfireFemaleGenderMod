@@ -73,7 +73,7 @@ public class WildfireCloudDetailsScreen extends BaseWildfireScreen {//TODO: PROP
     @Override
     public void renderBackground(GuiGraphics ctx, int mouseX, int mouseY, float delta) {
         this.renderTransparentBackground(ctx);
-        ctx.blit(RenderPipelines.GUI_TEXTURED, BACKGROUND, (this.width - 256) / 2, (this.height - 200) / 2, 0, 0, 256, 200, 256, 256);
+        ctx.blit(guiTextured(), BACKGROUND, (this.width - 256) / 2, (this.height - 200) / 2, 0, 0, 256, 200, 256, 256);
     }
 
     @Override

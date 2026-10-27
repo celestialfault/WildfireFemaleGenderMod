@@ -149,4 +149,18 @@ public abstract class BaseWildfireScreen extends Screen implements IFancyFontRen
         }
         return scale + shift;
     }
+
+    //? if >=26.4-snapshot-6 {
+    public static net.minecraft.client.gui.GuiPipeline guiTextured() {
+        return net.minecraft.client.gui.GuiPipeline.TEXTURED;
+    }
+    //?} else if 26.3 {
+    /*public static com.mojang.renderpearl.api.pipeline.RenderPipeline guiTextured() {
+        return net.minecraft.client.renderer.pipeline.RenderPipelines.GUI_TEXTURED;
+    }
+    *///?} else {
+    /*public static com.mojang.blaze3d.pipeline.RenderPipeline guiTextured() {
+        return net.minecraft.client.renderer.pipeline.RenderPipelines.GUI_TEXTURED;
+    }
+    *///?}
 }

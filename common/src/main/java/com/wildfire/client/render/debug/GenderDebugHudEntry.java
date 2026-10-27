@@ -88,7 +88,7 @@ public class GenderDebugHudEntry implements WildfireDebugEntry {
         var lines = new DebugLines(/*? <=26.3 >> ')'*//*mainGroup*/);
         lines.addAll(config.getDebugInfo());
 
-        //? if >=26.4-snapshot-5 {
+        //? if >=26.4-snapshot-6 {
         lines.submit(mainGroup, displayer);
         addEquippedChestplate(displayer, config, living);
         //?} else {
@@ -98,7 +98,7 @@ public class GenderDebugHudEntry implements WildfireDebugEntry {
     }
 
     private void addEquippedChestplate(
-        //? if >=26.4-snapshot-5 {
+        //? if >=26.4-snapshot-6 {
         DebugScreenDisplayer displayer,
         //?} else {
         /*DebugLines parent,
@@ -134,7 +134,7 @@ public class GenderDebugHudEntry implements WildfireDebugEntry {
             }
         }
 
-        //? if >=26.4-snapshot-5 {
+        //? if >=26.4-snapshot-6 {
         lines.submit(chestplateGroup, displayer);
         //?} else {
         /*parent.literal("");

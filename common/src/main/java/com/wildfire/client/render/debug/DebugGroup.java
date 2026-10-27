@@ -29,7 +29,7 @@ import java.util.OptionalInt;
 public final class DebugGroup {
     private final String name;
 
-    //? if >=26.4-snapshot-5 {
+    //? if >=26.4-snapshot-6 {
     private final net.minecraft.client.gui.components.debug.DebugGroup vanilla;
     //?} else {
     /*private final Identifier id;
@@ -42,7 +42,7 @@ public final class DebugGroup {
         //this.id = id;
         this.name = name;
 
-        //? if >=26.4-snapshot-5 {
+        //? if >=26.4-snapshot-6 {
         var builder = net.minecraft.client.gui.components.debug.DebugGroup.Builder.titled(prettyName);
         accentColor.ifPresent(builder::withAccentColor);
         preferredSide.map(Side::vanillaSide).ifPresent(builder::withPreferredColumn);
@@ -54,7 +54,7 @@ public final class DebugGroup {
         return name;
     }
 
-    //? if >=26.4-snapshot-5 {
+    //? if >=26.4-snapshot-6 {
     net.minecraft.client.gui.components.debug.DebugGroup vanillaGroup() {
         return this.vanilla;
     }
@@ -123,7 +123,7 @@ public final class DebugGroup {
         LEFT,
         RIGHT;
 
-        //? if >=26.4-snapshot-5 {
+        //? if >=26.4-snapshot-6 {
         public net.minecraft.client.gui.components.debug.DebugColumn.Side vanillaSide() {
             return switch(this) {
                 case LEFT -> net.minecraft.client.gui.components.debug.DebugColumn.Side.LEFT;

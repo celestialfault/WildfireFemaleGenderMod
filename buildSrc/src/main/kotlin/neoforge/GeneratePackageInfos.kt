@@ -9,9 +9,9 @@ import org.gradle.api.tasks.TaskAction
 import java.io.File
 
 /**
- * From <a href="https://github.com/neoforged/NeoForge/blob/26.1.x/buildSrc/src/main/groovy/neoforge.formatting-conventions.gradle">NeoForge</a>
+ * From [NeoForge](https://github.com/neoforged/NeoForge/blob/26.1.x/buildSrc/src/main/groovy/neoforge.formatting-conventions.gradle)
  *
- * License: <a href="https://github.com/neoforged/NeoForge/blob/26.1.x/LICENSE.txt">LGPL 2.1</a>
+ * License: [LGPL 2.1](https://github.com/neoforged/NeoForge/blob/26.1.x/LICENSE.txt)
  */
 abstract class GeneratePackageInfos : DefaultTask() {
 

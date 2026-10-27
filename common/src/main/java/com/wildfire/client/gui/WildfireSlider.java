@@ -220,7 +220,7 @@ public class WildfireSlider extends AbstractWidget implements IFancyFontRenderer
         updateMessage();
     }
 
-    //? if >=26.4-snapshot-5
+    //? if >=26.4-snapshot-6
     @Override
     public void setVisible(boolean visible) {
         if (this.visible != visible) {

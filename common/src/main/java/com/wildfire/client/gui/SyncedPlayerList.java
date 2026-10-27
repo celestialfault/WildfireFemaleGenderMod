@@ -23,12 +23,11 @@ import com.wildfire.api.client.WildfireClientAPI;
 import com.wildfire.client.contributors.Contributors;
 import com.wildfire.client.gui.IFancyFontRenderer.TextAlignment;
 import com.wildfire.common.WildfireLang;
+import com.wildfire.common.entities.players.SyncStatus;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-
-import com.wildfire.common.entities.players.SyncStatus;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.PlayerTabOverlay;

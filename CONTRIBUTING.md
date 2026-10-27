@@ -16,8 +16,9 @@ Some ground rules for contributed translations:
 - **Localize**, don't just translate the text verbatim. If something wouldn't make sense in the language you're translating
   to, reword it to make more sense (while also keeping it similar to the spirit of the original English text).
 
-The original English locale files can be found in `{loader}/versions/{version}/src/main/generated/` for each relevant loader;
-for example, [the English locale for Fabric 26.1](./fabric/versions/26.1/src/main/generated/assets/female_gender_mod/lang/en_us.json).
+The original English locale files can be found in `{loader}/versions/{version}/src/` for each relevant loader;
+for example, [Fabric 26.1] or [NeoForge 26.1]. Note that each loader may have strings that don't exist in the other,
+such as NeoForge having strings for the built-in mod configuration screen.
 
 Contributed translations should be placed within the `common` project's resources directory; for example,
 [the LOLCAT translation](./common/src/main/resources/assets/female_gender_mod/lang/lol_us.json).
@@ -48,3 +49,6 @@ should still check to make sure.
 - Avoid any kind of `*` imports where possible
 - Fully-qualified class references should be avoided, except when used in versioned code where it's the only use
   of any such classes, in which case fully-qualified references are preferred.
+
+[Fabric 26.1]: ./fabric/versions/26.1/src/main/generated/assets/female_gender_mod/lang/en_us.json
+[NeoForge 26.1]: ./neoforge/versions/26.1/src/generated/resources/assets/female_gender_mod/lang/en_us.json

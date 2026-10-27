@@ -35,7 +35,6 @@ import net.minecraft.client.entity.ClientAvatarEntity;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.renderer.pipeline.RenderPipelines;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextColor;
@@ -141,7 +140,7 @@ public class WildfireBreastUVEditorScreen extends BaseWildfireScreen {
                                 default -> TextColor.WHITE;
                                 //~ if >=26.2 'getColor()' -> 'getValue()'
                             }).getValue();
-                            ctx.blitSprite(RenderPipelines.GUI_TEXTURED,
+                            ctx.blitSprite(guiTextured(),
                                     isAdd ? TEXTURE_ADD : TEXTURE_SUBTRACT,
                                     button.getX() + button.getWidth() / 2 - 3,
                                     button.getY() + button.getHeight() / 2 - 3,
@@ -184,7 +183,7 @@ public class WildfireBreastUVEditorScreen extends BaseWildfireScreen {
     public void extractBackground(GuiGraphicsExtractor graphics/*? <=26.3 >> ')'*//*, int mouseX, int mouseY, float delta*/) {
         //super.renderBackground(ctx, mouseX, mouseY, delta);
         extractTransparentBackground(graphics);
-        //ctx.drawTexture(RenderPipelines.GUI_TEXTURED, BACKGROUND, (this.width - 190) / 2, (this.height - 107) / 2, 0, 0, 190, 107, 512, 512);
+        //ctx.drawTexture(guiTextured(), BACKGROUND, (this.width - 190) / 2, (this.height - 107) / 2, 0, 0, 190, 107, 512, 512);
         int w = this.width - (this.width - sidebarWidth) - 10;
 
         graphics.fill(this.width - sidebarWidth, 0, this.width, this.height, ARGB.black(0xCC));
@@ -215,14 +214,14 @@ public class WildfireBreastUVEditorScreen extends BaseWildfireScreen {
             return;
         }
 
-        //? if >=26.4-snapshot-5 {
+        //? if >=26.4-snapshot-6 {
         int mouseX = graphics.mouseX();
         int mouseY = graphics.mouseY();
         //?}
 
         if(selectedUVs != null) {
             //noinspection SuspiciousNameCombination
-            graphics.blit(RenderPipelines.GUI_TEXTURED, avatar.getSkin().body().texturePath(),
+            graphics.blit(guiTextured(), avatar.getSkin().body().texturePath(),
                     uvWindowPos.x(), uvWindowPos.y(),
                     0, 0, textureDrawWidth, textureDrawWidth, textureDrawWidth, textureDrawWidth);
 

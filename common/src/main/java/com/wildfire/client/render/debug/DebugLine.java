@@ -35,7 +35,7 @@ public sealed interface DebugLine permits DebugFactLine,  DebugLine.Literal {
     public record Literal(String value) implements DebugLine {
         @Override
         public void addToDisplay(final DebugGroup group, final DebugScreenDisplayer displayer) {
-            //? if >=26.4-snapshot-5 {
+            //? if >=26.4-snapshot-6 {
             displayer.addToGroup(group.vanillaGroup(), value);
             //?} else {
             /*displayer.addToGroup(group.id(), value);
