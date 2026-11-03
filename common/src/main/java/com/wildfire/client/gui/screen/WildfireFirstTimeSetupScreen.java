@@ -181,7 +181,7 @@ public class WildfireFirstTimeSetupScreen extends BaseWildfireScreen {
             x - 132, y - 13,
             x - 75, y + 60,
             50, getEntityScale(fakeKeira, 0.4f),
-            //? if <26.4-snapshot-6
+            //? if <26.4-snapshot-7
             //mouseX, mouseY,
             fakeKeira);
         //~ !entity_portrait_widget

@@ -226,7 +226,7 @@ public class WildfireCreditsScreen extends BaseWildfireScreen {
 
             drawScaledScrollingString(graphics, Component.literal(creditBox.getName()), creditBoxX + 3, yP + 23, TextAlignment.CENTER, CommonColors.WHITE, 46,  1, false, 0.55F);
 
-            //? if >=26.4-snapshot-6 {
+            //? if >=26.4-snapshot-7 {
             int mouseX = graphics.mouseX();
             int mouseY = graphics.mouseY();
             //?}

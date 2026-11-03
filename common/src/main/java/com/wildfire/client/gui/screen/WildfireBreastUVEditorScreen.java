@@ -214,7 +214,7 @@ public class WildfireBreastUVEditorScreen extends BaseWildfireScreen {
             return;
         }
 
-        //? if >=26.4-snapshot-6 {
+        //? if >=26.4-snapshot-7 {
         int mouseX = graphics.mouseX();
         int mouseY = graphics.mouseY();
         //?}
