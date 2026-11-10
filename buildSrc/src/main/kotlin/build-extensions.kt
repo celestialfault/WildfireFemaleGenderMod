@@ -25,6 +25,11 @@ import org.gradle.api.tasks.bundling.Jar
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.named
 
+internal val isCi: Boolean get() {
+    val ci = System.getenv("CI")
+    return ci != null && ci.isNotEmpty()
+}
+
 internal val Project.stonecutterBuild get() = extensions.getByType<StonecutterBuildExtension>()
 
 val loaderAttribute = Attribute.of("io.github.mcgradleconventions.loader", String::class.java)

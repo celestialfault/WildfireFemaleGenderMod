@@ -174,7 +174,7 @@ public class WardrobeBrowserScreen extends BaseWildfireScreen {
 
         graphics.blit(guiTextured(), backgroundTexture, (this.width - 272) / 2, (this.height - 138) / 2, 0, 0, 268, 124, 512, 512);
 
-        //? if >=26.4-snapshot-7 {
+        //? if >=26.4-snapshot-8 {
         int mouseX = graphics.mouseX();
         int mouseY = graphics.mouseY();
         //?}
@@ -188,7 +188,7 @@ public class WardrobeBrowserScreen extends BaseWildfireScreen {
         int y = this.height / 2;
         drawScrollingString(graphics, getTitle(), 0, y - 82, TextAlignment.CENTER, CommonColors.WHITE, graphics.guiWidth(), 5, false);
 
-        //? if >=26.4-snapshot-7 {
+        //? if >=26.4-snapshot-8 {
         int mouseX = graphics.mouseX();
         int mouseY = graphics.mouseY();
         //?}

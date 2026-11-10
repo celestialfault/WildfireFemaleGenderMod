@@ -21,7 +21,6 @@ package com.wildfire.client.command;
 import com.google.common.cache.Cache;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.wildfire.api.EntityCache;
 import com.wildfire.api.client.WildfireClientAPI;
@@ -41,16 +40,12 @@ import java.util.List;
 import java.util.UUID;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.commands.SharedSuggestionProvider;
-import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.ComponentUtils;
-import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 
 /// @apiNote Only use this on the client side
-public final class WildfireClientCommand<S extends SharedSuggestionProvider> extends AbstractWildfireCommand<ClientCommandHelper<S>, S> {
+public final class WildfireClientCommand<S> extends AbstractWildfireCommand<ClientCommandHelper<S>, S> {
     public WildfireClientCommand(ClientCommandHelper<S> helper) {
         super(helper);
     }
@@ -74,13 +69,13 @@ public final class WildfireClientCommand<S extends SharedSuggestionProvider> ext
             .then(helper.literal("firsttime")
                 .executes(this::openFirstTime))
             .then(helper.literal("cache")
-                .then(helper.argument("allPlayers", BoolArgumentType.bool())
+                .then(helper.argument("allPlayers", boolArgumentType())
                     .executes(this::getUsers)
-                    .then(helper.argument("showArmorStands", BoolArgumentType.bool())
+                    .then(helper.argument("showArmorStands", boolArgumentType())
                         .executes(this::getUsers)))
                 .executes(this::getUsers))
             .then(helper.literal("syncverbosity")
-                .then(helper.argument("level", new SyncVerbosity.SyncVerbosityArgumentType())
+                .then(helper.argument("level", SyncVerbosity.argumentType())
                     .executes(this::setLogLevel)));
 
         var root = dispatcher.register(helper.literal("femalegender")

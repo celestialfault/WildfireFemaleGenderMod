@@ -159,7 +159,7 @@ public class WildfireSlider extends AbstractWidget implements IFancyFontRenderer
             graphics.fill(xPos2 - 2, getY() + 1, xPos2, getBottom() - 1, ARGB.white(0x78));
         }
 
-        //~ if >=26.4-snapshot-7 isHoveredOrFocused -> isHighlighted
+        //~ if >=26.4-snapshot-8 isHoveredOrFocused -> isHighlighted
         int textColor = (isHighlighted() && active) || changed ? CommonColors.SOFT_YELLOW : CommonColors.WHITE;
         if(!active) {
             textColor = 0xFF666666;
@@ -221,7 +221,7 @@ public class WildfireSlider extends AbstractWidget implements IFancyFontRenderer
         updateMessage();
     }
 
-    //? if >=26.4-snapshot-7
+    //? if >=26.4-snapshot-8
     @Override
     public void setVisible(boolean visible) {
         if (this.visible != visible) {
@@ -279,9 +279,7 @@ public class WildfireSlider extends AbstractWidget implements IFancyFontRenderer
             if (validator instanceof ConfigRange<Float>(Float minInclusive, Float maxInclusive)) {
                 return range(minInclusive, maxInclusive);
             }
-            //TODO: Do we care about having a logging message? If so where should we get the key name from
-            //WildfireGender.LOGGER.warn("No range available for {}", key.key());
-            return this;
+            throw new IllegalArgumentException("Expected ConfigRange<Float> validator, instead got " + validator.getClass());
         }
 
         public Builder range(float min, float max) {

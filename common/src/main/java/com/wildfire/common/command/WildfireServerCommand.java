@@ -20,7 +20,6 @@ package com.wildfire.common.command;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -76,7 +75,7 @@ public final class WildfireServerCommand extends AbstractWildfireCommand<ServerC
                 return Command.SINGLE_SUCCESS;
             })
             .then(helper.literal("trim")
-                .then(helper.argument("glint", BoolArgumentType.bool())
+                .then(helper.argument("glint", boolArgumentType())
                     .executes(this::equipTrimmedChestplate))
                 .executes(this::equipTrimmedChestplate))
             .then(helper.literal("armorstand")

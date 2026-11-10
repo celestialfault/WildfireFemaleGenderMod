@@ -50,7 +50,7 @@ public class WildfireButton extends Button implements IFancyFontRenderer {
     private int getBackgroundColor() {
         if(!active) {
             return 0x54222222;
-        //~ if >=26.4-snapshot-7 isHoveredOrFocused -> isHighlighted
+        //~ if >=26.4-snapshot-8 isHoveredOrFocused -> isHighlighted
         } else if(this.isHighlighted()) {
             return 0x54666666;
         } else {
@@ -74,7 +74,7 @@ public class WildfireButton extends Button implements IFancyFontRenderer {
             graphics.fill(getX(), getY(), getRight(), getBottom(), getBackgroundColor());
         }
 
-        //? if >=26.4-snapshot-7 {
+        //? if >=26.4-snapshot-8 {
         int mouseX = graphics.mouseX();
         int mouseY = graphics.mouseY();
         float partialTicks = graphics.partialTicks();
@@ -96,7 +96,7 @@ public class WildfireButton extends Button implements IFancyFontRenderer {
         return this;
     }
 
-    //? if >=26.4-snapshot-7
+    //? if >=26.4-snapshot-8
     @Override
     public void setVisible(boolean visible) {
         if (this.visible != visible) {

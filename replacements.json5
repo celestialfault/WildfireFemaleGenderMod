@@ -1,5 +1,4 @@
 {
-    // See https://stonecutter.kikugie.dev/wiki/config/params.html#replacements
     // TL;DR: define a new replacement here, such as:
     //
     //  // tip: add a '!' prefix to the name to invert it (i.e. make it active by default)
@@ -17,6 +16,8 @@
     //
     //  //~ name *or use '//~ !name' instead to disable inverted replacements*
     //  // ... code ...
+    //
+    // See also https://stonecutter.kikugie.dev/wiki/config/params.html#replacements
 
     "26.2": {
         when: ">=26.2",
@@ -85,7 +86,7 @@
     },
 
     entity_portrait_widget: {
-        when: ">=26.4-snapshot-7",
+        when: ">=26.4-snapshot-8",
         strings: [
             ["net.minecraft.client.gui.screens.inventory.InventoryScreen", "net.minecraft.client.gui.screens.social.EntityPortraitWidget"],
         ],

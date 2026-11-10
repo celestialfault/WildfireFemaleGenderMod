@@ -18,6 +18,7 @@
 
 package com.wildfire.common.config.enums;
 
+import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.serialization.Codec;
 import com.wildfire.api.NamedEnum;
 import com.wildfire.common.WildfireLang;
@@ -60,9 +61,24 @@ public enum SyncVerbosity implements StringRepresentable, NamedEnum {
         return this.name.translate();
     }
 
+    public static ArgumentType<SyncVerbosity> argumentType() {
+        return SyncVerbosityArgumentType.INSTANCE/*? >=26.4-snapshot-8 >> ';'*/.toBrigadier();
+    }
+
     public static class SyncVerbosityArgumentType extends StringRepresentableArgument<SyncVerbosity> {
-        public SyncVerbosityArgumentType() {
+        private static final SyncVerbosityArgumentType INSTANCE = new SyncVerbosityArgumentType();
+        //? if >=26.4-snapshot-8
+        private static final Type<SyncVerbosityArgumentType> TYPE = net.minecraft.commands.arguments.SerializableArgument.singletonType(INSTANCE);
+
+        private SyncVerbosityArgumentType() {
             super(StringRepresentable.fromEnum(SyncVerbosity::values), SyncVerbosity::values);
         }
+
+        //? if >=26.4-snapshot-8 {
+        @Override
+        public Type<? extends StringRepresentableArgument<SyncVerbosity>> type() {
+            return TYPE;
+        }
+        //?}
     }
 }

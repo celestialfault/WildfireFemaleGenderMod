@@ -21,10 +21,9 @@ package com.wildfire.client.command;
 import com.wildfire.common.command.CommandHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.world.level.Level;
 
-public interface ClientCommandHelper<SOURCE extends SharedSuggestionProvider> extends CommandHelper<SOURCE> {
+public interface ClientCommandHelper<SOURCE> extends CommandHelper<SOURCE> {
     Level getLevel(SOURCE source);
     LocalPlayer getPlayer(SOURCE source);
     Minecraft getMinecraft(SOURCE source);

@@ -22,11 +22,10 @@ import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 
-public interface CommandHelper<SOURCE extends SharedSuggestionProvider> {
+public interface CommandHelper<SOURCE> {
     LiteralArgumentBuilder<SOURCE> literal(String key);
     <T> RequiredArgumentBuilder<SOURCE, T> argument(String key, ArgumentType<T> type);
 

@@ -18,18 +18,30 @@
 
 package com.wildfire.common.command.mannequins;
 
-import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
-import com.mojang.brigadier.suggestion.Suggestions;
-import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.wildfire.api.Gender;
+import net.minecraft.commands.CommandSourceStack;
 import java.util.Arrays;
-import java.util.concurrent.CompletableFuture;
-import net.minecraft.commands.SharedSuggestionProvider;
+import java.util.stream.Stream;
 
-public final class GenderSuggestionProvider<S extends SharedSuggestionProvider> implements SuggestionProvider<S> {
-    @Override
-    public CompletableFuture<Suggestions> getSuggestions(final CommandContext<S> context, final SuggestionsBuilder builder) {
-        return SharedSuggestionProvider.suggest(Arrays.stream(Gender.values()).map(Gender::name), builder);
+public final class GenderSuggestionProvider {
+    private GenderSuggestionProvider() {
+    }
+
+    //? if <=26.3 {
+    /*private static final SuggestionProvider<CommandSourceStack> INSTANCE = (_, builder) ->
+        net.minecraft.commands.SharedSuggestionProvider.suggest(names(), builder);
+    *///?}
+
+    public static SuggestionProvider<CommandSourceStack> getSuggestionProvider() {
+        //? if >=26.4-snapshot-8 {
+        return net.minecraft.commands.suggestions.SuggestLiteralString.suggestLiteral(names().toArray(String[]::new));
+        //?} else {
+        /*return INSTANCE;
+        *///?}
+    }
+
+    private static Stream<String> names() {
+        return Arrays.stream(Gender.values()).map(Gender::name);
     }
 }

@@ -36,7 +36,12 @@ public interface ServerCommandHelper extends CommandHelper<CommandSourceStack> {
     /// Use of this is recommended over checking a vanilla permission level to allow for future
     /// support of a permissions API.
     default Predicate<CommandSourceStack> requirePermissions(CommandPermission permission) {
-        return source -> source.permissions().hasPermission(permission.vanilla());
+        //? if >=26.4-snapshot-8 {
+        var check = new net.minecraft.server.permissions.PermissionCheck.Require(permission.vanilla());
+        return new net.minecraft.server.permissions.PermissionProviderCheck<>(check);
+        //?} else {
+        /*return source -> source.permissions().hasPermission(permission.vanilla());
+        *///?}
     }
 
     // TODO extract this out to its own class and use it in MannequinConfigHolder if/when we support a proper

@@ -20,6 +20,7 @@ package com.wildfire
 
 import groovy.json.JsonException
 import groovy.json.JsonSlurper
+import isCi
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
@@ -102,34 +103,36 @@ abstract class ValidateJson : DefaultTask() {
                 missingFromTranslation = rootStrings - strings
             }
 
-            logger.lifecycle("::group::${file.name}")
+            if(isCi) { // TODO log these messages outside ci if the task is run explicitly
+                logger.lifecycle("::group::${file.name}")
 
-            if (missingFromRoot.isNotEmpty()) {
-                logger.lifecycle("::notice file=${relativePath(file)}::Has ${missingFromRoot.size} extra translation strings")
-                missingFromRoot.sorted().forEach {
-                    logger.lifecycle("  - $it")
+                if (missingFromRoot.isNotEmpty()) {
+                    logger.lifecycle("::notice file=${relativePath(file)}::Has ${missingFromRoot.size} extra translation strings")
+                    missingFromRoot.sorted().forEach {
+                        logger.lifecycle("  - $it")
+                    }
                 }
-            }
 
-            if (missingFromTranslation.isNotEmpty()) {
-                logger.lifecycle("::notice file=${relativePath(file)}::Missing ${missingFromTranslation.size} translation strings")
-                missingFromTranslation.sorted().forEach {
-                    logger.lifecycle("  - $it")
+                if (missingFromTranslation.isNotEmpty()) {
+                    logger.lifecycle("::notice file=${relativePath(file)}::Missing ${missingFromTranslation.size} translation strings")
+                    missingFromTranslation.sorted().forEach {
+                        logger.lifecycle("  - $it")
+                    }
                 }
-            }
 
-            if (identicalToRoot.isNotEmpty()) {
-                logger.lifecycle("::notice file=${relativePath(file)}::Redundant ${identicalToRoot.size} translation strings")
-                identicalToRoot.map { entry -> entry.key }.sorted().forEach {
-                    logger.lifecycle("  - $it")
+                if (identicalToRoot.isNotEmpty()) {
+                    logger.lifecycle("::notice file=${relativePath(file)}::Redundant ${identicalToRoot.size} translation strings")
+                    identicalToRoot.map { entry -> entry.key }.sorted().forEach {
+                        logger.lifecycle("  - $it")
+                    }
                 }
-            }
 
-            if (missingFromRoot.isEmpty() && missingFromTranslation.isEmpty()) {
-                logger.lifecycle("No missing translations!")
-            }
+                if (missingFromRoot.isEmpty() && missingFromTranslation.isEmpty()) {
+                    logger.lifecycle("No missing translations!")
+                }
 
-            logger.lifecycle("::endgroup::")
+                logger.lifecycle("::endgroup::")
+            }
         }
     }
 }

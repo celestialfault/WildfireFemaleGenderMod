@@ -18,15 +18,10 @@
 
 package com.wildfire.common.command.mannequins;
 
-import com.mojang.brigadier.arguments.ArgumentType;
-import com.mojang.brigadier.arguments.BoolArgumentType;
-import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.wildfire.api.Gender;
 import com.wildfire.common.WildfireLang;
-import com.wildfire.common.config.validator.ConfigRange;
-import com.wildfire.common.config.value.ConfigKey;
 import com.wildfire.common.entities.Breasts;
 import com.wildfire.common.entities.EntityConfigHolder;
 import com.wildfire.common.entities.Sounds;
@@ -36,6 +31,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import static com.wildfire.common.command.AbstractWildfireCommand.boolArgumentType;
+import static com.wildfire.common.command.AbstractWildfireCommand.boundedFloat;
+import static com.wildfire.common.command.AbstractWildfireCommand.stringEnumArgument;
+
 /*package-private*/ final class MannequinComponents {
     private static final DynamicCommandExceptionType INVALID_GENDER_INPUT = WildfireLang.COMMAND_SERVER_INVALID_GENDER.dynamicCommandException();
     private static final List<MannequinComponent<?>> components = new ArrayList<>();
@@ -44,7 +43,7 @@ import java.util.Locale;
     // given an unrecognized argument type as part of these commands
     public static final MannequinComponent<Gender> GENDER = register(MannequinComponent.<Gender>builder()
         .name(WildfireLang.COMMAND_MANNEQUIN_DATA_GENDER)
-        .argument(StringArgumentType.word())
+        .argument(stringEnumArgument(Gender.class))
         .parser((ctx, name) -> {
             String input = StringArgumentType.getString(ctx, name);
             try {
@@ -54,7 +53,7 @@ import java.util.Locale;
             }
         })
         .getter(EntityConfigHolder::gender)
-        .suggests(new GenderSuggestionProvider<>())
+        .suggests(GenderSuggestionProvider.getSuggestionProvider())
         .build());
 
     public static final MannequinComponent<Float> BREAST_SIZE = register(MannequinComponent.builder(Float.class)
@@ -87,13 +86,13 @@ import java.util.Locale;
 
     public static final MannequinComponent<Boolean> SHOW_IN_ARMOR = register(MannequinComponent.builder(Boolean.class)
         .name(WildfireLang.COMMAND_MANNEQUIN_DATA_SHOW_IN_ARMOR)
-        .argument(BoolArgumentType.bool())
+        .argument(boolArgumentType())
         .getter(AbstractAvatarConfigHolder::showBreastsInArmor)
         .build());
 
     public static final MannequinComponent<Boolean> PHYSICS = register(MannequinComponent.builder(Boolean.class)
         .name(WildfireLang.COMMAND_MANNEQUIN_DATA_PHYSICS)
-        .argument(BoolArgumentType.bool())
+        .argument(boolArgumentType())
         .getter(config -> config.breasts().physics().enabled())
         .build());
     public static final MannequinComponent<Float> PHYSICS_BOUNCE = register(MannequinComponent.builder(Float.class)
@@ -108,13 +107,13 @@ import java.util.Locale;
         .build());
     public static final MannequinComponent<Boolean> PHYSICS_UNIBOOB = register(MannequinComponent.builder(Boolean.class)
         .name(WildfireLang.COMMAND_MANNEQUIN_DATA_PHYSICS_UNIBOOB)
-        .argument(BoolArgumentType.bool())
+        .argument(boolArgumentType())
         .getter(config -> config.breasts().physics().uniboob())
         .build());
 
     public static final MannequinComponent<Boolean> HURT_SOUNDS = register(MannequinComponent.builder(Boolean.class)
         .name(WildfireLang.COMMAND_MANNEQUIN_DATA_HURT_SOUNDS)
-        .argument(BoolArgumentType.bool())
+        .argument(boolArgumentType())
         .getter(config -> config.sounds().hurt())
         .build());
     public static final MannequinComponent<Float> VOICE_PITCH = register(MannequinComponent.builder(Float.class)
@@ -122,13 +121,6 @@ import java.util.Locale;
         .argument(boundedFloat(Sounds.VOICE_PITCH))
         .getter(config -> config.sounds().voicePitch())
         .build());
-
-    private static ArgumentType<Float> boundedFloat(ConfigKey<Float> key) {
-        if(key.validator() instanceof ConfigRange<Float>(Float minInclusive, Float maxInclusive)) {
-            return FloatArgumentType.floatArg(minInclusive, maxInclusive);
-        }
-        return FloatArgumentType.floatArg();
-    }
 
     private static <T> MannequinComponent<T> register(MannequinComponent<T> component) {
         components.add(component);
