@@ -150,7 +150,7 @@ public abstract class BaseWildfireScreen extends Screen implements IFancyFontRen
         return scale + shift;
     }
 
-    //? if >=26.4-snapshot-8 {
+    //? if >=26.4-* {
     public static net.minecraft.client.gui.GuiPipeline guiTextured() {
         return net.minecraft.client.gui.GuiPipeline.TEXTURED;
     }

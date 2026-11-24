@@ -99,6 +99,12 @@ stonecutter parameters {
                 for((old, new) in value.strings) {
                     replace(old, new)
                 }
+                if(value.include.isNotEmpty()) {
+                    include(value.include)
+                }
+                if(value.exclude.isNotEmpty()) {
+                    exclude(value.exclude)
+                }
             }
 
             when(value.alwaysActive) {
@@ -112,6 +118,12 @@ stonecutter parameters {
                 direction = eval(current.version, value.`when`)
                 for((forward, backward) in value.regex) {
                     replace(forward.pattern, forward.replacement, backward.pattern, backward.replacement)
+                }
+                if(value.include.isNotEmpty()) {
+                    include(value.include)
+                }
+                if(value.exclude.isNotEmpty()) {
+                    exclude(value.exclude)
                 }
             }
 

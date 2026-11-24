@@ -36,7 +36,7 @@ public interface ServerCommandHelper extends CommandHelper<CommandSourceStack> {
     /// Use of this is recommended over checking a vanilla permission level to allow for future
     /// support of a permissions API.
     default Predicate<CommandSourceStack> requirePermissions(CommandPermission permission) {
-        //? if >=26.4-snapshot-8 {
+        //? if >=26.4-* {
         var check = new net.minecraft.server.permissions.PermissionCheck.Require(permission.vanilla());
         return new net.minecraft.server.permissions.PermissionProviderCheck<>(check);
         //?} else {

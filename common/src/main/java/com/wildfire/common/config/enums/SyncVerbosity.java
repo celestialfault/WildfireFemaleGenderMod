@@ -62,19 +62,19 @@ public enum SyncVerbosity implements StringRepresentable, NamedEnum {
     }
 
     public static ArgumentType<SyncVerbosity> argumentType() {
-        return SyncVerbosityArgumentType.INSTANCE/*? >=26.4-snapshot-8 >> ';'*/.toBrigadier();
+        return SyncVerbosityArgumentType.INSTANCE/*? if >=26.4-* >> ';'*/.toBrigadier();
     }
 
     public static class SyncVerbosityArgumentType extends StringRepresentableArgument<SyncVerbosity> {
         private static final SyncVerbosityArgumentType INSTANCE = new SyncVerbosityArgumentType();
-        //? if >=26.4-snapshot-8
+        //? if >=26.4-*
         private static final Type<SyncVerbosityArgumentType> TYPE = net.minecraft.commands.arguments.SerializableArgument.singletonType(INSTANCE);
 
         private SyncVerbosityArgumentType() {
             super(StringRepresentable.fromEnum(SyncVerbosity::values), SyncVerbosity::values);
         }
 
-        //? if >=26.4-snapshot-8 {
+        //? if >=26.4-* {
         @Override
         public Type<? extends StringRepresentableArgument<SyncVerbosity>> type() {
             return TYPE;

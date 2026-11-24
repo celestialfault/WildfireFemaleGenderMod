@@ -81,7 +81,7 @@ neoForge {
 }
 
 repositories {
-    val snapshotPr: Int? = sc.properties.getOrNull("dependencies.neoforge_snapshot_pr")
+    val snapshotPr: Int? = sc.properties.getAsOrNull("dependencies.neoforge_snapshot_pr")
     if (snapshotPr != null) {
         maven {
             name = "Maven for PR #${snapshotPr}"

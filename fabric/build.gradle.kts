@@ -12,9 +12,9 @@ repositories {
 
 dependencies {
     minecraft("com.mojang:minecraft:${sc.current.version}")
-    implementation("net.fabricmc:fabric-loader:${sc.properties["dependencies.fabric_loader_version"] as String}")
+    implementation("net.fabricmc:fabric-loader:${sc.properties["dependencies.fabric_loader_version"]}")
 
-    implementation(platform("net.fabricmc.fabric-api:fabric-api-bom:${sc.properties["dependencies.fabric_api"] as String}+${sc.current.project}"))
+    implementation(platform("net.fabricmc.fabric-api:fabric-api-bom:${sc.properties["dependencies.fabric_api"]}+${sc.current.project}"))
     implementation("net.fabricmc.fabric-api:fabric-data-generation-api-v1")
     implementation("net.fabricmc.fabric-api:fabric-networking-api-v1")
     implementation("net.fabricmc.fabric-api:fabric-key-mapping-api-v1")
@@ -29,9 +29,9 @@ dependencies {
     // See https://github.com/DJtheRedstoner/DevAuth
     localRuntime("me.djtheredstoner:DevAuth-fabric:1.2.2")
 
-    val modmenu: String = sc.properties["dependencies.modmenu"]
+    val modmenu = sc.properties["dependencies.modmenu"]
     compileOnly("com.terraformersmc:modmenu:${modmenu}")
-    if(sc.properties["debug.load_modmenu"]) {
+    if(sc.properties.getAs("debug.load_modmenu")) {
         localRuntime("com.terraformersmc:modmenu:${modmenu}")
         localRuntime("net.fabricmc.fabric-api:fabric-screen-api-v1")
     }
@@ -116,7 +116,7 @@ tasks.named<ProcessResources>("processResources").configure {
     mustRunAfter(convertATs)
     exclude("META-INF/accesstransformer.cfg")
 }
-tasks.named("stonecutterPrepare").configure {
+tasks.named("stonecutterGenerate").configure { // TODO is this the correct task to add this dependency to?
     mustRunAfter(convertATs)
 }
 

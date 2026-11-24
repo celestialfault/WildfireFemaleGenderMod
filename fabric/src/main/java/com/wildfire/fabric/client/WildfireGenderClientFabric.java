@@ -75,7 +75,7 @@ public class WildfireGenderClientFabric implements ClientModInitializer {
     }
 
     private void registerDebugEntry(WildfireDebugEntry entry) {
-        //? if >=26.4-snapshot-4 {
+        //? if >=26.4-* {
         var registry = net.minecraft.client.core.registries.BuiltInClientRegistries.DEBUG_SCREEN_ENTRY;
         var key = net.minecraft.resources.ResourceKey.create(registry.key(), entry.id());
         net.minecraft.core.Registry.register(registry, key, entry);

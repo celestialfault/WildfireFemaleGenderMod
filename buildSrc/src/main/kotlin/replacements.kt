@@ -35,6 +35,9 @@ data class Replacement(
     val alwaysActive: Boolean = false,
     val strings: List<StringReplacement> = emptyList(),
     val regex: List<RegexReplacement> = emptyList(),
+    // TODO support perl replacements?
+    val include: List<String> = emptyList(),
+    val exclude: List<String> = emptyList(),
 ) {
     init {
         check(strings.isNotEmpty() || regex.isNotEmpty()) {

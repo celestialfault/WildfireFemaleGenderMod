@@ -180,7 +180,7 @@ public class WildfireBreastUVEditorScreen extends BaseWildfireScreen {
     }
 
     @Override
-    public void extractBackground(GuiGraphicsExtractor graphics/*? <=26.3 >> ')'*//*, int mouseX, int mouseY, float delta*/) {
+    public void extractBackground(GuiGraphicsExtractor graphics/*? if <=26.3 >> ')'*//*, int mouseX, int mouseY, float delta*/) {
         //super.renderBackground(ctx, mouseX, mouseY, delta);
         extractTransparentBackground(graphics);
         //ctx.drawTexture(guiTextured(), BACKGROUND, (this.width - 190) / 2, (this.height - 107) / 2, 0, 0, 190, 107, 512, 512);
@@ -208,13 +208,13 @@ public class WildfireBreastUVEditorScreen extends BaseWildfireScreen {
 
     // TODO this should be broken up into smaller methods
     @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics/*? <=26.3 >> ')'*//*, int mouseX, int mouseY, float delta*/) {
+    public void extractRenderState(GuiGraphicsExtractor graphics/*? if <=26.3 >> ')'*//*, int mouseX, int mouseY, float delta*/) {
         LivingEntity entity = getEntity();
         if(!(entity instanceof ClientAvatarEntity avatar)) {
             return;
         }
 
-        //? if >=26.4-snapshot-8 {
+        //? if >=26.4-* {
         int mouseX = graphics.mouseX();
         int mouseY = graphics.mouseY();
         //?}
@@ -277,7 +277,7 @@ public class WildfireBreastUVEditorScreen extends BaseWildfireScreen {
         //~ !entity_portrait_widget
         drawScrollingString(graphics, getTitle(), uvWindowPos.x(), 20, TextAlignment.CENTER, CommonColors.WHITE, textureDrawWidth, 2, false);
 
-        super.extractRenderState(graphics/*? <=26.3 >> ')'*//*, mouseX, mouseY, delta*/);
+        super.extractRenderState(graphics/*? if <=26.3 >> ')'*//*, mouseX, mouseY, delta*/);
     }
 
     private void drawFaceBorders(GuiGraphicsExtractor graphics, UVLayout uvList, int mouseX, int mouseY, boolean faded) {
@@ -337,13 +337,13 @@ public class WildfireBreastUVEditorScreen extends BaseWildfireScreen {
                     if(click.button() == InputConstants.MOUSE_BUTTON_LEFT) {
 
                         if(selectedDirection != direction) {
-                            Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+                            Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F/*? if >=26.4-* >> ')'*/, 0.25F));
                             selectedDirection = direction; // store which rect was clicked
                             rebuildWidgets();
                         }
                     } else if(click.button() == InputConstants.MOUSE_BUTTON_RIGHT && selectedDirection != null) {
                         selectedDirection = null;
-                        Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+                        Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F/*? if >=26.4-* >> ')'*/, 0.25F));
                         rebuildWidgets();
                     }
                     return true;

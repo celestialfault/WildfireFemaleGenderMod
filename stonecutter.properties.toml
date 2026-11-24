@@ -96,4 +96,4 @@ publish.modrinth = "bcOsQHnC"
     publish.versions = ["26.4"]
 [fabric."26.4"]
     meta.minecraft_version = ">=26.4-alpha.8 <26.4"
-    dependencies.fabric_api = "0.166.1"
+    dependencies.fabric_api = "0.167.1"

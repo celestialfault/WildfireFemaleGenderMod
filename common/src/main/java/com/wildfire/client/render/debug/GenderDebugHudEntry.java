@@ -85,10 +85,10 @@ public class GenderDebugHudEntry implements WildfireDebugEntry {
             return;
         }
 
-        var lines = new DebugLines(/*? <=26.3 >> ')'*//*mainGroup*/);
+        var lines = new DebugLines(/*? if <=26.3 >> ')'*//*mainGroup*/);
         lines.addAll(config.getDebugInfo());
 
-        //? if >=26.4-snapshot-8 {
+        //? if >=26.4-* {
         lines.submit(mainGroup, displayer);
         addEquippedChestplate(displayer, config, living);
         //?} else {
@@ -98,7 +98,7 @@ public class GenderDebugHudEntry implements WildfireDebugEntry {
     }
 
     private void addEquippedChestplate(
-        //? if >=26.4-snapshot-8 {
+        //? if >=26.4-* {
         DebugScreenDisplayer displayer,
         //?} else {
         /*DebugLines parent,
@@ -115,7 +115,7 @@ public class GenderDebugHudEntry implements WildfireDebugEntry {
             return;
         }
 
-        var lines = new DebugLines(/*? <=26.3 >> ')'*//*chestplateGroup*/);
+        var lines = new DebugLines(/*? if <=26.3 >> ')'*//*chestplateGroup*/);
 
         var id = asset.identifier();
         var armorConfig = Optionull.mapOrDefault(GenderArmorResourceManager.get(id), Function.identity(), IGenderArmor.DEFAULT);
@@ -134,7 +134,7 @@ public class GenderDebugHudEntry implements WildfireDebugEntry {
             }
         }
 
-        //? if >=26.4-snapshot-8 {
+        //? if >=26.4-* {
         lines.submit(chestplateGroup, displayer);
         //?} else {
         /*parent.literal("");

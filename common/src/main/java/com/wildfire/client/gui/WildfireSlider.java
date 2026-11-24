@@ -143,7 +143,7 @@ public class WildfireSlider extends AbstractWidget implements IFancyFontRenderer
     }
 
     @Override
-    protected void extractWidgetRenderState(GuiGraphicsExtractor graphics/*? <=26.3 >> ')'*//*, int mouseX, int mouseY, float delta*/) {
+    protected void extractWidgetRenderState(GuiGraphicsExtractor graphics/*? if <=26.3 >> ')'*//*, int mouseX, int mouseY, float delta*/) {
         if(!this.visible) {
             return;
         }
@@ -159,7 +159,7 @@ public class WildfireSlider extends AbstractWidget implements IFancyFontRenderer
             graphics.fill(xPos2 - 2, getY() + 1, xPos2, getBottom() - 1, ARGB.white(0x78));
         }
 
-        //~ if >=26.4-snapshot-8 isHoveredOrFocused -> isHighlighted
+        //~ if >=26.4-* isHoveredOrFocused -> isHighlighted
         int textColor = (isHighlighted() && active) || changed ? CommonColors.SOFT_YELLOW : CommonColors.WHITE;
         if(!active) {
             textColor = 0xFF666666;
@@ -221,7 +221,7 @@ public class WildfireSlider extends AbstractWidget implements IFancyFontRenderer
         updateMessage();
     }
 
-    //? if >=26.4-snapshot-8
+    //? if >=26.4-*
     @Override
     public void setVisible(boolean visible) {
         if (this.visible != visible) {

@@ -153,7 +153,7 @@ public class WildfireCreditsScreen extends BaseWildfireScreen {
     }
 
     @Override
-    public void extractBackground(GuiGraphicsExtractor graphics/*? <=26.3 >> ')'*//*, int mouseX, int mouseY, float a*/) {
+    public void extractBackground(GuiGraphicsExtractor graphics/*? if <=26.3 >> ')'*//*, int mouseX, int mouseY, float a*/) {
         extractTransparentBackground(graphics);
     }
 
@@ -174,7 +174,7 @@ public class WildfireCreditsScreen extends BaseWildfireScreen {
     }
 
     @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics/*? <=26.3 >> ')'*//*, int mouseX, int mouseY, float delta*/) {
+    public void extractRenderState(GuiGraphicsExtractor graphics/*? if <=26.3 >> ')'*//*, int mouseX, int mouseY, float delta*/) {
         drawScrollingString(graphics, getTitle(), 0, height / 2 - 100, TextAlignment.CENTER, CommonColors.WHITE, graphics.guiWidth(), 5, false);
         drawScrollingString(graphics, WildfireLang.CREDITS_DESCRIPTION.translate(), 0, height / 2 - 85, TextAlignment.CENTER, 0xFF888888, graphics.guiWidth(), 5, false);
 
@@ -226,7 +226,7 @@ public class WildfireCreditsScreen extends BaseWildfireScreen {
 
             drawScaledScrollingString(graphics, Component.literal(creditBox.getName()), creditBoxX + 3, yP + 23, TextAlignment.CENTER, CommonColors.WHITE, 46,  1, false, 0.55F);
 
-            //? if >=26.4-snapshot-8 {
+            //? if >=26.4-* {
             int mouseX = graphics.mouseX();
             int mouseY = graphics.mouseY();
             //?}
@@ -246,6 +246,6 @@ public class WildfireCreditsScreen extends BaseWildfireScreen {
         //String pageInfo = (creditsPage) + " / " + (totalPages-1);
         //GuiUtils.drawCenteredText(ctx, textRenderer, Text.literal(pageInfo), width / 2, height / 2, CommonColors.WHITE);
 
-        super.extractRenderState(graphics/*? <=26.3 >> ')'*//*, mouseX, mouseY, delta*/);
+        super.extractRenderState(graphics/*? if <=26.3 >> ')'*//*, mouseX, mouseY, delta*/);
     }
 }

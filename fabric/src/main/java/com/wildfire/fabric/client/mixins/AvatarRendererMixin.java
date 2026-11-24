@@ -70,7 +70,7 @@ abstract class AvatarRendererMixin extends LivingEntityRenderer<Avatar, AvatarRe
         final CameraRenderState camera,
         CallbackInfo ci
     ) {
-        //? if >=26.4-snapshot-4 {
+        //? if >=26.4-* {
         if(state.nameTag == null) {
             return;
         }

@@ -76,7 +76,7 @@ public abstract class AbstractWildfireCommand<T extends CommandHelper<S>, S> {
         helper.sendSystemMessage(ctx.getSource(), ComponentUtils.formatList(lines, CommonComponents.NEW_LINE));
     }
 
-    //~ if >=26.4-snapshot-8 'com.mojang.brigadier.arguments.FloatArgumentType' -> 'net.minecraft.commands.arguments.FloatArgument' {
+    //~ if >=26.4-* 'com.mojang.brigadier.arguments.FloatArgumentType' -> 'net.minecraft.commands.arguments.FloatArgument' {
     public static ArgumentType<Float> boundedFloat(ConfigKey<Float> key) {
         if(key.validator() instanceof ConfigRange<Float>(Float minInclusive, Float maxInclusive)) {
             return net.minecraft.commands.arguments.FloatArgument.floatArg(minInclusive, maxInclusive);
@@ -86,13 +86,13 @@ public abstract class AbstractWildfireCommand<T extends CommandHelper<S>, S> {
     //~}
 
     public static ArgumentType<Boolean> boolArgumentType() {
-        //~ if >=26.4-snapshot-8 'com.mojang.brigadier.arguments.BoolArgumentType' -> 'net.minecraft.commands.arguments.BooleanArgument'
+        //~ if >=26.4-* 'com.mojang.brigadier.arguments.BoolArgumentType' -> 'net.minecraft.commands.arguments.BooleanArgument'
         return net.minecraft.commands.arguments.BooleanArgument.bool();
     }
 
     @SuppressWarnings({"SameParameterValue", "unused"})
     public static <T extends Enum<T>> ArgumentType<String> stringEnumArgument(Class<T> enumClass) {
-        //? if >=26.4-snapshot-8 {
+        //? if >=26.4-* {
         var joiner = new java.util.StringJoiner("|");
         for(T entry : enumClass.getEnumConstants()) {
             joiner.add(entry.name());

@@ -310,7 +310,7 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
     }
 
     @Override
-    public void extractBackground(GuiGraphicsExtractor graphics/*? <=26.3 >> ')'*//*, int mouseX, int mouseY, float delta*/) {
+    public void extractBackground(GuiGraphicsExtractor graphics/*? if <=26.3 >> ')'*//*, int mouseX, int mouseY, float delta*/) {
         extractTransparentBackground(graphics);
 
         Identifier backgroundTexture = switch(config.gender().get()) {
@@ -326,7 +326,7 @@ public class WildfireBreastCustomizationScreen extends BaseWildfireScreen {
         graphics.blit(guiTextured(), currentTab.background, this.width / 2 - 42, this.height / 2 - 43, 0, 0, 178, currentTab.backgroundHeight, 512, 512);
         drawScrollingString(graphics, getTitle(), 0, (height / 2) - 82, TextAlignment.CENTER, CommonColors.WHITE, graphics.guiWidth(), 5, false);
 
-        //? if >=26.4-snapshot-8 {
+        //? if >=26.4-* {
         int mouseX = graphics.mouseX();
         int mouseY = graphics.mouseY();
         //?}

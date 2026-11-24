@@ -34,7 +34,7 @@ public final class GenderSuggestionProvider {
     *///?}
 
     public static SuggestionProvider<CommandSourceStack> getSuggestionProvider() {
-        //? if >=26.4-snapshot-8 {
+        //? if >=26.4-* {
         return net.minecraft.commands.suggestions.SuggestLiteralString.suggestLiteral(names().toArray(String[]::new));
         //?} else {
         /*return INSTANCE;
